@@ -134,7 +134,7 @@ const MoneyListUI = ({ exchanges: { cnyToJpy, twdToJpy, usdToJpy } }) => {
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>
-                    <span className="text-xs">美元:{usdToJpy};<br />人民币:{cnyToJpy};<br />台币:{twdToJpy}</span>
+                    <span className="text-[10px]">美元:{usdToJpy};<br />人民币:{cnyToJpy};<br />台币:{twdToJpy}</span>
                 </div>
                 <Button className="" variant="outline">图表</Button>
             </div>
