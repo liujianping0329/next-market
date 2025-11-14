@@ -35,7 +35,7 @@ import ky from "ky";
 const MoneyListUI = ({ exchanges: { cnyToJpy, twdToJpy, usdToJpy } }) => {
     return (
         <>
-            <div id="toolBar" className="flex p-2.5 justify-between">
+            <div id="toolBar" className="flex p-2.5 justify-between overflow-x-auto items-center">
                 <div className="flex space-x-2 items-center">
                     <Dialog>
                         <DialogTrigger asChild>
@@ -134,9 +134,9 @@ const MoneyListUI = ({ exchanges: { cnyToJpy, twdToJpy, usdToJpy } }) => {
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>
-                    <span>美元:{usdToJpy};人民币:{cnyToJpy};台币:{twdToJpy}</span>
+                    <span className="text-xs">美元:{usdToJpy};<br />人民币:{cnyToJpy};<br />台币:{twdToJpy}</span>
                 </div>
-                <Button variant="outline">图表</Button>
+                <Button className="" variant="outline">图表</Button>
             </div>
             <div className="p-2.5">
             <Table>
