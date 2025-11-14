@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/table"
 import { useEffect } from "react";
 import ky from "ky";
+import Datepicker from "./_component/datepicker";
 
 const MoneyListUI = ({ exchanges: { cnyToJpy, twdToJpy, usdToJpy } }) => {
     return (
@@ -51,7 +52,7 @@ const MoneyListUI = ({ exchanges: { cnyToJpy, twdToJpy, usdToJpy } }) => {
                                         <FieldGroup>
                                         <Field>
                                         <FieldLabel htmlFor="dateX">日期</FieldLabel>
-                                        <Input id="dateX" type="text" placeholder="请输入日期" />
+                                        <Datepicker dateDf={new Date()} />
                                         </Field>
                                         <Field>
                                         <FieldLabel  htmlFor="jpyX">日币（万）</FieldLabel>
@@ -98,7 +99,7 @@ const MoneyListUI = ({ exchanges: { cnyToJpy, twdToJpy, usdToJpy } }) => {
                                         <FieldGroup>
                                         <Field>
                                         <FieldLabel htmlFor="dateL">日期</FieldLabel>
-                                        <Input id="dateL" type="text" placeholder="请输入日期" />
+                                        <Datepicker dateDf={new Date()} />
                                         </Field>
                                         <Field>
                                         <FieldLabel  htmlFor="jpyL">日币（万）</FieldLabel>

@@ -27,7 +27,7 @@ export async function MoneyList () {
         next: { revalidate: 7200 }
       }).then(r => r.json()),
     ]);
-    return <MoneyListUI exchanges = {{cnyToJpy,twdToJpy,usdToJpy}} />;
+    return <MoneyListUI exchanges = {{cnyToJpy:Number(cnyToJpy).toFixed(2),twdToJpy:Number(twdToJpy).toFixed(2),usdToJpy:Number(usdToJpy).toFixed(2)}} />;
 }
 
 export default MoneyList;
