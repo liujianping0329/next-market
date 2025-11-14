@@ -1,5 +1,5 @@
 import MoneyListUI from './pageUI';
-
+export const revalidate = 0;
 export async function MoneyList () {
     const paraExchange = {
         to: 'JPY',
@@ -31,3 +31,4 @@ export async function MoneyList () {
 }
 
 export default MoneyList;
+
