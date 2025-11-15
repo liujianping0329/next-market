@@ -18,13 +18,14 @@ const formatDateLocal = (date) => {
       return `${y}-${m}-${d}`;
 };
 
-const Datepicker = ({ dateDf }) => {
+const Datepicker = ({ dateDf, onChange }) => {
     const [date, setDate] = useState(dateDf);
     const [open, setOpen] = useState(false);
     
 
     const calendarSelect = (date) => {
         setDate(date);
+        onChange(date);
         setOpen(false);
     }
     return (

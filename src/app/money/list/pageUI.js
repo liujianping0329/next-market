@@ -32,6 +32,7 @@ import {
 import { useEffect } from "react";
 import ky from "ky";
 import Datepicker from "./_component/datepicker";
+import FormX from "./_component/form/formX";
 
 const MoneyListUI = ({ exchanges: { cnyToJpy, twdToJpy, usdToJpy } }) => {
     return (
@@ -46,41 +47,12 @@ const MoneyListUI = ({ exchanges: { cnyToJpy, twdToJpy, usdToJpy } }) => {
                             <DialogHeader>
                                 <DialogTitle>记账本</DialogTitle>
                             </DialogHeader>
-                            <div className="w-full">
-                                <FieldGroup>
-                                    <FieldSet>
-                                        <FieldGroup>
-                                        <Field>
-                                        <FieldLabel htmlFor="dateX">日期</FieldLabel>
-                                        <Datepicker dateDf={new Date()} />
-                                        </Field>
-                                        <Field>
-                                        <FieldLabel  htmlFor="jpyX">日币（万）</FieldLabel>
-                                        <Input id="jpyX" type="text" placeholder="请输入金额" />
-                                        </Field>
-                                        <Field>
-                                        <FieldLabel  htmlFor="twdX">台币</FieldLabel>
-                                        <Input id="twdX" type="text" placeholder="请输入金额" />
-                                        </Field>
-                                        </FieldGroup>
-                                    </FieldSet>
-                                <FieldSeparator />
-                                    <FieldSet>
-                                        <FieldLabel>投资</FieldLabel>
-                                        <FieldGroup>
-                                        <Field>
-                                        <FieldLabel  htmlFor="nisaX">NISA（万jpy）</FieldLabel>
-                                        <Input id="nisaX" type="text" placeholder="请输入金额" />
-                                        </Field>
-                                        </FieldGroup>
-                                    </FieldSet> 
-                                </FieldGroup>
-                            </div>
+                            <FormX />
                             <DialogFooter>
                                 <DialogClose asChild>
                                     <Button variant="outline">关闭</Button>
                                 </DialogClose>
-                                <Button type="submit">保存</Button>
+                                <Button type="submit" form="formX">保存</Button>
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>
