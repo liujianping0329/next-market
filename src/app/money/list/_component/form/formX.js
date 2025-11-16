@@ -23,9 +23,9 @@ import { useForm } from "react-hook-form";
 const FormX = () => {
     const form = useForm({
         defaultValues: {
-            dateX: new Date(),
+            date: new Date(),
             jpyX: 0,
-            twdX: 0,
+            twd: 0,
             nisaX: 0
         }
     });
@@ -45,7 +45,7 @@ const FormX = () => {
                                 <FieldLabel htmlFor="dateX">日期</FieldLabel>
                                 <Datepicker dateDf={new Date()} />
                             </Field> */}
-                            <FormField name="dateX" control={form.control}
+                            <FormField name="date" control={form.control}
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>日期</FormLabel>
@@ -78,7 +78,7 @@ const FormX = () => {
                                     </FormItem>
                                 )}
                             />
-                            <FormField name="twdX" control={form.control}
+                            <FormField name="twd" control={form.control}
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>台币</FormLabel>

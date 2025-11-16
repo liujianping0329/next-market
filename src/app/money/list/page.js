@@ -1,4 +1,6 @@
+import ky from 'ky';
 import MoneyListUI from './pageUI';
+import supabase from '../../utils/database';
 export const revalidate = 0;
 export async function MoneyList () {
     const paraExchange = {
@@ -27,7 +29,9 @@ export async function MoneyList () {
         next: { revalidate: 7200 }
       }).then(r => r.json()),
     ]);
-    return <MoneyListUI exchanges = {{cnyToJpy:Number(cnyToJpy).toFixed(2),twdToJpy:Number(twdToJpy).toFixed(2),usdToJpy:Number(usdToJpy).toFixed(2)}} />;
+    const{ data:list } = await supabase.from("money").select();
+    console.log("Money list fetched:", list);
+    return <MoneyListUI list = {list} exchanges = {{cnyToJpy:Number(cnyToJpy).toFixed(2),twdToJpy:Number(twdToJpy).toFixed(2),usdToJpy:Number(usdToJpy).toFixed(2)}} />;
 }
 
 export default MoneyList;
