@@ -36,8 +36,19 @@ import FormX from "./_component/form/formX";
 
 export const revalidate = 0;
 
-const MoneyListUI = ({ list, exchanges: { cnyToJpy, twdToJpy, usdToJpy } }) => {
+const MoneyListUI = ({ exchanges: { cnyToJpy, twdToJpy, usdToJpy } }) => {
     const [openX, setOpenX] =  useState(false);
+    const [list, setList] = useState([]);
+
+    const fetchList = async () => {
+        const response = await ky.get('/api/money/list').json();
+        setList(response.list);
+    }
+
+    useEffect(() => {
+        fetchList();
+    }, []);
+
     return (
         <>
             <div id="toolBar" className="flex p-2.5 justify-between overflow-x-auto items-center">
@@ -52,6 +63,7 @@ const MoneyListUI = ({ list, exchanges: { cnyToJpy, twdToJpy, usdToJpy } }) => {
                             </DialogHeader>
                             <FormX onSuccess={()=>{
                                 setOpenX(false);
+                                fetchList();
                             }} exchanges = {{ cnyToJpy, twdToJpy, usdToJpy }}/>
                             <DialogFooter>
                                 <DialogClose asChild>
