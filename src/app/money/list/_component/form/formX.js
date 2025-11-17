@@ -19,19 +19,30 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { useForm } from "react-hook-form";
+import { formatDateLocal } from "../../../../../lib/date";
+import ky from "ky";
 
-const FormX = () => {
+const FormX = ({ onSuccess, exchanges }) => {
     const form = useForm({
         defaultValues: {
             date: new Date(),
-            jpyX: 0,
-            twd: 0,
-            nisaX: 0
+            jpyX: "",
+            twd: "",
+            nisaX: ""
         }
     });
 
-    const onSubmit = (values) => {
-        alert(JSON.stringify(values, null, 2));
+    const onSubmit = async (values) => {
+        alert(JSON.stringify(exchanges, null, 2));
+        await ky.post('/api/money/upsert', {
+          json: {
+            ...values,
+            date : formatDateLocal(values.date),
+            from : "X",
+            ...exchanges
+          }
+        }).json();
+        onSuccess();
     }
     return (
         <>

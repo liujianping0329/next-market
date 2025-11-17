@@ -29,8 +29,7 @@ export async function MoneyList () {
         next: { revalidate: 7200 }
       }).then(r => r.json()),
     ]);
-    const{ data:list } = await supabase.from("money").select();
-    console.log("Money list fetched:", list);
+    const{ data:list } = await supabase.from("money").select().order('date', { ascending: false });
     return <MoneyListUI list = {list} exchanges = {{cnyToJpy:Number(cnyToJpy).toFixed(2),twdToJpy:Number(twdToJpy).toFixed(2),usdToJpy:Number(usdToJpy).toFixed(2)}} />;
 }
 

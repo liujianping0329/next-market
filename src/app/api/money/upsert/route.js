@@ -3,6 +3,7 @@ import supabase from "../../../utils/database";
 
 export async function POST(request, context) {
     const requestBody = await request.json();
+    console.log("Insert Data:", requestBody);
 
     Object.keys(requestBody).forEach((key) => {
         const v = requestBody[key];
@@ -61,7 +62,6 @@ export async function POST(request, context) {
                 zsbc: requestBody.zsbc
             };
         }
-        console.log("Insert Data:", insertData.total);
         insertData.total = +insertData.total.toFixed(2);
         const { data:insertRes } = await supabase.from("money").insert(insertData).select();
         upsertId = insertRes[0].id;

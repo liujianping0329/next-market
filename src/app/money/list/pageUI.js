@@ -29,17 +29,20 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import ky from "ky";
 import Datepicker from "./_component/datepicker";
 import FormX from "./_component/form/formX";
 
+export const revalidate = 0;
+
 const MoneyListUI = ({ list, exchanges: { cnyToJpy, twdToJpy, usdToJpy } }) => {
+    const [openX, setOpenX] =  useState(false);
     return (
         <>
             <div id="toolBar" className="flex p-2.5 justify-between overflow-x-auto items-center">
                 <div className="flex space-x-2 items-center">
-                    <Dialog>
+                    <Dialog open={openX} onOpenChange={setOpenX}>
                         <DialogTrigger asChild>
                             <Button variant="outline">（许）进帐</Button>
                         </DialogTrigger>
@@ -47,7 +50,9 @@ const MoneyListUI = ({ list, exchanges: { cnyToJpy, twdToJpy, usdToJpy } }) => {
                             <DialogHeader>
                                 <DialogTitle>记账本</DialogTitle>
                             </DialogHeader>
-                            <FormX />
+                            <FormX onSuccess={()=>{
+                                setOpenX(false);
+                            }} exchanges = {{ cnyToJpy, twdToJpy, usdToJpy }}/>
                             <DialogFooter>
                                 <DialogClose asChild>
                                     <Button variant="outline">关闭</Button>
