@@ -17,7 +17,9 @@ export async function POST(request, context) {
     let upsertId = -1;
     if (curDateMoney) {
         if(requestBody.from === "X") {
-            curDateMoney.total = requestBody.jpyX + (requestBody.twd * requestBody.twdToJpy / 10000) + requestBody.nisaX;
+            curDateMoney.total = requestBody.jpyX + (requestBody.twd * curDateMoney.twdToJpy / 10000) + requestBody.nisaX
+                + (curDateMoney.detail.jpyL??0) + ((curDateMoney.detail.zfb??0) * curDateMoney.cnyToJpy / 10000) + (curDateMoney.detail.cnbj??0)
+                + ((curDateMoney.detail.zsbc??0) * curDateMoney.cnyToJpy / 10000);
             curDateMoney.detail = {
                 ...curDateMoney.detail,
                 jpyX: requestBody.jpyX,
@@ -25,8 +27,9 @@ export async function POST(request, context) {
                 nisaX: requestBody.nisaX
             };
         }else if(requestBody.from === "L") {
-            curDateMoney.total = requestBody.jpyL + (requestBody.zfb * requestBody.cnyToJpy / 10000) + requestBody.cnbj
-                + (requestBody.zsbc * requestBody.cnyToJpy / 10000);
+            curDateMoney.total = requestBody.jpyL + (requestBody.zfb * curDateMoney.cnyToJpy / 10000) + requestBody.cnbj
+                + (requestBody.zsbc * curDateMoney.cnyToJpy / 10000)
+                + (curDateMoney.detail.jpyX??0) + ((curDateMoney.detail.twd??0) * curDateMoney.twdToJpy / 10000) + (curDateMoney.detail.nisaX??0);
             curDateMoney.detail = {
                 ...curDateMoney.detail,
                 jpyL: requestBody.jpyL,

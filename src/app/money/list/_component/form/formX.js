@@ -33,7 +33,6 @@ const FormX = ({ onSuccess, exchanges }) => {
     });
 
     const onSubmit = async (values) => {
-        alert(JSON.stringify(exchanges, null, 2));
         await ky.post('/api/money/upsert', {
           json: {
             ...values,

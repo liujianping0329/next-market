@@ -33,11 +33,13 @@ import { useEffect, useState } from "react";
 import ky from "ky";
 import Datepicker from "./_component/datepicker";
 import FormX from "./_component/form/formX";
+import FormL from "./_component/form/formL";
 
 export const revalidate = 0;
 
 const MoneyListUI = ({ exchanges: { cnyToJpy, twdToJpy, usdToJpy } }) => {
     const [openX, setOpenX] =  useState(false);
+    const [openL, setOpenL] =  useState(false);
     const [list, setList] = useState([]);
 
     const fetchList = async () => {
@@ -74,7 +76,7 @@ const MoneyListUI = ({ exchanges: { cnyToJpy, twdToJpy, usdToJpy } }) => {
                         </DialogContent>
                     </Dialog>
 
-                    <Dialog>
+                    <Dialog open={openL} onOpenChange={setOpenL}>
                         <DialogTrigger asChild>
                             <Button variant="outline">（刘）进帐</Button>
                         </DialogTrigger>
@@ -82,45 +84,15 @@ const MoneyListUI = ({ exchanges: { cnyToJpy, twdToJpy, usdToJpy } }) => {
                             <DialogHeader>
                                 <DialogTitle>记账本</DialogTitle>
                             </DialogHeader>
-                            <div className="w-full">
-                                <FieldGroup>
-                                    <FieldSet>
-                                        <FieldGroup>
-                                            <Field>
-                                                <FieldLabel htmlFor="date">日期</FieldLabel>
-                                                <Datepicker dateDf={new Date()} />
-                                            </Field>
-                                            <Field>
-                                                <FieldLabel htmlFor="jpyL">日币（万）</FieldLabel>
-                                                <Input id="jpyL" type="text" placeholder="请输入金额" />
-                                            </Field>
-                                            <Field>
-                                                <FieldLabel htmlFor="zfb">支付宝</FieldLabel>
-                                                <Input id="zfb" type="text" placeholder="请输入金额" />
-                                            </Field>
-                                        </FieldGroup>
-                                    </FieldSet>
-                                    <FieldSeparator />
-                                    <FieldSet>
-                                        <FieldLabel>金库</FieldLabel>
-                                        <FieldGroup>
-                                            <Field>
-                                                <FieldLabel htmlFor="cnbj">中行日元（万）</FieldLabel>
-                                                <Input id="cnbj" type="text" placeholder="请输入金额" />
-                                            </Field>
-                                            <Field>
-                                                <FieldLabel htmlFor="zsbc">招行人民币</FieldLabel>
-                                                <Input id="zsbc" type="text" placeholder="请输入金额" />
-                                            </Field>
-                                        </FieldGroup>
-                                    </FieldSet>
-                                </FieldGroup>
-                            </div>
+                            <FormL onSuccess={()=>{
+                                setOpenL(false);
+                                fetchList();
+                            }} exchanges = {{ cnyToJpy, twdToJpy, usdToJpy }}/>
                             <DialogFooter>
                                 <DialogClose asChild>
                                     <Button variant="outline">关闭</Button>
                                 </DialogClose>
-                                <Button type="submit">保存</Button>
+                                <Button type="submit" form="formL">保存</Button>
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>
