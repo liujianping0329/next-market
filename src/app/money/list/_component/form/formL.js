@@ -23,7 +23,7 @@ import { formatDateLocal } from "../../../../../lib/date";
 import ky from "ky";
 
 
-const FormL = ({ onSuccess, exchanges }) => {
+const FormL = ({ onSuccess, exchanges ,btnStatus }) => {
     const form = useForm({
         defaultValues: {
             date: new Date(),
@@ -34,6 +34,7 @@ const FormL = ({ onSuccess, exchanges }) => {
         }
     });
     const onSubmit = async (values) => {
+        btnStatus(true);
         await ky.post('/api/money/upsert', {
             json: {
                 ...values,
@@ -47,6 +48,7 @@ const FormL = ({ onSuccess, exchanges }) => {
             }
         }).json();
         onSuccess();
+        btnStatus(false);
     }
 
     return (

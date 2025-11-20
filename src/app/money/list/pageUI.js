@@ -34,6 +34,7 @@ import ky from "ky";
 import Datepicker from "./_component/datepicker";
 import FormX from "./_component/form/formX";
 import FormL from "./_component/form/formL";
+import { Spinner } from "@/components/ui/spinner"
 
 export const revalidate = 0;
 
@@ -41,6 +42,8 @@ const MoneyListUI = ({ exchanges: { cnyToJpy, twdToJpy, usdToJpy } }) => {
     const [openX, setOpenX] =  useState(false);
     const [openL, setOpenL] =  useState(false);
     const [list, setList] = useState([]);
+    const [isLoadX, setIsLoadX] = useState(false);
+    const [isLoadL, setIsLoadL] = useState(false);
 
     const fetchList = async () => {
         const response = await ky.get('/api/money/list').json();
@@ -66,12 +69,14 @@ const MoneyListUI = ({ exchanges: { cnyToJpy, twdToJpy, usdToJpy } }) => {
                             <FormX onSuccess={()=>{
                                 setOpenX(false);
                                 fetchList();
-                            }} exchanges = {{ cnyToJpy, twdToJpy, usdToJpy }}/>
+                            }} exchanges = {{ cnyToJpy, twdToJpy, usdToJpy }} btnStatus = {setIsLoadX}/>
                             <DialogFooter>
                                 <DialogClose asChild>
                                     <Button variant="outline">关闭</Button>
                                 </DialogClose>
-                                <Button type="submit" form="formX">保存</Button>
+                                <Button type="submit" form="formX" disabled = {isLoadX}>
+                                    {isLoadX && <Spinner />}保存
+                                </Button>
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>
@@ -87,12 +92,14 @@ const MoneyListUI = ({ exchanges: { cnyToJpy, twdToJpy, usdToJpy } }) => {
                             <FormL onSuccess={()=>{
                                 setOpenL(false);
                                 fetchList();
-                            }} exchanges = {{ cnyToJpy, twdToJpy, usdToJpy }}/>
+                            }} exchanges = {{ cnyToJpy, twdToJpy, usdToJpy }} btnStatus = {setIsLoadL}/>
                             <DialogFooter>
                                 <DialogClose asChild>
                                     <Button variant="outline">关闭</Button>
                                 </DialogClose>
-                                <Button type="submit" form="formL">保存</Button>
+                                <Button type="submit" form="formL" disabled = {isLoadL}>
+                                    {isLoadL && <Spinner />}保存
+                                </Button>
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>

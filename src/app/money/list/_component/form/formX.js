@@ -22,7 +22,7 @@ import { useForm } from "react-hook-form";
 import { formatDateLocal } from "../../../../../lib/date";
 import ky from "ky";
 
-const FormX = ({ onSuccess, exchanges }) => {
+const FormX = ({ onSuccess, exchanges, btnStatus }) => {
     const form = useForm({
         defaultValues: {
             date: new Date(),
@@ -33,6 +33,7 @@ const FormX = ({ onSuccess, exchanges }) => {
     });
 
     const onSubmit = async (values) => {
+        btnStatus(true);
         await ky.post('/api/money/upsert', {
             json: {
                 ...values,
@@ -45,6 +46,7 @@ const FormX = ({ onSuccess, exchanges }) => {
             }
         }).json();
         onSuccess();
+        btnStatus(false);
     }
     return (
         <>
