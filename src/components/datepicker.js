@@ -10,7 +10,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { useState } from "react";
-import { formatDateLocal } from "../../../../lib/date";
+import { formatDateLocal } from "../lib/date";
 
 const Datepicker = ({ dateDf, onChange }) => {
     const [date, setDate] = useState(dateDf);
