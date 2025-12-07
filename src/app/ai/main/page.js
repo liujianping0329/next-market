@@ -10,16 +10,16 @@ export async function AiMainPage () {
             contents: '今天的国际新闻摘要',
         });
 
-        const response2 = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: '美股和日股今日走势分析',
-        });
+        // const response2 = await ai.models.generateContent({
+        //     model: 'gemini-2.5-flash',
+        //     contents: '美股和日股今日走势分析',
+        // });
 
-        const response3 = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: '东京最新周末好去处推荐，商场活动',
-        });
-    return <AiMainPageUI data={response3.text} />;
+        // const response3 = await ai.models.generateContent({
+        //     model: 'gemini-2.5-flash',
+        //     contents: '东京最新周末好去处推荐，商场活动',
+        // });
+    return <AiMainPageUI data={response1.text} />;
 }
 
 export default AiMainPage;
