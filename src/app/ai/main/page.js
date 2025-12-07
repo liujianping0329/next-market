@@ -1,3 +1,4 @@
+import { GoogleGenAI } from "@google/genai";
 import AiMainPageUI from "./pageUI";
 
 export async function AiMainPage () {
