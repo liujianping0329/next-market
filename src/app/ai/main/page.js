@@ -19,7 +19,7 @@ export async function AiMainPage () {
             model: 'gemini-2.5-flash',
             contents: '东京最新周末好去处推荐，商场活动',
         });
-    return <AiMainPageUI data={response.text} />;
+    return <AiMainPageUI data={response3.text} />;
 }
 
 export default AiMainPage;
