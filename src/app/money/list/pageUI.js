@@ -29,9 +29,10 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ky from "ky";
 import FormX from "./_component/form/formX";
+import Bar , { toBarChartData } from "./_component/chart/bar";
 import FormL from "./_component/form/formL";
 import { Spinner } from "@/components/ui/spinner"
 
@@ -40,9 +41,12 @@ export const revalidate = 0;
 const MoneyListUI = ({ exchanges: { cnyToJpy, twdToJpy, usdToJpy } }) => {
     const [openX, setOpenX] =  useState(false);
     const [openL, setOpenL] =  useState(false);
+    const [openChart, setOpenChart] =  useState(false);
     const [list, setList] = useState([]);
     const [isLoadX, setIsLoadX] = useState(false);
     const [isLoadL, setIsLoadL] = useState(false);
+
+    const chartData = useMemo(() => toBarChartData(list), [list]);
 
     const fetchList = async () => {
         const response = await ky.get('/api/money/list').json();
@@ -104,7 +108,22 @@ const MoneyListUI = ({ exchanges: { cnyToJpy, twdToJpy, usdToJpy } }) => {
                     </Dialog>
                     <span className="text-[10px] whitespace-nowrap">美元:{usdToJpy};<br />人民币:{cnyToJpy};<br />台币:{twdToJpy}</span>
                 </div>
-                <Button className="" variant="outline">图表</Button>
+                <Dialog open={openChart} onOpenChange={setOpenChart}>
+                    <DialogTrigger asChild>
+                        <Button className="" variant="outline">图表</Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>图表</DialogTitle>
+                        </DialogHeader>
+                        <Bar data={chartData} />
+                        <DialogFooter>
+                            <DialogClose asChild>
+                                <Button variant="outline">关闭</Button>
+                            </DialogClose>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </div>
             <div className="p-2.5">
                 <Table>
@@ -120,26 +139,56 @@ const MoneyListUI = ({ exchanges: { cnyToJpy, twdToJpy, usdToJpy } }) => {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {list.map((row) => (
-                            <TableRow key={row.id}>
-                                <TableCell>{row.date}</TableCell>
-                                <TableCell>{row.usdToJpy}</TableCell>
-                                <TableCell>{row.cnyToJpy}</TableCell>
-                                <TableCell>{row.twdToJpy}</TableCell>
+                        {list.map((row, index) => {
+                            const next = list[index + 1];
+                            const profit =
+                                next ? Number(row.total) - Number(next.total) : null;
+                            const isPositive = profit !== null && profit > 0;
+                            const isNegative = profit !== null && profit < 0;
+                            
+                                return (
+                                    <TableRow key={row.id}>
+                                        <TableCell>{row.date}</TableCell>
+                                        <TableCell>{row.usdToJpy}</TableCell>
+                                        <TableCell>{row.cnyToJpy}</TableCell>
+                                        <TableCell>{row.twdToJpy}</TableCell>
 
-                                {/* total 显示两位小数 */}
-                                <TableCell>{Number(row.total).toFixed(2)}</TableCell>
+                                        {/* total 显示两位小数 */}
+                                        <TableCell>{Number(row.total).toFixed(2)}</TableCell>
 
-                                {/* 盈亏先留空 */}
-                                <TableCell>—</TableCell>
+                                        {/* 盈亏先留空 */}
+                                        <TableCell className="flex items-center gap-1">
+                                            {profit === null ? (
+                                                  "—"
+                                                ) : (
+                                                  <>
+                                                    <span
+                                                      className={
+                                                        isPositive
+                                                          ? "text-red-600"
+                                                          : isNegative
+                                                          ? "text-green-600"
+                                                          : ""
+                                                      }
+                                                    >
+                                                      {isPositive && "▲"}
+                                                      {isNegative && "▼"}
+                                                      {profit >= 0
+                                                        ? `+${profit.toFixed(2)}`
+                                                        : profit.toFixed(2)}
+                                                    </span>
+                                                  </>
+                                                )}
+                                        </TableCell>
 
-                                <TableCell>
-                                    <Button size="sm" variant="outline">
-                                        编辑
-                                    </Button>
-                                </TableCell>
-                            </TableRow>
-                        ))}
+                                        <TableCell>
+                                            <Button size="sm" variant="outline">
+                                                编辑
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                            )
+                        })}
                     </TableBody>
                 </Table>
             </div>
