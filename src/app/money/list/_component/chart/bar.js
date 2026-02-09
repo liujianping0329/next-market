@@ -39,7 +39,7 @@ const Bar = ({ data }) => {
       moneyL: "刘",
     };
     return (
-        <div className="w-full max-w-[700px] aspect-[1.618]">
+        <div className="w-full max-w-[700px] aspect-[4/5] sm:aspect-[1.618]">
             <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={data}
                     margin={{
