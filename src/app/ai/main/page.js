@@ -3,12 +3,9 @@ import AiMainPageUI from "./pageUI";
 
 export async function AiMainPage () {
 
-    const ai = new GoogleGenAI({ apiKey: "AIzaSyDmKNV2Jj62OAsLxfCT0kgeJpBL4grgCLQ" });
+    // const ai = new GoogleGenAI({ apiKey: "AIzaSyDmKNV2Jj62OAsLxfCT0kgeJpBL4grgCLQ" });
     
-        const response1 = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: '今天的国际新闻摘要',
-        });
+        const response1 = { text: "欢迎使用AI助手！请告诉我您需要什么帮助。" };
 
         // const response2 = await ai.models.generateContent({
         //     model: 'gemini-2.5-flash',
