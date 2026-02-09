@@ -49,7 +49,15 @@ const Bar = ({ data }) => {
                       bottom: 0,
                     }}
                 >
-                    <XAxis dataKey="date" />
+                    <XAxis
+                      dataKey="date"
+                      tickFormatter={(v) => String(v).slice(5).replace("-", "/")}
+                      tick={{ fontSize: 10 }}
+                      angle={-35}
+                      textAnchor="end"
+                      height={50}
+                      interval="preserveStartEnd"
+                    />
                     <YAxis domain={[0, 'dataMax + 20']} />
                     <Tooltip
                       formatter={(value, name) => {
