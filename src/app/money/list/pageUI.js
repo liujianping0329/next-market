@@ -35,16 +35,20 @@ import FormX from "./_component/form/formX";
 import Bar , { toBarChartData } from "./_component/chart/bar";
 import FormL from "./_component/form/formL";
 import { Spinner } from "@/components/ui/spinner"
+import FormMemo from "./_component/form/formMemo";
 
 export const revalidate = 0;
 
 const MoneyListUI = ({ exchanges: { cnyToJpy, twdToJpy, usdToJpy } }) => {
     const [openX, setOpenX] =  useState(false);
     const [openL, setOpenL] =  useState(false);
+    const [openMemo, setOpenMemo] =  useState(false);
+
     const [openChart, setOpenChart] =  useState(false);
     const [list, setList] = useState([]);
     const [isLoadX, setIsLoadX] = useState(false);
     const [isLoadL, setIsLoadL] = useState(false);
+    const [isLoadMemo, setIsLoadMemo] = useState(false);
 
     const chartData = useMemo(() => toBarChartData(list), [list]);
 
@@ -102,6 +106,29 @@ const MoneyListUI = ({ exchanges: { cnyToJpy, twdToJpy, usdToJpy } }) => {
                                 </DialogClose>
                                 <Button type="submit" form="formL" disabled = {isLoadL}>
                                     {isLoadL && <Spinner />}保存
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+
+                    <Dialog open={openMemo} onOpenChange={setOpenMemo}>
+                        <DialogTrigger asChild>
+                            <Button variant="outline">记一笔</Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>记一笔支出/收入</DialogTitle>
+                            </DialogHeader>
+                            <FormMemo onSuccess={()=>{
+                                setOpenMemo(false);
+                                fetchList();
+                            }} btnStatus = {setIsLoadMemo}/>
+                            <DialogFooter>
+                                <DialogClose asChild>
+                                    <Button variant="outline">关闭</Button>
+                                </DialogClose>
+                                <Button type="submit" form="formMemo" disabled = {isLoadMemo}>
+                                    {isLoadMemo && <Spinner />}保存
                                 </Button>
                             </DialogFooter>
                         </DialogContent>

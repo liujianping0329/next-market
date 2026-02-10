@@ -24,6 +24,7 @@
     "ky": "^1.14.0",
     "lucide-react": "^0.553.0",
     "next": "15.5.7",
+    "radix-ui": "^1.4.3",
     "react": "19.2.1",
     "react-day-picker": "^9.11.1",
     "react-dom": "19.2.1",

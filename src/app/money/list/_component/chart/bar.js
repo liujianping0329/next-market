@@ -58,6 +58,7 @@ const Bar = ({ data }) => {
                       height={50}
                       interval="preserveStartEnd"
                     />
+                    {/* <YAxis domain={['dataMin - 20', 'dataMax + 20']} /> */}
                     <YAxis domain={[0, 'dataMax + 20']} />
                     <Tooltip
                       formatter={(value, name) => {
@@ -65,9 +66,9 @@ const Bar = ({ data }) => {
                         return [Number(value).toFixed(2), label];
                       }}
                     />
+                    {/* <Area type="monotone" dataKey="total" stroke="#84a8d8ff" fill="#84a8d8ff" /> */}
                     <Area type="monotone" dataKey="moneyX" stackId="1" stroke="#84a8d8ff" fill="#84a8d8ff" />
                     <Area type="monotone" dataKey="moneyL" stackId="1" stroke="#ca82b8ff" fill="#ca82b8ff" />
-                    {/* <Area type="monotone" dataKey="amt" stackId="1" stroke="#ffc658" fill="#ffc658" /> */}
                 </AreaChart>
             </ResponsiveContainer>
         </div>
