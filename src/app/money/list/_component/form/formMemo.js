@@ -33,7 +33,7 @@ const FormMemo = ({ onSuccess, btnStatus }) => {
     const form = useForm({
         defaultValues: {
             date: new Date(),
-            name: "",
+            price: 0,
             kind: "家电",
             memo: ""
         }
@@ -74,10 +74,10 @@ const FormMemo = ({ onSuccess, btnStatus }) => {
                                         <FormMessage />
                                     </FormItem>
                                 )} />
-                            <FormField name="name" control={form.control}
+                            <FormField name="price" control={form.control}
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>名目</FormLabel>
+                                        <FormLabel>价格（万日元）</FormLabel>
                                         <FormControl>
                                             <Input {...field} />
                                         </FormControl>
