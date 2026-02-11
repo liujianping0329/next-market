@@ -26,8 +26,10 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
+import ky from "ky";
 
 import Datepicker from "../../../../../components/datepicker";
+import { formatDateLocal } from "@/lib/date";
 
 const FormMemo = ({ onSuccess, btnStatus }) => {
     const form = useForm({
@@ -41,19 +43,9 @@ const FormMemo = ({ onSuccess, btnStatus }) => {
 
     const onSubmit = async (values) => {
         btnStatus(true);
-        alert(JSON.stringify(values));
-        // await ky.post('/api/money/upsert', {
-        //     json: {
-        //         ...values,
-        //         jpyL: values.jpyL === "" ? 0 : values.jpyL,
-        //         zfb: values.zfb === "" ? 0 : values.zfb,
-        //         cnbj: values.cnbj === "" ? 0 : values.cnbj,
-        //         zsbc: values.zsbc === "" ? 0 : values.zsbc,
-        //         date: formatDateLocal(values.date),
-        //         from: "L",
-        //         ...exchanges
-        //     }
-        // }).json();
+        await ky.post('/api/money/memo/upsert', {
+            json: {...values, date: formatDateLocal(values.date)}
+        }).json();
         onSuccess();
         btnStatus(false);
     }
@@ -75,11 +67,17 @@ const FormMemo = ({ onSuccess, btnStatus }) => {
                                     </FormItem>
                                 )} />
                             <FormField name="price" control={form.control}
+                                rules={{ required: true }}
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>价格（万日元）</FormLabel>
                                         <FormControl>
-                                            <Input {...field} />
+                                            <Input type="number" step="0.01" inputMode="decimal" value={field.value}
+                                            onChange={(e) => {
+                                                const n = e.target.valueAsNumber;
+                                                field.onChange(Number.isNaN(n) ? 0 : n);
+                                            }}
+                                            onBlur={() => field.onChange(Number(field.value.toFixed(2)))} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>

@@ -1,5 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button"
+import Link from "next/link";
 import {
     Field,
     FieldDescription,
@@ -209,9 +210,16 @@ const MoneyListUI = ({ exchanges: { cnyToJpy, twdToJpy, usdToJpy } }) => {
                                         </TableCell>
 
                                         <TableCell>
-                                            <Button size="sm" variant="outline">
-                                                编辑
-                                            </Button>
+                                            <div className="flex items-center gap-2">
+                                                <Button size="sm" variant="outline">
+                                                    编辑
+                                                </Button>
+                                                <Button size="sm" variant="outline" asChild>
+                                                  <Link href={`/money/memo/${row.id}`}>
+                                                    详情
+                                                  </Link>
+                                                </Button>
+                                            </div>
                                         </TableCell>
                                     </TableRow>
                             )
