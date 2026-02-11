@@ -37,6 +37,7 @@ import Bar , { toBarChartData } from "./_component/chart/bar";
 import FormL from "./_component/form/formL";
 import { Spinner } from "@/components/ui/spinner"
 import FormMemo from "./_component/form/formMemo";
+import { formatDateLocal } from "@/lib/date";
 
 export const revalidate = 0;
 
@@ -167,6 +168,25 @@ const MoneyListUI = ({ exchanges: { cnyToJpy, twdToJpy, usdToJpy } }) => {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
+                        <TableRow className="bg-red-50 font-semibold border-l-4 border-red-400">
+                            <TableCell>（现在）{formatDateLocal(new Date())}</TableCell>
+                            <TableCell>{usdToJpy}</TableCell>
+                            <TableCell>{cnyToJpy}</TableCell>
+                            <TableCell>{twdToJpy}</TableCell>
+                            {/* total 显示两位小数 */}
+                            <TableCell>—</TableCell>
+                            {/* 盈亏先留空 */}
+                            <TableCell>—</TableCell>
+                            <TableCell>
+                                <div className="flex items-center gap-2">
+                                    <Button size="sm" variant="outline" asChild>
+                                      <Link href={`/money/memo/-1`}>
+                                        详情
+                                      </Link>
+                                    </Button>
+                                </div>
+                            </TableCell>
+                        </TableRow>
                         {list.map((row, index) => {
                             const next = list[index + 1];
                             const profit =

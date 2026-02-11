@@ -3,7 +3,13 @@ import supabase from "@/app/utils/database";
 
 export async function MemoDetail ({ params }) {
     const { id } = await params;
-    
+    if (id === "-1") {
+        let { data: moneyMax } = await supabase.from('money').select('*')
+            .order('date', { ascending: false }).limit(1).single();
+        let { data: memoListCur } = await supabase.from('money_memo').select('*')
+            .gt('date', moneyMax?.date ?? '1900-01-01');
+        return <MemoDetailUI basicData={{}} memoList={memoListCur} />;
+    }
     let { data: money } = await supabase.from('money').select('*').eq('id', id).single();
     let { data: moneyPrev } = await supabase.from('money').select('*').lt('date', money.date)
         .order('date', { ascending: false }).limit(1).single();

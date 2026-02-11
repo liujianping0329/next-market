@@ -19,7 +19,7 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { useForm } from "react-hook-form";
-import { formatDateLocal } from "../../../../../lib/date";
+import { formatDateLocal } from "@/lib/date";
 import ky from "ky";
 import Datepicker from "../../../../../components/datepicker";
 
