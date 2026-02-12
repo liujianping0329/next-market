@@ -135,7 +135,12 @@ const MoneyListUI = ({ exchanges: { cnyToJpy, twdToJpy, usdToJpy } }) => {
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>
-                    <span className="text-[10px] whitespace-nowrap">美元:{usdToJpy};<br />人民币:{cnyToJpy};<br />台币:{twdToJpy}</span>
+                    <Button variant="outline" asChild
+                        className="bg-green-50 border-green-300 text-green-700 hover:bg-green-100">
+                      <Link href={`/money/garden/`}>
+                        青青草原
+                      </Link>
+                    </Button>
                 </div>
                 <Dialog open={openChart} onOpenChange={setOpenChart}>
                     <DialogTrigger asChild>
