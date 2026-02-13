@@ -1,4 +1,5 @@
 "use client";
+import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import {
     Form,
@@ -37,20 +38,26 @@ const FormGarden = ({ onSuccess, btnStatus }) => {
     const form = useForm({
         defaultValues: {
             date: new Date(),
-            pics: "",
+            pics: [],
             title: "",
             content: ""
         }
     });
 
+    const picRef = useRef(null)
+
     const onSubmit = async (values) => {
+        btnStatus(true);
+        const urls = await picRef.current?.upload()
+        form.setValue("pics", urls, { shouldDirty: true, shouldValidate: true })
+
         alert(JSON.stringify(values));
-    //     btnStatus(true);
     //     await ky.post('/api/money/memo/upsert', {
     //         json: {...values, date: formatDateLocal(values.date)}
     //     }).json();
     //     onSuccess();
-    //     btnStatus(false);
+        picRef.current.clear()
+        btnStatus(false);
     }
     
     return (
@@ -74,7 +81,7 @@ const FormGarden = ({ onSuccess, btnStatus }) => {
                                     <FormItem>
                                         <FormLabel>图片</FormLabel>
                                         <FormControl>
-                                            <PicUploader rhfField={field} />
+                                            <PicUploader ref={picRef} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
