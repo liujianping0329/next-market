@@ -13,10 +13,9 @@ const PicUploader = forwardRef(function PicUploader(props,ref) {
 
         const fd = new FormData()
         files.forEach((f) => fd.append("files", f))
-        alert(`Uploading ${files.length} files`);
-        // const res = await ky.post(uploadUrl, { body: fd }).json()
+        const res = await ky.post('/api/file', { body: fd }).json()
         setUploading(false)
-        return ["123","456"];
+        return res;
     }
     
     const clear = () => setFiles([])

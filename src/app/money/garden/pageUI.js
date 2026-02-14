@@ -22,17 +22,38 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { useEffect, useMemo, useState } from "react";
 import FormGarden from "./_component/form/FormGarden";
 import { Spinner } from "@/components/ui/spinner"
+import ky from "ky";
 
 export const revalidate = 0;
 
 const GardenUI = () => {
     const [openGarden, setOpenGarden] =  useState(false);
+    const [list, setList] = useState([]);
 
     const [isLoadGarden, setIsLoadGarden] = useState(false);
+
+    const fetchList = async () => {
+        const response = await ky.get('/api/money/garden/list').json();
+        setList(response.list);
+    }
+
+    useEffect(() => {
+        fetchList();
+    }, []);
     return (
         <>
             <div id="toolBar" className="flex p-2.5 justify-between overflow-x-auto items-center">
@@ -70,7 +91,29 @@ const GardenUI = () => {
                         </DialogContent>
                     </Dialog>
                 </div>
-            </div>            
+            </div>
+            <div id="cardContainer" className="p-4">
+                {list.map((item, index) => {
+                    return (
+                        <Card key={item.id} className="mx-auto w-full max-w-sm pt-0">
+                            <img
+                              src={item.pics?.[0]}
+                              className="aspect-video w-full object-cover"
+                            />
+                            <CardHeader>
+                              <CardAction>
+                                <Badge variant="secondary">Featured</Badge>
+                              </CardAction>
+                              <CardTitle>{item.title}</CardTitle>
+                              <CardDescription>
+                                {item.content}
+                              </CardDescription>
+                            </CardHeader>
+                            <CardFooter />
+                        </Card>
+                    )
+                })}   
+            </div>        
         </>
     );
 }

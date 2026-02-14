@@ -38,7 +38,6 @@ const FormGarden = ({ onSuccess, btnStatus }) => {
     const form = useForm({
         defaultValues: {
             date: new Date(),
-            pics: [],
             title: "",
             content: ""
         }
@@ -49,13 +48,11 @@ const FormGarden = ({ onSuccess, btnStatus }) => {
     const onSubmit = async (values) => {
         btnStatus(true);
         const urls = await picRef.current?.upload()
-        form.setValue("pics", urls, { shouldDirty: true, shouldValidate: true })
 
-        alert(JSON.stringify(values));
-    //     await ky.post('/api/money/memo/upsert', {
-    //         json: {...values, date: formatDateLocal(values.date)}
-    //     }).json();
-    //     onSuccess();
+        await ky.post('/api/money/garden/upsert', {
+            json: {...values, pics: urls, date: formatDateLocal(values.date)}
+        }).json();
+        onSuccess();
         picRef.current.clear()
         btnStatus(false);
     }
@@ -76,16 +73,13 @@ const FormGarden = ({ onSuccess, btnStatus }) => {
                                         <FormMessage />
                                     </FormItem>
                                 )} />
-                            <FormField name="pics" control={form.control}
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>图片</FormLabel>
-                                        <FormControl>
-                                            <PicUploader ref={picRef} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )} />
+                            <FormItem>
+                                <FormLabel>图片</FormLabel>
+                                <FormControl>
+                                    <PicUploader ref={picRef} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
                             <FormField name="title" control={form.control}
                                 render={({ field }) => (
                                     <FormItem>
