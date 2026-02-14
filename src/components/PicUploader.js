@@ -1,4 +1,7 @@
+"use client"
+
 import { forwardRef, useImperativeHandle, useState } from "react"
+import imageCompression from "browser-image-compression";
 import { Input } from "@/components/ui/input"
 import ky from "ky"
 
@@ -11,8 +14,18 @@ const PicUploader = forwardRef(function PicUploader(props,ref) {
     const upload = async () => {
         setUploading(true)
 
+        const ImgOptions = {
+          maxSizeMB: 0.8,        // 最大 0.5MB
+          maxWidthOrHeight: 1200 // 最长边 1200px
+        };
         const fd = new FormData()
-        files.forEach((f) => fd.append("files", f))
+
+        const compressedFiles = [];
+        for (const f of files) {
+          compressedFiles.push(await imageCompression(f, ImgOptions));
+        }
+
+        compressedFiles.forEach(async (f) => fd.append("files", f))
         const res = await ky.post('/api/file', { body: fd }).json()
         setUploading(false)
         return res;
