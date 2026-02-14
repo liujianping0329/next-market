@@ -78,7 +78,7 @@ const GardenUI = () => {
                             </DialogHeader>
                             <FormGarden onSuccess={()=>{
                                 setOpenGarden(false);
-                                // fetchList();
+                                fetchList();
                             }} btnStatus = {setIsLoadGarden}/>
                             <DialogFooter>
                                 <DialogClose asChild>
