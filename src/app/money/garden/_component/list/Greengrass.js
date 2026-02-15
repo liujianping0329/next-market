@@ -66,17 +66,49 @@ const Greengrass = ({ list, onAddSuccess }) => {
       </div>
       <div id="cardContainer" className="p-4">
         {list.map((item, index) => {
+
+          const hasPic = !!item.pics?.[0];
+          const len = item.title?.length || 0;
+          const size =
+            len <= 8 ? "text-4xl" :
+              len <= 16 ? "text-lg" :
+                "text-base";
+
           return (
             <Card key={item.id} className="mx-auto w-full max-w-sm pt-0">
-              <img
-                src={item.pics?.[0]}
-                className="aspect-video w-full object-cover"
-              />
+              {hasPic ? (
+                <img
+                  src={item.pics[0]}
+                  className="aspect-video w-full object-cover"
+                />
+              ) : (
+                <div className="relative aspect-video w-full overflow-hidden">
+
+                  {/* 背景图 */}
+                  <img
+                    src="/gardenNoPic.jpg"
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+
+                  {/* 半透明遮罩（防止文字看不清） */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
+
+                  {/* 中间标题 */}
+                  <div className="relative flex h-full items-center justify-center p-6 text-center">
+                    <div className="bg-black/70 px-4 py-2 rounded-lg">
+                      <h3 className={`${size} font-semibold leading-snug text-white`}>
+                        {item.title}
+                      </h3>
+                    </div>
+                  </div>
+
+                </div>
+              )}
               <CardHeader>
                 <CardAction>
                   {/* <Badge variant="secondary">Featured</Badge> */}
                 </CardAction>
-                <CardTitle>{item.title}</CardTitle>
+                {hasPic && <CardTitle>{item.title}</CardTitle>}
                 <CardDescription>
                   {item.location &&
                     <div className="mt-1 flex items-center justify-between text-xs text-muted-foreground">
