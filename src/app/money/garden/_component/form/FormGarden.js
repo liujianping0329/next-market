@@ -51,9 +51,10 @@ const FormGarden = ({ onSuccess, btnStatus }) => {
         btnStatus(true);
         const urls = await picRef.current?.upload()
 
+        const { locationPath, ...rest } = values;
         await ky.post('/api/money/garden/upsert', {
             json: {
-                ...values, pics: urls,
+                ...rest, pics: urls,
                 date: formatDateLocal(values.date),
                 location: { name: values.location, path: values.locationPath }
             }
