@@ -19,12 +19,12 @@ import {
     FieldSeparator
 } from "@/components/ui/field"
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import ky from "ky";
@@ -39,6 +39,8 @@ const FormGarden = ({ onSuccess, btnStatus }) => {
         defaultValues: {
             date: new Date(),
             title: "",
+            location: "",
+            locationPath: "",
             content: ""
         }
     });
@@ -50,13 +52,17 @@ const FormGarden = ({ onSuccess, btnStatus }) => {
         const urls = await picRef.current?.upload()
 
         await ky.post('/api/money/garden/upsert', {
-            json: {...values, pics: urls, date: formatDateLocal(values.date)}
+            json: {
+                ...values, pics: urls,
+                date: formatDateLocal(values.date),
+                location: { name: values.location, path: values.locationPath }
+            }
         }).json();
         onSuccess();
         picRef.current.clear()
         btnStatus(false);
     }
-    
+
     return (
         <>
             <div className="w-full">
@@ -90,6 +96,28 @@ const FormGarden = ({ onSuccess, btnStatus }) => {
                                         <FormMessage />
                                     </FormItem>
                                 )} />
+                            <div className="grid grid-cols-4 gap-3">
+                                <FormField name="location" control={form.control}
+                                    render={({ field }) => (
+                                        <FormItem className="col-span-1">
+                                            <FormLabel>地点</FormLabel>
+                                            <FormControl>
+                                                <Input {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )} />
+                                <FormField name="locationPath" control={form.control}
+                                    render={({ field }) => (
+                                        <FormItem className="col-span-3">
+                                            <FormLabel>地图url</FormLabel>
+                                            <FormControl>
+                                                <Input {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )} />
+                            </div>
                             <FormField name="content" control={form.control}
                                 render={({ field }) => (
                                     <FormItem>

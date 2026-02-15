@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardAction,
@@ -5,32 +6,103 @@ import {
   CardFooter,
   CardHeader,
   CardTitle
-} from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-const Greengrass = ({ list }) => {
+} from "@/components/ui/card";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from "@/components/ui/dialog";
+import { Spinner } from "@/components/ui/spinner";
+import { MapPin } from "lucide-react";
+import { useState } from "react";
+import FormGarden from "../form/FormGarden";
+import { formatDistanceToNow } from "date-fns";
+import { zhCN } from "date-fns/locale";
+
+const Greengrass = ({ list, onAddSuccess }) => {
+  const [openGarden, setOpenGarden] = useState(false);
+
+  const [isLoadGarden, setIsLoadGarden] = useState(false);
+
   return (
-    <div id="cardContainer" className="p-4">
-      {list.map((item, index) => {
-        return (
-          <Card key={item.id} className="mx-auto w-full max-w-sm pt-0">
-            <img
-              src={item.pics?.[0]}
-              className="aspect-video w-full object-cover"
-            />
-            <CardHeader>
-              <CardAction>
-                <Badge variant="secondary">Featured</Badge>
-              </CardAction>
-              <CardTitle>{item.title}</CardTitle>
-              <CardDescription>
-                {item.content}
-              </CardDescription>
-            </CardHeader>
-            <CardFooter />
-          </Card>
-        )
-      })}
-    </div>
+    <>
+      <div id="toolBar" className="mx-2.5 mt-2 flex items-center justify-between rounded-md border bg-muted/40 px-2.5 py-2">
+        <div className="flex flex-col gap-2">
+          <span className="text-sm text-muted-foreground">
+            记录一些日常的好物分享，类似于小红书的种草笔记，偶尔也会有一些生活感悟之类的东西。
+          </span>
+
+          <div className="self-start">
+            <Dialog open={openGarden} onOpenChange={setOpenGarden}>
+              <DialogTrigger asChild>
+                <Button size="sm" variant="outline">新增记录</Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>种草</DialogTitle>
+                </DialogHeader>
+                <FormGarden onSuccess={() => {
+                  setOpenGarden(false);
+                  onAddSuccess();
+                }} btnStatus={setIsLoadGarden} />
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button variant="outline">关闭</Button>
+                  </DialogClose>
+                  <Button type="submit" form="formGarden" disabled={isLoadGarden}>
+                    {isLoadGarden && <Spinner />}保存
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+
+            </Dialog>
+          </div>
+        </div>
+      </div>
+      <div id="cardContainer" className="p-4">
+        {list.map((item, index) => {
+          return (
+            <Card key={item.id} className="mx-auto w-full max-w-sm pt-0">
+              <img
+                src={item.pics?.[0]}
+                className="aspect-video w-full object-cover"
+              />
+              <CardHeader>
+                <CardAction>
+                  {/* <Badge variant="secondary">Featured</Badge> */}
+                </CardAction>
+                <CardTitle>{item.title}</CardTitle>
+                <CardDescription>
+                  {item.location &&
+                    <div className="mt-1 flex items-center justify-between text-xs text-muted-foreground">
+
+                      <div className="flex items-center gap-1 truncate">
+                        <MapPin className="h-3.5 w-3.5 shrink-0" />
+                        <span className="truncate">{item.location?.name}</span>
+                      </div>
+
+                      <span className="shrink-0">
+                        {formatDistanceToNow(new Date(item.date), {
+                          addSuffix: true,
+                          locale: zhCN,
+                        })}
+                      </span>
+
+                    </div>}
+                  {item.content}
+                </CardDescription>
+              </CardHeader>
+              <CardFooter />
+            </Card>
+          )
+        })}
+      </div>
+    </>
+
   )
 }
 
