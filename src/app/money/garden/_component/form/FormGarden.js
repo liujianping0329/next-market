@@ -124,7 +124,16 @@ const FormGarden = ({ onSuccess, btnStatus }) => {
                                     <FormItem>
                                         <FormLabel>内容</FormLabel>
                                         <FormControl>
-                                            <Textarea {...field} className="min-h-[120px] resize-none" />
+                                            <Textarea {...field} className="min-h-[120px] resize-none"
+                                                onFocus={(e) => {
+                                                    // 等键盘弹出来再滚，稳定很多
+                                                    setTimeout(() => {
+                                                        e.target.scrollIntoView({
+                                                            behavior: "smooth",
+                                                            block: "center",
+                                                        });
+                                                    }, 250);
+                                                }} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>

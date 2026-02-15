@@ -110,23 +110,27 @@ const Greengrass = ({ list, onAddSuccess }) => {
                 </CardAction>
                 {hasPic && <CardTitle>{item.title}</CardTitle>}
                 <CardDescription>
-                  {item.location &&
-                    <div className="mt-1 flex items-center justify-between text-xs text-muted-foreground">
 
+                  <div className="mt-1 flex items-center text-xs text-muted-foreground">
+
+                    {item.location?.name &&
                       <Link href={item.location.path} className="flex items-center gap-1 truncate">
                         <MapPin className="h-3.5 w-3.5 shrink-0" />
                         <span className="truncate">{item.location?.name}</span>
                       </Link>
+                    }
 
-                      <span className="shrink-0">
-                        {formatDistanceToNow(new Date(item.created_at), {
-                          addSuffix: true,
-                          locale: zhCN,
-                        })}
-                      </span>
+                    <span className="ml-auto shrink-0">
+                      {formatDistanceToNow(new Date(item.created_at), {
+                        addSuffix: true,
+                        locale: zhCN,
+                      })}
+                    </span>
 
-                    </div>}
-                  {item.content}
+                  </div>
+                  <p className="mt-2">
+                    {item.content}
+                  </p>
                 </CardDescription>
               </CardHeader>
               <CardFooter />
