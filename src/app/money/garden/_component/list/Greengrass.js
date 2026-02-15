@@ -26,6 +26,7 @@ import Link from "next/link";
 
 const Greengrass = ({ list, onAddSuccess }) => {
   const [openGarden, setOpenGarden] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   const [isLoadGarden, setIsLoadGarden] = useState(false);
 
@@ -61,10 +62,13 @@ const Greengrass = ({ list, onAddSuccess }) => {
               </DialogContent>
 
             </Dialog>
+            <Button size="sm" variant="outline" onClick={() => setExpanded(!expanded)}>
+              {expanded ? "全收起" : "全展开"}
+            </Button>
           </div>
         </div>
       </div>
-      <div id="cardContainer" className="p-4">
+      <div id="cardContainer" className="p-4 space-y-4">
         {list.map((item, index) => {
 
           const hasPic = !!item.pics?.[0];
@@ -75,7 +79,7 @@ const Greengrass = ({ list, onAddSuccess }) => {
                 "text-base";
 
           return (
-            <Card key={item.id} className="mx-auto w-full max-w-sm pt-0">
+            <Card key={item.id} className="mx-auto w-full max-w-sm pt-0 overflow-hidden">
               {hasPic ? (
                 <img
                   src={item.pics[0]}
@@ -128,7 +132,7 @@ const Greengrass = ({ list, onAddSuccess }) => {
                     </span>
 
                   </div>
-                  <p className="mt-2">
+                  <p className={"mt-2 whitespace-pre-line " + (expanded ? "" : "line-clamp-3")}>
                     {item.content}
                   </p>
                 </CardDescription>
