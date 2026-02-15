@@ -66,7 +66,7 @@ const FormGarden = ({ onSuccess, btnStatus }) => {
 
     return (
         <>
-            <div className="w-full">
+            <div className="w-full max-h-dvh overflow-y-auto overscroll-contain">
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} id="formGarden" className="">
                         <FieldGroup>
@@ -125,15 +125,16 @@ const FormGarden = ({ onSuccess, btnStatus }) => {
                                         <FormLabel>内容</FormLabel>
                                         <FormControl>
                                             <Textarea {...field} className="min-h-[120px] resize-none"
-                                                onFocus={(e) => {
-                                                    // 等键盘弹出来再滚，稳定很多
-                                                    setTimeout(() => {
-                                                        e.target.scrollIntoView({
-                                                            behavior: "smooth",
-                                                            block: "center",
-                                                        });
-                                                    }, 250);
-                                                }} />
+                                            // onFocus={(e) => {
+                                            //     // 等键盘弹出来再滚，稳定很多
+                                            //     setTimeout(() => {
+                                            //         e.target.scrollIntoView({
+                                            //             behavior: "smooth",
+                                            //             block: "center",
+                                            //         });
+                                            //     }, 250);
+                                            // }
+                                            />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
