@@ -22,6 +22,7 @@ import { useState } from "react";
 import FormGarden from "../form/FormGarden";
 import { formatDistanceToNow } from "date-fns";
 import { zhCN } from "date-fns/locale";
+import Link from "next/link";
 
 const Greengrass = ({ list, onAddSuccess }) => {
   const [openGarden, setOpenGarden] = useState(false);
@@ -80,10 +81,10 @@ const Greengrass = ({ list, onAddSuccess }) => {
                   {item.location &&
                     <div className="mt-1 flex items-center justify-between text-xs text-muted-foreground">
 
-                      <div className="flex items-center gap-1 truncate">
+                      <Link href={item.location.path} className="flex items-center gap-1 truncate">
                         <MapPin className="h-3.5 w-3.5 shrink-0" />
                         <span className="truncate">{item.location?.name}</span>
-                      </div>
+                      </Link>
 
                       <span className="shrink-0">
                         {formatDistanceToNow(new Date(item.date), {
