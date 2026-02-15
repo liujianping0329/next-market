@@ -23,26 +23,29 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
+    Card,
+    CardAction,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
 } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { useEffect, useMemo, useState } from "react";
 import FormGarden from "./_component/form/FormGarden";
-import { Spinner } from "@/components/ui/spinner"
+import { Spinner } from "@/components/ui/spinner";
+import Soybean from "./_component/list/Soybean";
+import Greengrass from "./_component/list/Greengrass";
 import ky from "ky";
 
 export const revalidate = 0;
 
 const GardenUI = () => {
-    const [openGarden, setOpenGarden] =  useState(false);
+    const [openGarden, setOpenGarden] = useState(false);
     const [list, setList] = useState([]);
+    const [tab, setTab] = useState("Greengrass");
 
     const [isLoadGarden, setIsLoadGarden] = useState(false);
 
@@ -58,16 +61,19 @@ const GardenUI = () => {
         <>
             <div id="toolBar" className="flex p-2.5 justify-between overflow-x-auto items-center">
                 <div className="flex space-x-2 items-center">
-                    <Button variant="outline" asChild>
+                    <Button variant="outline" asChild className="hidden">
                         <Link href={`/money/list`}>
                             返回
                         </Link>
                     </Button>
-                    <ToggleGroup type="single" defaultValue="plant" variant="outline">
-                      <ToggleGroupItem value="daily" className="data-[state=on]:bg-blue-500 data-[state=on]:text-white">每日种草</ToggleGroupItem>
-                      <ToggleGroupItem value="plant" className="data-[state=on]:bg-blue-500 data-[state=on]:text-white">种草</ToggleGroupItem>
+                    <ToggleGroup type="single" defaultValue="Greengrass" variant="outline"
+                        onValueChange={(v) => {
+                            if (v) setTab(v);
+                        }}>
+                        <ToggleGroupItem value="Soybean" className="data-[state=on]:bg-blue-500 data-[state=on]:text-white">春盛园</ToggleGroupItem>
+                        <ToggleGroupItem value="Greengrass" className="data-[state=on]:bg-blue-500 data-[state=on]:text-white">百草园</ToggleGroupItem>
                     </ToggleGroup>
-                    
+
                     <Dialog open={openGarden} onOpenChange={setOpenGarden}>
                         <DialogTrigger asChild>
                             <Button variant="outline">新增</Button>
@@ -76,15 +82,15 @@ const GardenUI = () => {
                             <DialogHeader>
                                 <DialogTitle>种草</DialogTitle>
                             </DialogHeader>
-                            <FormGarden onSuccess={()=>{
+                            <FormGarden onSuccess={() => {
                                 setOpenGarden(false);
                                 fetchList();
-                            }} btnStatus = {setIsLoadGarden}/>
+                            }} btnStatus={setIsLoadGarden} />
                             <DialogFooter>
                                 <DialogClose asChild>
                                     <Button variant="outline">关闭</Button>
                                 </DialogClose>
-                                <Button type="submit" form="formGarden" disabled = {isLoadGarden}>
+                                <Button type="submit" form="formGarden" disabled={isLoadGarden}>
                                     {isLoadGarden && <Spinner />}保存
                                 </Button>
                             </DialogFooter>
@@ -92,28 +98,8 @@ const GardenUI = () => {
                     </Dialog>
                 </div>
             </div>
-            <div id="cardContainer" className="p-4">
-                {list.map((item, index) => {
-                    return (
-                        <Card key={item.id} className="mx-auto w-full max-w-sm pt-0">
-                            <img
-                              src={item.pics?.[0]}
-                              className="aspect-video w-full object-cover"
-                            />
-                            <CardHeader>
-                              <CardAction>
-                                <Badge variant="secondary">Featured</Badge>
-                              </CardAction>
-                              <CardTitle>{item.title}</CardTitle>
-                              <CardDescription>
-                                {item.content}
-                              </CardDescription>
-                            </CardHeader>
-                            <CardFooter />
-                        </Card>
-                    )
-                })}   
-            </div>        
+            {tab === "Soybean" && <Soybean list={list} />}
+            {tab === "Greengrass" && <Greengrass list={list} />}
         </>
     );
 }
