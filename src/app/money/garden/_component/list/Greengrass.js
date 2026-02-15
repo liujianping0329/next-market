@@ -86,20 +86,20 @@ const Greengrass = ({ list, onAddSuccess }) => {
 
                   {/* 背景图 */}
                   <img
-                    src="/gardenNoPic.jpg"
+                    src="/gardenNoPic.png"
                     className="absolute inset-0 w-full h-full object-cover"
                   />
 
                   {/* 半透明遮罩（防止文字看不清） */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
+                  {/* <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" /> */}
 
                   {/* 中间标题 */}
                   <div className="relative flex h-full items-center justify-center p-6 text-center">
-                    <div className="bg-black/70 px-4 py-2 rounded-lg">
-                      <h3 className={`${size} font-semibold leading-snug text-white`}>
-                        {item.title}
-                      </h3>
-                    </div>
+
+                    <h3 className={`${size} font-semibold leading-snug text-black/100`}>
+                      {item.title}
+                    </h3>
+
                   </div>
 
                 </div>
@@ -119,7 +119,7 @@ const Greengrass = ({ list, onAddSuccess }) => {
                       </Link>
 
                       <span className="shrink-0">
-                        {formatDistanceToNow(new Date(item.date), {
+                        {formatDistanceToNow(new Date(item.created_at), {
                           addSuffix: true,
                           locale: zhCN,
                         })}
