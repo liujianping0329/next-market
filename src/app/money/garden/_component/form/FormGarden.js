@@ -34,10 +34,11 @@ import Datepicker from "@/components/datepicker";
 import PicUploader from "@/components/PicUploader";
 import { formatDateLocal } from "@/lib/date";
 
-const FormGarden = ({ onSuccess, btnStatus }) => {
+const FormGarden = ({ onSuccess, btnStatus, categories }) => {
     const form = useForm({
         defaultValues: {
             date: new Date(),
+            category: "else",
             title: "",
             location: "",
             locationPath: "",
@@ -76,6 +77,25 @@ const FormGarden = ({ onSuccess, btnStatus }) => {
                                         <FormLabel>日期</FormLabel>
                                         <FormControl>
                                             <Datepicker dateDf={field.value} onChange={field.onChange} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )} />
+                            <FormField name="category" control={form.control}
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>种类</FormLabel>
+                                        <FormControl>
+                                            <Select onValueChange={field.onChange} value={field.value}>
+                                                <SelectTrigger className="w-full">
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {categories.map(cate => (
+                                                        <SelectItem key={cate.value} value={cate.value}>{cate.label}</SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>

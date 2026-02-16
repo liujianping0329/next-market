@@ -23,13 +23,27 @@ import FormGarden from "../form/FormGarden";
 import { formatDistanceToNow } from "date-fns";
 import { zhCN } from "date-fns/locale";
 import Link from "next/link";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Badge } from "@/components/ui/badge"
 
 const Greengrass = ({ list, onAddSuccess }) => {
   const [openGarden, setOpenGarden] = useState(false);
   const [expanded, setExpanded] = useState(false);
+  const [subCategory, setSubCategory] = useState("all");
 
   const [isLoadGarden, setIsLoadGarden] = useState(false);
 
+  const categories = [
+    { value: "all", label: "全部" },
+    { value: "recipe", label: "菜谱" },
+    { value: "shop", label: "想去的店" },
+    { value: "weekend", label: "周末好去处" },
+    { value: "travel", label: "旅行" },
+    { value: "else", label: "其他" }
+  ];
+
+  const filteredList = subCategory === "all" ? list
+    : list.filter((item) => item.category === subCategory); // 按实际字段改
   return (
     <>
       <div id="toolBar" className="mx-2.5 mt-2 flex items-center justify-between rounded-md border bg-muted/40 px-2.5 py-2">
@@ -50,7 +64,7 @@ const Greengrass = ({ list, onAddSuccess }) => {
                 <FormGarden onSuccess={() => {
                   setOpenGarden(false);
                   onAddSuccess();
-                }} btnStatus={setIsLoadGarden} />
+                }} btnStatus={setIsLoadGarden} categories={categories.filter(c => c.value !== "all")} />
                 <DialogFooter>
                   <DialogClose asChild>
                     <Button variant="outline">关闭</Button>
@@ -68,8 +82,22 @@ const Greengrass = ({ list, onAddSuccess }) => {
           </div>
         </div>
       </div>
+      <div id="cateContainer" className="px-4 pt-2 flex gap-1 flex-wrap justify-center">
+        {categories.map((cate) => (
+          <Badge
+            key={cate.value}
+            onClick={() => setSubCategory(cate.value)}
+            className={`cursor-pointer rounded-full px-2.5 py-0.5 text-sm transition
+              ${subCategory === cate.value
+                ? "bg-blue-50 text-blue-500"
+                : "bg-transparent text-muted-foreground hover:bg-muted/40"
+              }`}
+          >
+            {cate.label}
+          </Badge>))}
+      </div>
       <div id="cardContainer" className="p-4 space-y-4">
-        {list.map((item, index) => {
+        {filteredList.map((item, index) => {
 
           const hasPic = !!item.pics?.[0];
           const len = item.title?.length || 0;
@@ -83,6 +111,8 @@ const Greengrass = ({ list, onAddSuccess }) => {
               {hasPic ? (
                 <img
                   src={item.pics[0]}
+                  loading="lazy"
+                  decoding="async"
                   className="aspect-video w-full object-cover"
                 />
               ) : (
@@ -91,6 +121,8 @@ const Greengrass = ({ list, onAddSuccess }) => {
                   {/* 背景图 */}
                   <img
                     src="/gardenNoPic.png"
+                    loading="lazy"
+                    decoding="async"
                     className="absolute inset-0 w-full h-full object-cover"
                   />
 
