@@ -57,7 +57,8 @@ const FormGarden = ({ onSuccess, btnStatus, categories }) => {
             json: {
                 ...rest, pics: urls,
                 date: formatDateLocal(values.date),
-                location: { name: values.location, path: values.locationPath }
+                location: { name: values.location, path: values.locationPath },
+                topic: "Greengrass"
             }
         }).json();
         onSuccess();

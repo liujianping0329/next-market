@@ -3,11 +3,16 @@ import supabase from "@/app/utils/database";
 
 export async function POST(request, context) {
     const requestBody = await request.json();
-    const { data: matchList } = await supabase.from("garden").select().match(requestBody)
-        .order('date', { ascending: false })
-        .order('created_at', { ascending: false })
-        .order('status', { ascending: false })
-        .order('sort', { ascending: true });
+
+    let query = supabase.from("garden").select().match(requestBody);
+
+    if (requestBody.topic === "SoyBean") {
+        query = query.order('status', { ascending: false }).order('sort', { ascending: true });
+    } else if (requestBody.topic === "Greengrass") {
+        query = query.order("date", { ascending: false }).order("created_at", { ascending: false });
+    }
+
+    const { data: matchList } = await query;
     console.log("Match Garden List:", matchList);
     return NextResponse.json({ list: matchList });
 }
