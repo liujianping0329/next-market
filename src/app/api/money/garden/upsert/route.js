@@ -6,5 +6,5 @@ export async function POST(request, context) {
     console.log("Upserted Garden:", requestBody);
     const { data } = await supabase.from('garden').upsert(requestBody).select();
     console.log("Upserted Garden:", data);
-    return NextResponse.json({ id: data[0].id });
+    return NextResponse.json({ ids: data.map(item => item.id) });
 }

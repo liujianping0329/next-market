@@ -1,3 +1,4 @@
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -17,21 +18,32 @@ import {
   DialogTrigger
 } from "@/components/ui/dialog";
 import { Spinner } from "@/components/ui/spinner";
-import { MapPin } from "lucide-react";
-import { useState } from "react";
-import FormGarden from "../form/FormGarden";
 import { formatDistanceToNow } from "date-fns";
 import { zhCN } from "date-fns/locale";
+import ky from "ky";
+import { MapPin } from "lucide-react";
 import Link from "next/link";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { Badge } from "@/components/ui/badge"
+import { useEffect, useState } from "react";
+import FormGarden from "../form/FormGarden";
 
-const Greengrass = ({ list, onAddSuccess }) => {
+const Greengrass = () => {
   const [openGarden, setOpenGarden] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [subCategory, setSubCategory] = useState("all");
+  const [list, setList] = useState([]);
 
   const [isLoadGarden, setIsLoadGarden] = useState(false);
+
+  const fetchList = async () => {
+    const response = await ky.post('/api/money/garden/list/match', {
+      json: { topic: "Greengrass" }
+    }).json();
+    setList(response.list);
+  }
+
+  useEffect(() => {
+    fetchList();
+  }, []);
 
   const categories = [
     { value: "all", label: "全部" },
@@ -63,7 +75,7 @@ const Greengrass = ({ list, onAddSuccess }) => {
                 </DialogHeader>
                 <FormGarden onSuccess={() => {
                   setOpenGarden(false);
-                  onAddSuccess();
+                  fetchList();
                 }} btnStatus={setIsLoadGarden} categories={categories.filter(c => c.value !== "all")} />
                 <DialogFooter>
                   <DialogClose asChild>

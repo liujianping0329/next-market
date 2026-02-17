@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/dialog";
 import { Spinner } from "@/components/ui/spinner";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import ky from "ky";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import FormGarden from "./_component/form/FormGarden";
@@ -21,17 +20,8 @@ import Soybean from "./_component/list/Soybean";
 export const revalidate = 0;
 
 const GardenUI = () => {
-    const [list, setList] = useState([]);
     const [tab, setTab] = useState("Greengrass");
 
-    const fetchList = async () => {
-        const response = await ky.get('/api/money/garden/list').json();
-        setList(response.list);
-    }
-
-    useEffect(() => {
-        fetchList();
-    }, []);
     return (
         <>
             <div id="toolBar" className="flex p-2.5 justify-between overflow-x-auto items-center">
@@ -51,8 +41,8 @@ const GardenUI = () => {
 
                 </div>
             </div>
-            {tab === "Soybean" && <Soybean list={list} />}
-            {tab === "Greengrass" && <Greengrass list={list} onAddSuccess={fetchList} />}
+            {tab === "Soybean" && <Soybean />}
+            {tab === "Greengrass" && <Greengrass />}
         </>
     );
 }
