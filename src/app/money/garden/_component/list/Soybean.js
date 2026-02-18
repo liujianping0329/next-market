@@ -21,6 +21,7 @@ import FormSoy from "../form/FormSoy";
 import { Button } from "@/components/ui/button";
 import ky from "ky";
 import { Check } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 
 const Soybean = () => {
@@ -79,7 +80,7 @@ const Soybean = () => {
                         即时的种草记录，包含要买的东西、要去做的事情等，记录灵感和想法，方便以后回顾和实践。
                     </span>
 
-                    <div className="self-start">
+                    <div className="flex items-center justify-between">
                         <Dialog open={openSoy} onOpenChange={setOpenSoy}>
                             <DialogTrigger asChild>
                                 <Button size="sm" variant="outline">新增记录</Button>
@@ -103,6 +104,11 @@ const Soybean = () => {
                             </DialogContent>
 
                         </Dialog>
+                        <Button size="sm" variant="outline" onClick={() => {
+                            ky.post("/api/money/garden/delete", {
+                                json: { topic: "SoyBean", status: "0" }
+                            }).then(() => fetchList());
+                        }}>一键清理</Button>
                     </div>
                 </div>
             </div>
@@ -111,32 +117,41 @@ const Soybean = () => {
                     const done = item.status === "0";
                     const syncing = pending.has(item.id);
 
+                    let icon;
+
+                    if (syncing) {
+                        icon = (
+                            <div className="h-5 w-5 flex items-center justify-center rounded-full border border-gray-400">
+                                <Loader2 className="h-3 w-3 animate-spin text-gray-400" />
+                            </div>
+                        );
+                    } else if (done) {
+                        icon = (
+                            <div className="h-5 w-5 flex items-center justify-center rounded-full bg-gray-400 border-gray-400">
+                                <Check className="h-3 w-3 text-white" />
+                            </div>
+                        );
+                    } else {
+                        icon = (
+                            <div className="h-5 w-5 rounded-full border border-gray-400" />
+                        );
+                    }
+
                     return (
-                        <Card key={item.id}
+                        <div key={item.id}
                             onClick={() => !syncing && toggleOptimistic(item)}
-                            className={`mx-auto w-full max-w-sm cursor-pointer select-none transition
-                                ${syncing ? "opacity-70" : ""}`}
+                            className="flex items-center gap-3 px-4 py-3 cursor-pointer transition"
                         >
-                            <CardHeader className="flex items-center gap-3 rounded-lg border p-4">
+                            {icon}
 
-                                {/* 圆圈 */}
-                                <div
-                                    className={`h-5 w-5 flex items-center justify-center rounded-full border transition
-                                        ${done ? "bg-gray-400 border-gray-400" : "border-gray-400"}`}
-                                >
-                                    {done && <Check className="h-3 w-3 text-white" />}
-                                </div>
-
-                                {/* 标题 */}
-                                <CardTitle
-                                    className={`font-medium transition ${done ? "text-gray-400 line-through" : ""
-                                        }`}
-                                >
-                                    {item.title}
-                                </CardTitle>
-
-                            </CardHeader>
-                        </Card>
+                            {/* 标题 */}
+                            <span
+                                className={`text-sm transition ${done ? "text-gray-400 line-through" : ""
+                                    }`}
+                            >
+                                {item.title}
+                            </span>
+                        </div>
                     )
                 })}
             </div>

@@ -64,7 +64,7 @@ const FormSoy = ({ onSuccess, btnStatus }) => {
                             <FormField name="titles" control={form.control}
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>内容</FormLabel>
+                                        <FormLabel>每行对应一条记录</FormLabel>
                                         <FormControl>
                                             <Textarea {...field} className="min-h-[120px] resize-none" />
                                         </FormControl>
