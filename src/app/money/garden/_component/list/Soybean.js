@@ -30,6 +30,7 @@ const Soybean = () => {
 
     const [openSoy, setOpenSoy] = useState(false);
     const [isLoadSoy, setIsLoadSoy] = useState(false);
+    const [isLoadCleanup, setIsLoadCleanup] = useState(false);
 
     const fetchList = async () => {
         const response = await ky.post('/api/money/garden/list/match', {
@@ -104,11 +105,15 @@ const Soybean = () => {
                             </DialogContent>
 
                         </Dialog>
-                        <Button size="sm" variant="outline" onClick={() => {
+                        <Button size="sm" variant="outline" disabled={isLoadCleanup} onClick={() => {
+                            setIsLoadCleanup(true);
                             ky.post("/api/money/garden/delete", {
                                 json: { topic: "SoyBean", status: "0" }
-                            }).then(() => fetchList());
-                        }}>一键清理</Button>
+                            }).then(() => {
+                                fetchList();
+                                setIsLoadCleanup(false);
+                            });
+                        }}>{isLoadCleanup && <Spinner />}一键清理</Button>
                     </div>
                 </div>
             </div>
