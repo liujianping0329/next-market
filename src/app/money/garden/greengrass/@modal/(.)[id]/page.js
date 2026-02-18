@@ -1,3 +1,4 @@
+"use client";
 import GreengrassDetail from "../../_component/detail/GreengrassDetail";
 import { useRouter } from "next/navigation"
 import { Dialog, DialogContent } from "@/components/ui/dialog"

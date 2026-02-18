@@ -2,8 +2,10 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Info, Pencil, Trash2, Share2, ArrowLeft } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 const GreengrassDetail = ({ id }) => {
+  const router = useRouter()
   return (
     <>
       <div id="toolBar" className="flex p-2.5 justify-between overflow-x-auto items-center border-b">
