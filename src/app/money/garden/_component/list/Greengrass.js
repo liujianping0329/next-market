@@ -25,6 +25,7 @@ import { MapPin } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import FormGarden from "../form/FormGarden";
+import { useRouter } from "next/navigation"
 
 const Greengrass = () => {
   const [openGarden, setOpenGarden] = useState(false);
@@ -33,6 +34,8 @@ const Greengrass = () => {
   const [list, setList] = useState([]);
 
   const [isLoadGarden, setIsLoadGarden] = useState(false);
+
+  const router = useRouter()
 
   const fetchList = async () => {
     const response = await ky.post('/api/money/garden/list/match', {
@@ -119,7 +122,7 @@ const Greengrass = () => {
                 "text-base";
 
           return (
-            <Card key={item.id} className="mx-auto w-full max-w-sm pt-0 overflow-hidden">
+            <Card key={item.id} onClick={() => router.push(`/money/garden/greengrass/${item.id}`)} className="mx-auto w-full max-w-sm pt-0 overflow-hidden">
               {hasPic ? (
                 <img
                   src={item.pics[0]}
