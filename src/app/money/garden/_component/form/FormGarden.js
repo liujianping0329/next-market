@@ -149,16 +149,7 @@ const FormGarden = ({ onSuccess, btnStatus, categories }) => {
                                                 onFocus={(e) => {
                                                     setTimeout(() => {
                                                         const scroller = e.target.closest("[data-scroll]")
-
-                                                        const textareaRect = e.target.getBoundingClientRect()
-                                                        const containerRect = scroller.getBoundingClientRect()
-
-                                                        const offsetTop = textareaRect.top - containerRect.top
-
-                                                        scroller.scrollTo({
-                                                            top: scroller.scrollTop + offsetTop - 20, // 20px 预留空间
-                                                            behavior: "smooth",
-                                                        })
+                                                        scroller?.scrollTo({ top: scroller.scrollHeight, behavior: "smooth" })
                                                     }, 350)
                                                 }}
                                             />
