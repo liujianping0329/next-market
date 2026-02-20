@@ -26,6 +26,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import FormGarden from "../form/FormGarden";
 import { useRouter } from "next/navigation"
+import { useGardenStore } from "@/store/gardenStore"
 
 const Greengrass = () => {
   const [openGarden, setOpenGarden] = useState(false);
