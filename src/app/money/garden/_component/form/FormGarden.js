@@ -34,7 +34,7 @@ import Datepicker from "@/components/datepicker";
 import PicUploader from "@/components/PicUploader";
 import { formatDateLocal } from "@/lib/date";
 
-const FormGarden = ({ onSuccess, btnStatus, categories }) => {
+const FormGarden = ({ onSuccess, btnStatus, categories, onFocusChange }) => {
     const form = useForm({
         defaultValues: {
             date: new Date(),
@@ -145,6 +145,8 @@ const FormGarden = ({ onSuccess, btnStatus, categories }) => {
                                     <FormLabel>内容</FormLabel>
                                     <FormControl>
                                         <Textarea {...field} className="min-h-[120px] resize-none"
+                                            onFocus={() => onFocusChange(true)}
+                                            onBlur={() => onFocusChange(false)}
                                         // onFocus={(e) => {
                                         //     // 等键盘弹出来再滚，稳定很多
                                         //     setTimeout(() => {

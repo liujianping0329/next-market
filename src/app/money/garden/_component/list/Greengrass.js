@@ -35,6 +35,7 @@ const Greengrass = () => {
   const [list, setList] = useState([]);
 
   const [isLoadGarden, setIsLoadGarden] = useState(false);
+  const [focused, setFocused] = useState(false)
 
   const router = useRouter()
 
@@ -77,11 +78,11 @@ const Greengrass = () => {
                 <DialogHeader>
                   <DialogTitle>种草</DialogTitle>
                 </DialogHeader>
-                <div className="flex-1 min-h-0 overflow-y-auto pb-[320px]">
+                <div className={`flex-1 min-h-0 overflow-y-auto ${focused ? "pb-[320px]" : ""}`}>
                   <FormGarden onSuccess={() => {
                     setOpenGarden(false);
                     fetchList();
-                  }} btnStatus={setIsLoadGarden} categories={categories.filter(c => c.value !== "all")} />
+                  }} onFocusChange={setFocused} btnStatus={setIsLoadGarden} categories={categories.filter(c => c.value !== "all")} />
                   <DialogFooter className="pt-4">
                     <DialogClose asChild>
                       <Button variant="outline">关闭</Button>
