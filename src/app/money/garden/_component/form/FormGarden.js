@@ -46,7 +46,7 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 
-const FormGarden = ({ trigger, onSuccess, categories }) => {
+const FormGarden = ({ trigger, onSuccess, categories, isUpdate }) => {
     const [openGarden, setOpenGarden] = useState(false);
     const [isLoadGarden, setIsLoadGarden] = useState(false);
 

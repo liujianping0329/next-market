@@ -18,6 +18,7 @@ import { useEffect, useState } from "react";
 import FormGarden from "../form/FormGarden";
 import { useRouter } from "next/navigation"
 import { useGardenStore } from "@/store/gardenStore"
+import { gardenCategories, gardenCategoriesNoAll } from "@/app/money/garden/_component/constants/gardenCategories";
 
 const Greengrass = () => {
   const [expanded, setExpanded] = useState(false);
@@ -38,17 +39,6 @@ const Greengrass = () => {
     fetchList();
   }, []);
 
-  const categories = [
-    { value: "all", label: "全部" },
-    { value: "recipe", label: "菜谱" },
-    { value: "shop", label: "想去的店" },
-    { value: "weekend", label: "周末好去处" },
-    { value: "taiwan", label: "台湾" },
-    { value: "haerbin", label: "哈尔滨" },
-    { value: "japan", label: "日本" },
-    { value: "else", label: "其他" }
-  ];
-
   const filteredList = subCategory === "all" ? list
     : list.filter((item) => item.category === subCategory); // 按实际字段改
   return (
@@ -62,7 +52,7 @@ const Greengrass = () => {
           <div className="self-start">
             <FormGarden trigger={
               <Button size="sm" variant="outline">新增记录</Button>
-            } onSuccess={() => fetchList()} categories={categories.filter(c => c.value !== "all")} />
+            } onSuccess={() => fetchList()} categories={gardenCategoriesNoAll} />
 
             <Button size="sm" variant="outline" onClick={() => setExpanded(!expanded)}>
               {expanded ? "全收起" : "全展开"}
@@ -71,7 +61,7 @@ const Greengrass = () => {
         </div>
       </div>
       <div id="cateContainer" className="px-4 pt-2 flex gap-1 flex-wrap justify-center">
-        {categories.map((cate) => (
+        {gardenCategories.map((cate) => (
           <Badge
             key={cate.value}
             onClick={() => setSubCategory(cate.value)}

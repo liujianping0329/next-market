@@ -9,6 +9,9 @@ import { de } from "date-fns/locale";
 import ky from "ky"
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner"
+import FormGarden from "@/app/money/garden/_component/form/FormGarden";
+import { gardenCategories, gardenCategoriesNoAll } from "@/app/money/garden/_component/constants/gardenCategories";
+
 
 const GreengrassDetail = ({ id, showToolbar }) => {
   const router = useRouter()
@@ -52,12 +55,15 @@ const GreengrassDetail = ({ id, showToolbar }) => {
           </Button>
         </div>
         <div className="flex space-x-2 items-center">
-          <Button variant="ghost" size="sm" className="h-auto px-2 py-2">
-            <span className="flex flex-col items-center gap-1">
-              <Pencil className="h-5 w-5" />
-              <span className="text-[11px] leading-none text-muted-foreground">修改</span>
-            </span>
-          </Button>
+          <FormGarden trigger={
+            <Button variant="ghost" size="sm" className="h-auto px-2 py-2">
+              <span className="flex flex-col items-center gap-1">
+                <Pencil className="h-5 w-5" />
+                <span className="text-[11px] leading-none text-muted-foreground">修改</span>
+              </span>
+            </Button>
+          } onSuccess={() => fetchDetail()} isUpdate={true} categories={gardenCategoriesNoAll} />
+
 
           <Button variant="ghost" size="sm" className="h-auto px-2 py-2">
             <span className="flex flex-col items-center gap-1">
