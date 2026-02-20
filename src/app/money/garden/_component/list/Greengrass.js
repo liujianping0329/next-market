@@ -35,7 +35,6 @@ const Greengrass = () => {
   const [list, setList] = useState([]);
 
   const [isLoadGarden, setIsLoadGarden] = useState(false);
-  const [focused, setFocused] = useState(false)
 
   const router = useRouter()
 
@@ -74,24 +73,25 @@ const Greengrass = () => {
               <DialogTrigger asChild>
                 <Button size="sm" variant="outline">新增记录</Button>
               </DialogTrigger>
-              <DialogContent className="h-[95vh] max-h-[95vh] flex flex-col">
+              <DialogContent className="h-[90dvh] flex flex-col">
                 <DialogHeader>
                   <DialogTitle>种草</DialogTitle>
                 </DialogHeader>
-                <div className={`flex-1 min-h-0 overflow-y-auto ${focused ? "pb-[320px]" : ""}`}>
+                <div className={`flex-1 min-h-0 overflow-y-auto`}>
                   <FormGarden onSuccess={() => {
                     setOpenGarden(false);
                     fetchList();
-                  }} onFocusChange={setFocused} btnStatus={setIsLoadGarden} categories={categories.filter(c => c.value !== "all")} />
-                  <DialogFooter className="pt-4">
-                    <DialogClose asChild>
-                      <Button variant="outline">关闭</Button>
-                    </DialogClose>
-                    <Button type="submit" form="formGarden" disabled={isLoadGarden}>
-                      {isLoadGarden && <Spinner />}保存
-                    </Button>
-                  </DialogFooter>
+                  }} btnStatus={setIsLoadGarden} categories={categories.filter(c => c.value !== "all")} />
+
                 </div>
+                <DialogFooter className="pt-4">
+                  <DialogClose asChild>
+                    <Button variant="outline">关闭</Button>
+                  </DialogClose>
+                  <Button type="submit" form="formGarden" disabled={isLoadGarden}>
+                    {isLoadGarden && <Spinner />}保存
+                  </Button>
+                </DialogFooter>
 
               </DialogContent>
 
