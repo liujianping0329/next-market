@@ -8,16 +8,7 @@ import {
   CardHeader,
   CardTitle
 } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from "@/components/ui/dialog";
-import { Spinner } from "@/components/ui/spinner";
+
 import { formatDistanceToNow } from "date-fns";
 import { zhCN } from "date-fns/locale";
 import ky from "ky";
@@ -29,12 +20,10 @@ import { useRouter } from "next/navigation"
 import { useGardenStore } from "@/store/gardenStore"
 
 const Greengrass = () => {
-  const [openGarden, setOpenGarden] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [subCategory, setSubCategory] = useState("all");
   const [list, setList] = useState([]);
 
-  const [isLoadGarden, setIsLoadGarden] = useState(false);
 
   const router = useRouter()
 
@@ -54,7 +43,9 @@ const Greengrass = () => {
     { value: "recipe", label: "菜谱" },
     { value: "shop", label: "想去的店" },
     { value: "weekend", label: "周末好去处" },
-    { value: "travel", label: "旅行" },
+    { value: "taiwan", label: "台湾" },
+    { value: "haerbin", label: "哈尔滨" },
+    { value: "japan", label: "日本" },
     { value: "else", label: "其他" }
   ];
 
@@ -69,30 +60,10 @@ const Greengrass = () => {
           </span>
 
           <div className="self-start">
-            <Dialog open={openGarden} onOpenChange={setOpenGarden}>
-              <DialogTrigger asChild>
-                <Button size="sm" variant="outline">新增记录</Button>
-              </DialogTrigger>
-              <DialogContent className="h-[90dvh] flex flex-col">
-                <DialogHeader>
-                  <DialogTitle>种草</DialogTitle>
-                </DialogHeader>
-                <FormGarden onSuccess={() => {
-                  setOpenGarden(false);
-                  fetchList();
-                }} btnStatus={setIsLoadGarden} categories={categories.filter(c => c.value !== "all")} />
-                <DialogFooter className="pt-4">
-                  <DialogClose asChild>
-                    <Button variant="outline">关闭</Button>
-                  </DialogClose>
-                  <Button type="submit" form="formGarden" disabled={isLoadGarden}>
-                    {isLoadGarden && <Spinner />}保存
-                  </Button>
-                </DialogFooter>
+            <FormGarden trigger={
+              <Button size="sm" variant="outline">新增记录</Button>
+            } onSuccess={() => fetchList()} categories={categories.filter(c => c.value !== "all")} />
 
-              </DialogContent>
-
-            </Dialog>
             <Button size="sm" variant="outline" onClick={() => setExpanded(!expanded)}>
               {expanded ? "全收起" : "全展开"}
             </Button>
