@@ -73,14 +73,16 @@ const Greengrass = () => {
               <DialogTrigger asChild>
                 <Button size="sm" variant="outline">新增记录</Button>
               </DialogTrigger>
-              <DialogContent>
+              <DialogContent className="h-[85vh] max-h-[85vh] p-0 flex flex-col">
                 <DialogHeader>
                   <DialogTitle>种草</DialogTitle>
                 </DialogHeader>
-                <FormGarden onSuccess={() => {
-                  setOpenGarden(false);
-                  fetchList();
-                }} btnStatus={setIsLoadGarden} categories={categories.filter(c => c.value !== "all")} />
+                <div className="flex-1 min-h-0 overflow-y-auto">
+                  <FormGarden onSuccess={() => {
+                    setOpenGarden(false);
+                    fetchList();
+                  }} btnStatus={setIsLoadGarden} categories={categories.filter(c => c.value !== "all")} />
+                </div>
                 <DialogFooter>
                   <DialogClose asChild>
                     <Button variant="outline">关闭</Button>
