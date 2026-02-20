@@ -77,7 +77,7 @@ const Greengrass = () => {
                 <DialogHeader>
                   <DialogTitle>种草</DialogTitle>
                 </DialogHeader>
-                <div className="flex-1 min-h-0 overflow-y-auto">
+                <div className="flex-1 min-h-0 overflow-y-auto pb-[320px]">
                   <FormGarden onSuccess={() => {
                     setOpenGarden(false);
                     fetchList();
