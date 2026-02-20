@@ -77,13 +77,10 @@ const Greengrass = () => {
                 <DialogHeader>
                   <DialogTitle>种草</DialogTitle>
                 </DialogHeader>
-                <div className={`flex-1 min-h-0 overflow-y-auto`}>
-                  <FormGarden onSuccess={() => {
-                    setOpenGarden(false);
-                    fetchList();
-                  }} btnStatus={setIsLoadGarden} categories={categories.filter(c => c.value !== "all")} />
-
-                </div>
+                <FormGarden onSuccess={() => {
+                  setOpenGarden(false);
+                  fetchList();
+                }} btnStatus={setIsLoadGarden} categories={categories.filter(c => c.value !== "all")} />
                 <DialogFooter className="pt-4">
                   <DialogClose asChild>
                     <Button variant="outline">关闭</Button>

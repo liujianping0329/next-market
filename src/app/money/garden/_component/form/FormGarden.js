@@ -68,100 +68,108 @@ const FormGarden = ({ onSuccess, btnStatus, categories }) => {
 
     return (
         <>
-            <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} id="formGarden" className="">
-                    <FieldGroup>
-                        <FormField name="date" control={form.control}
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>日期</FormLabel>
-                                    <FormControl>
-                                        <Datepicker dateDf={field.value} onChange={field.onChange} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )} />
-                        <FormField name="category" control={form.control}
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>种类</FormLabel>
-                                    <FormControl>
-                                        <Select onValueChange={field.onChange} value={field.value}>
-                                            <SelectTrigger className="w-full">
-                                                <SelectValue />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {categories.map(cate => (
-                                                    <SelectItem key={cate.value} value={cate.value}>{cate.label}</SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )} />
-                        <FormItem>
-                            <FormLabel>图片</FormLabel>
-                            <FormControl>
-                                <PicUploader ref={picRef} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                        <FormField name="title" control={form.control}
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>标题</FormLabel>
-                                    <FormControl>
-                                        <Input {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )} />
-                        <div className="grid grid-cols-4 gap-3">
-                            <FormField name="location" control={form.control}
+            <div data-scroll className={`flex-1 min-h-0 overflow-y-auto`}>
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} id="formGarden" className="">
+                        <FieldGroup>
+                            <FormField name="date" control={form.control}
                                 render={({ field }) => (
-                                    <FormItem className="col-span-1">
-                                        <FormLabel>地点</FormLabel>
+                                    <FormItem>
+                                        <FormLabel>日期</FormLabel>
+                                        <FormControl>
+                                            <Datepicker dateDf={field.value} onChange={field.onChange} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )} />
+                            <FormField name="category" control={form.control}
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>种类</FormLabel>
+                                        <FormControl>
+                                            <Select onValueChange={field.onChange} value={field.value}>
+                                                <SelectTrigger className="w-full">
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {categories.map(cate => (
+                                                        <SelectItem key={cate.value} value={cate.value}>{cate.label}</SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )} />
+                            <FormItem>
+                                <FormLabel>图片</FormLabel>
+                                <FormControl>
+                                    <PicUploader ref={picRef} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                            <FormField name="title" control={form.control}
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>标题</FormLabel>
                                         <FormControl>
                                             <Input {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
                                 )} />
-                            <FormField name="locationPath" control={form.control}
+                            <div className="grid grid-cols-4 gap-3">
+                                <FormField name="location" control={form.control}
+                                    render={({ field }) => (
+                                        <FormItem className="col-span-1">
+                                            <FormLabel>地点</FormLabel>
+                                            <FormControl>
+                                                <Input {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )} />
+                                <FormField name="locationPath" control={form.control}
+                                    render={({ field }) => (
+                                        <FormItem className="col-span-3">
+                                            <FormLabel>地图url</FormLabel>
+                                            <FormControl>
+                                                <Input {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )} />
+                            </div>
+                            <FormField name="content" control={form.control}
                                 render={({ field }) => (
-                                    <FormItem className="col-span-3">
-                                        <FormLabel>地图url</FormLabel>
+                                    <FormItem>
+                                        <FormLabel>内容</FormLabel>
                                         <FormControl>
-                                            <Input {...field} />
+                                            <Textarea {...field} className="min-h-[120px] resize-none"
+                                                onFocus={(e) => {
+                                                    setTimeout(() => {
+                                                        const scroller = e.target.closest("[data-scroll]")
+
+                                                        const textareaRect = e.target.getBoundingClientRect()
+                                                        const containerRect = scroller.getBoundingClientRect()
+
+                                                        const offsetTop = textareaRect.top - containerRect.top
+
+                                                        scroller.scrollTo({
+                                                            top: scroller.scrollTop + offsetTop - 20, // 20px 预留空间
+                                                            behavior: "smooth",
+                                                        })
+                                                    }, 350)
+                                                }}
+                                            />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
                                 )} />
-                        </div>
-                        <FormField name="content" control={form.control}
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>内容</FormLabel>
-                                    <FormControl>
-                                        <Textarea {...field} className="min-h-[120px] resize-none"
-                                        // onFocus={(e) => {
-                                        //     // 等键盘弹出来再滚，稳定很多
-                                        //     setTimeout(() => {
-                                        //         e.target.scrollIntoView({
-                                        //             behavior: "smooth",
-                                        //             block: "center",
-                                        //         });
-                                        //     }, 250);
-                                        // }
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )} />
-                    </FieldGroup>
-                </form>
-            </Form>
+                        </FieldGroup>
+                    </form>
+                </Form>
+            </div>
         </>
     );
 }
