@@ -28,6 +28,11 @@ const GreengrassDetail = ({ id, showToolbar }) => {
   }, []);
   const handleShare = async () => {
     const url = window.location.href
+    const isWeChat = /MicroMessenger/i.test(navigator.userAgent)
+    if (isWeChat) {
+      toast.info("请点击右上角 ··· 进行分享", { position: "top-left" })
+      return
+    }
     setCopied(true)
     await navigator.clipboard.writeText(url)
     toast.success("已复制链接", { position: "top-left" })
