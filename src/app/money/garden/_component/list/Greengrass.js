@@ -73,7 +73,7 @@ const Greengrass = () => {
               <DialogTrigger asChild>
                 <Button size="sm" variant="outline">新增记录</Button>
               </DialogTrigger>
-              <DialogContent className="h-[85vh] max-h-[85vh] p-0 flex flex-col">
+              <DialogContent className="h-[95vh] max-h-[95vh] flex flex-col">
                 <DialogHeader>
                   <DialogTitle>种草</DialogTitle>
                 </DialogHeader>
