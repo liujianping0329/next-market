@@ -82,15 +82,16 @@ const Greengrass = () => {
                     setOpenGarden(false);
                     fetchList();
                   }} btnStatus={setIsLoadGarden} categories={categories.filter(c => c.value !== "all")} />
+                  <DialogFooter className="pt-4">
+                    <DialogClose asChild>
+                      <Button variant="outline">关闭</Button>
+                    </DialogClose>
+                    <Button type="submit" form="formGarden" disabled={isLoadGarden}>
+                      {isLoadGarden && <Spinner />}保存
+                    </Button>
+                  </DialogFooter>
                 </div>
-                <DialogFooter>
-                  <DialogClose asChild>
-                    <Button variant="outline">关闭</Button>
-                  </DialogClose>
-                  <Button type="submit" form="formGarden" disabled={isLoadGarden}>
-                    {isLoadGarden && <Spinner />}保存
-                  </Button>
-                </DialogFooter>
+
               </DialogContent>
 
             </Dialog>
