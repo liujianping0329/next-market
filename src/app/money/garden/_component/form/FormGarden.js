@@ -71,7 +71,7 @@ const FormGarden = ({ onSuccess, btnStatus, categories }) => {
             <div data-scroll className={`flex-1 min-h-0 overflow-y-auto`}>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} id="formGarden" className="">
-                        <FieldGroup className="!space-y-2">
+                        <FieldGroup>
                             <FormField name="date" control={form.control}
                                 render={({ field }) => (
                                     <FormItem>
