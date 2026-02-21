@@ -103,10 +103,10 @@ const GreengrassDetail = ({ id, showToolbar }) => {
           </Button>
         </div>
       </div >}
-      <p>
+      <p className="whitespace-pre-line">
         <img
           src={detail?.pics?.[0]}
-          className="w-full aspect-[3/4] object-contain bg-black"
+          className="w-full aspect-[3/4] object-contain bg-white"
         />
         {detail?.title}<br />
         {detail?.location?.name &&
