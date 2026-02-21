@@ -19,6 +19,7 @@ const GreengrassDetail = ({ id, showToolbar }) => {
   const [copied, setCopied] = useState(false)
 
   const [editVer, setEditVer] = useState(0);
+  const [deleting, setDeleting] = useState(false);
 
   const fetchDetail = async () => {
     const response = await ky.post('/api/money/garden/list/match', {
@@ -43,6 +44,18 @@ const GreengrassDetail = ({ id, showToolbar }) => {
     toast.success("已复制链接", { position: "top-left" })
     setTimeout(() => setCopied(false), 1200)
   }
+
+  const handleDelete = async () => {
+
+    const ok = window.confirm("确定要删除吗？删除后无法恢复。");
+    if (!ok) return;
+    setDeleting(true);
+    await ky.post("/api/money/garden/delete", { json: { id: detail.id } }).json();
+    toast.success("已删除", { position: "top-left" });
+    router.back();
+    // 如果你路由不是这个路径，就改成你的列表路径
+    setDeleting(false);
+  };
 
 
   return (
@@ -71,7 +84,8 @@ const GreengrassDetail = ({ id, showToolbar }) => {
           )}
 
 
-          <Button variant="ghost" size="sm" className="h-auto px-2 py-2">
+          <Button variant="ghost" size="sm" className="h-auto px-2 py-2" onClick={handleDelete}
+            disabled={deleting || !detail}>
             <span className="flex flex-col items-center gap-1">
               <Trash2 className="h-5 w-5" />
               <span className="text-[11px] leading-none text-muted-foreground">删除</span>
