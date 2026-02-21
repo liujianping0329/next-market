@@ -33,7 +33,7 @@ import { Textarea } from "@/components/ui/textarea"
 
 import Datepicker from "@/components/datepicker";
 import PicUploader from "@/components/PicUploader";
-import { formatDateLocal } from "@/lib/date";
+import { formatDateLocal, parseLocalDate } from "@/lib/date";
 import {
     Dialog,
     DialogClose,
@@ -46,20 +46,30 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 
-const FormGarden = ({ trigger, onSuccess, categories, isUpdate }) => {
+const FormGarden = ({ trigger, onSuccess, categories, defaultValues = null }) => {
     const [openGarden, setOpenGarden] = useState(false);
     const [isLoadGarden, setIsLoadGarden] = useState(false);
 
     const form = useForm({
         defaultValues: {
-            date: new Date(),
-            category: "else",
-            title: "",
-            location: "",
-            locationPath: "",
-            content: ""
+            date: defaultValues?.date ? parseLocalDate(defaultValues.date) : new Date(),
+            category: defaultValues?.category || "else",
+            title: defaultValues?.title || "",
+            location: defaultValues?.location?.name || "",
+            locationPath: defaultValues?.location?.path || "",
+            content: defaultValues?.content || ""
         }
     });
+    useEffect(() => {
+        form.reset({
+            date: defaultValues?.date ? parseLocalDate(defaultValues.date) : new Date(),
+            category: defaultValues?.category || "else",
+            title: defaultValues?.title || "",
+            location: defaultValues?.location?.name || "",
+            locationPath: defaultValues?.location?.path || "",
+            content: defaultValues?.content || ""
+        });
+    }, [defaultValues?.id]);
 
     const picRef = useRef(null)
 
@@ -70,6 +80,7 @@ const FormGarden = ({ trigger, onSuccess, categories, isUpdate }) => {
         const { locationPath, ...rest } = values;
         await ky.post('/api/money/garden/upsert', {
             json: {
+                ...(defaultValues?.id && { id: defaultValues.id }),
                 ...rest, pics: urls,
                 date: formatDateLocal(values.date),
                 location: { name: values.location, path: values.locationPath },
@@ -129,7 +140,7 @@ const FormGarden = ({ trigger, onSuccess, categories, isUpdate }) => {
                                     <FormItem>
                                         <FormLabel>图片</FormLabel>
                                         <FormControl>
-                                            <PicUploader ref={picRef} />
+                                            <PicUploader ref={picRef} defaultPics={defaultValues?.pics} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>

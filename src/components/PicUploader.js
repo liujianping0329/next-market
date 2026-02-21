@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import ky from "ky"
 
 
-const PicUploader = forwardRef(function PicUploader(props,ref) {
+const PicUploader = forwardRef(function PicUploader({ defaultPics = [] }, ref) {
 
     const [files, setFiles] = useState([])
     const [uploading, setUploading] = useState(false)
@@ -14,23 +14,26 @@ const PicUploader = forwardRef(function PicUploader(props,ref) {
     const upload = async () => {
         setUploading(true)
 
-        const ImgOptions = {
-          maxSizeMB: 0.8,        // 最大 0.5MB
-          maxWidthOrHeight: 1200 // 最长边 1200px
-        };
-        const fd = new FormData()
+        let res = defaultPics;
+        if (files.length) {
+            const ImgOptions = {
+                maxSizeMB: 0.8,        // 最大 0.5MB
+                maxWidthOrHeight: 1200 // 最长边 1200px
+            };
+            const fd = new FormData()
 
-        const compressedFiles = [];
-        for (const f of files) {
-          compressedFiles.push(await imageCompression(f, ImgOptions));
+            for (const f of files) {
+                const compressed = await imageCompression(f, ImgOptions);
+                fd.append("files", compressed);
+            }
+
+            res = await ky.post('/api/file', { body: fd }).json()
         }
 
-        compressedFiles.forEach(async (f) => fd.append("files", f))
-        const res = await ky.post('/api/file', { body: fd }).json()
         setUploading(false)
         return res;
     }
-    
+
     const clear = () => setFiles([])
 
     useImperativeHandle(ref, () => ({ upload, clear }))
@@ -43,11 +46,18 @@ const PicUploader = forwardRef(function PicUploader(props,ref) {
                     e.currentTarget.value = ""
                 }} />
 
-            {files.length > 0 && (
-                <div className="text-xs text-muted-foreground">
-                  已选择 {files.length} 张 {uploading ? "（上传中）" : ""}
-                </div>
-            )}
+            <div className="text-xs text-muted-foreground">
+                {files.length > 0 && (
+                    <>
+                        已选择 {files.length} 张 {uploading ? "（上传中）" : ""}
+                    </>
+                )}
+                {(!files.length && defaultPics.length) && (
+                    <>
+                        现有 {defaultPics.length} 张
+                    </>
+                )}
+            </div>
         </>
     )
 })

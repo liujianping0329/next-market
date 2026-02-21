@@ -55,14 +55,16 @@ const GreengrassDetail = ({ id, showToolbar }) => {
           </Button>
         </div>
         <div className="flex space-x-2 items-center">
-          <FormGarden trigger={
-            <Button variant="ghost" size="sm" className="h-auto px-2 py-2">
-              <span className="flex flex-col items-center gap-1">
-                <Pencil className="h-5 w-5" />
-                <span className="text-[11px] leading-none text-muted-foreground">修改</span>
-              </span>
-            </Button>
-          } onSuccess={() => fetchDetail()} isUpdate={true} categories={gardenCategoriesNoAll} />
+          {detail && (
+            <FormGarden trigger={
+              <Button variant="ghost" size="sm" className="h-auto px-2 py-2">
+                <span className="flex flex-col items-center gap-1">
+                  <Pencil className="h-5 w-5" />
+                  <span className="text-[11px] leading-none text-muted-foreground">修改</span>
+                </span>
+              </Button>
+            } onSuccess={() => fetchDetail()} defaultValues={detail} categories={gardenCategoriesNoAll} />
+          )}
 
 
           <Button variant="ghost" size="sm" className="h-auto px-2 py-2">
