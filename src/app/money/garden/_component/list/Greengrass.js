@@ -18,13 +18,14 @@ import { useEffect, useState } from "react";
 import FormGarden from "../form/FormGarden";
 import { useRouter } from "next/navigation"
 import { useGardenStore } from "@/store/gardenStore"
+import { usePathname } from "next/navigation";
 import { gardenCategories, gardenCategoriesNoAll } from "@/app/money/garden/_component/constants/gardenCategories";
 
 const Greengrass = () => {
   const [expanded, setExpanded] = useState(false);
   const [subCategory, setSubCategory] = useState("all");
   const [list, setList] = useState([]);
-
+  const pathname = usePathname();
 
   const router = useRouter()
 
@@ -37,7 +38,7 @@ const Greengrass = () => {
 
   useEffect(() => {
     fetchList();
-  }, []);
+  }, [pathname]);
 
   const filteredList = subCategory === "all" ? list
     : list.filter((item) => item.category === subCategory); // 按实际字段改

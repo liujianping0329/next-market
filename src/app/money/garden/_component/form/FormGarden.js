@@ -60,16 +60,6 @@ const FormGarden = ({ trigger, onSuccess, categories, defaultValues = null }) =>
             content: defaultValues?.content || ""
         }
     });
-    useEffect(() => {
-        form.reset({
-            date: defaultValues?.date ? parseLocalDate(defaultValues.date) : new Date(),
-            category: defaultValues?.category || "else",
-            title: defaultValues?.title || "",
-            location: defaultValues?.location?.name || "",
-            locationPath: defaultValues?.location?.path || "",
-            content: defaultValues?.content || ""
-        });
-    }, [defaultValues?.id]);
 
     const picRef = useRef(null)
 

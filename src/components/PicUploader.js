@@ -52,7 +52,7 @@ const PicUploader = forwardRef(function PicUploader({ defaultPics = [] }, ref) {
                         已选择 {files.length} 张 {uploading ? "（上传中）" : ""}
                     </>
                 )}
-                {(!files.length && defaultPics.length) && (
+                {files.length === 0 && defaultPics.length > 0 && (
                     <>
                         现有 {defaultPics.length} 张
                     </>

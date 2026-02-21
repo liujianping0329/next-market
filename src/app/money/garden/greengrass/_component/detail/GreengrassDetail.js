@@ -18,12 +18,14 @@ const GreengrassDetail = ({ id, showToolbar }) => {
   const [detail, setDetail] = useState(null)
   const [copied, setCopied] = useState(false)
 
+  const [editVer, setEditVer] = useState(0);
+
   const fetchDetail = async () => {
     const response = await ky.post('/api/money/garden/list/match', {
       json: { id }
     }).json();
-    console.log(response);
     setDetail(response.list[0]);
+    setEditVer(prev => prev + 1)
   }
 
   useEffect(() => {
@@ -56,14 +58,16 @@ const GreengrassDetail = ({ id, showToolbar }) => {
         </div>
         <div className="flex space-x-2 items-center">
           {detail && (
-            <FormGarden trigger={
-              <Button variant="ghost" size="sm" className="h-auto px-2 py-2">
-                <span className="flex flex-col items-center gap-1">
-                  <Pencil className="h-5 w-5" />
-                  <span className="text-[11px] leading-none text-muted-foreground">修改</span>
-                </span>
-              </Button>
-            } onSuccess={() => fetchDetail()} defaultValues={detail} categories={gardenCategoriesNoAll} />
+            <FormGarden
+              key={`${detail?.id}-${editVer}`}
+              trigger={
+                <Button variant="ghost" size="sm" className="h-auto px-2 py-2">
+                  <span className="flex flex-col items-center gap-1">
+                    <Pencil className="h-5 w-5" />
+                    <span className="text-[11px] leading-none text-muted-foreground">修改</span>
+                  </span>
+                </Button>
+              } onSuccess={() => fetchDetail()} defaultValues={detail} categories={gardenCategoriesNoAll} />
           )}
 
 
