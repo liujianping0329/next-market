@@ -11,7 +11,7 @@ export async function generateMetadata({ params }) {
   const title = data?.title;
   const description = data?.content?.slice?.(0, 80) || data?.location;
 
-  const ogImage = "https://next-market-beta-dun.vercel.app/gardenNoPic.png";
+  const ogImage = data?.pics?.[0] || "https://next-market-beta-dun.vercel.app/noImg.png";
 
   return {
     metadataBase: new URL("https://next-market-beta-dun.vercel.app"),
