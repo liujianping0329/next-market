@@ -11,7 +11,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner"
 import FormGarden from "@/app/money/garden/_component/form/FormGarden";
 import { gardenCategories, gardenCategoriesNoAll } from "@/app/money/garden/_component/constants/gardenCategories";
-
+import { MapPin } from "lucide-react";
 
 const GreengrassDetail = ({ id, showToolbar }) => {
   const router = useRouter()
@@ -90,8 +90,17 @@ const GreengrassDetail = ({ id, showToolbar }) => {
         </div>
       </div >}
       <p>
-        <img src={detail?.pics?.[0]} className="w-full h-48 object-cover" />
+        <img
+          src={detail?.pics?.[0]}
+          className="w-full aspect-[3/4] object-contain bg-black"
+        />
         {detail?.title}<br />
+        {detail?.location?.name &&
+          <Link href={detail?.location?.path} className="flex items-center gap-1 truncate">
+            <MapPin className="h-3.5 w-3.5 shrink-0" />
+            <span className="truncate">{detail?.location?.name}</span>
+          </Link>
+        }<br />
         {detail?.content}
       </p>
     </>
