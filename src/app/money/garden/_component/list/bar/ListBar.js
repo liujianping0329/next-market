@@ -85,12 +85,10 @@ const ListBar = () => {
       {/* ✅ 抽屉：浮在列表上层，贴着工具栏下边缘 */}
       {open && (
         <div className="fixed left-0 right-0 top-[53px] z-50">
-          <div className="border-b bg-background shadow-sm">
-            <div className="px-4 py-4 max-h-[70vh] overflow-auto">
+          <div className="border-b bg-background shadow-sm rounded-b-md">
+            <div className="pt-4 overflow-auto">
               {active === "filter" && (
-                <div className="space-y-3 pb-2">
-                  <FilterContent />
-                </div>
+                <FilterContent />
               )}
 
               {active === "sort" && (
