@@ -4,7 +4,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import FilterContent from "@/app/money/garden/_component/list/bar/FilterContent";
 
-const ListBar = () => {
+const ListBar = ({ onApply }) => {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState("filter");
   const barRef = useRef(null);
@@ -88,7 +88,10 @@ const ListBar = () => {
           <div className="border-b bg-background shadow-sm rounded-b-md">
             <div className="pt-4 overflow-auto">
               {active === "filter" && (
-                <FilterContent />
+                <FilterContent onConfirm={(category) => {
+                  onApply(category);
+                  setOpen(false);
+                }} />
               )}
 
               {active === "sort" && (

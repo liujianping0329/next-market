@@ -1,5 +1,5 @@
 export const gardenCategories = [
-  { value: "all", label: "全部" },
+  { value: null, label: "全部" },
   { value: "recipe", label: "菜谱" },
   { value: "shop", label: "想去的店" },
   { value: "weekend", label: "周末好去处" },
@@ -9,4 +9,4 @@ export const gardenCategories = [
   { value: "else", label: "其他" }
 ];
 
-export const gardenCategoriesNoAll = gardenCategories.filter(c => c.value !== "all");
+export const gardenCategoriesNoAll = gardenCategories.filter(c => c.value !== null);

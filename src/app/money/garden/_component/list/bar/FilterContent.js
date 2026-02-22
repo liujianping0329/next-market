@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { ca } from "date-fns/locale";
 import ky from "ky";
 
-const FilterContent = () => {
+const FilterContent = ({ onConfirm }) => {
 
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [categories, setCategories] = useState(null);
@@ -65,9 +65,9 @@ const FilterContent = () => {
         <Button
           variant="outline"
           className="bg-primary text-primary-foreground w-2/5"
-        // onClick={() => {
-        //   console.log("selected:", selected);
-        // }}
+          onClick={() => {
+            onConfirm(selectedCategory?.value);
+          }}
         >
           确定
         </Button>

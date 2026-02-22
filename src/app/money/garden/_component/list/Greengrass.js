@@ -24,7 +24,7 @@ import ListBar from "@/app/money/garden/_component/list/bar/ListBar";
 
 const Greengrass = () => {
   const [expanded, setExpanded] = useState(false);
-  const [subCategory, setSubCategory] = useState("all");
+  const [subCategory, setSubCategory] = useState(null);
   const [list, setList] = useState([]);
   const pathname = usePathname();
 
@@ -41,8 +41,7 @@ const Greengrass = () => {
     fetchList();
   }, [pathname]);
 
-  const filteredList = subCategory === "all" ? list
-    : list.filter((item) => item.category === subCategory); // 按实际字段改
+  const filteredList = subCategory ? list.filter((item) => item.category === subCategory) : list; // 按实际字段改
   return (
     <>
       <div id="toolBar" className="mx-2.5 mt-2 flex items-center justify-between rounded-md border bg-muted/40 px-2.5 py-2">
@@ -62,7 +61,10 @@ const Greengrass = () => {
           </div>
         </div>
       </div>
-      <ListBar />
+      <ListBar onApply={(category) => {
+        setSubCategory(category);
+        console.log("selected category:", category);
+      }} />
       <div id="cateContainer" className="px-4 pt-2 flex gap-1 flex-wrap justify-center">
         {gardenCategories.map((cate) => (
           <Badge
@@ -77,7 +79,7 @@ const Greengrass = () => {
             {cate.label}
           </Badge>))}
       </div>
-      <div id="cardContainer" className="p-4 space-y-4">
+      <div id="cardContainer" className="p-4 space-y-4 min-h-[100dvh]">
         {filteredList.map((item, index) => {
 
           const hasPic = !!item.pics?.[0];
