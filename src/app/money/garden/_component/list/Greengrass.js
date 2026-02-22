@@ -65,7 +65,7 @@ const Greengrass = () => {
         setSubCategory(category);
         console.log("selected category:", category);
       }} />
-      <div id="cateContainer" className="px-4 pt-2 flex gap-1 flex-wrap justify-center">
+      {/* <div id="cateContainer" className="px-4 pt-2 flex gap-1 flex-wrap justify-center">
         {gardenCategories.map((cate) => (
           <Badge
             key={cate.value}
@@ -78,7 +78,7 @@ const Greengrass = () => {
           >
             {cate.label}
           </Badge>))}
-      </div>
+      </div> */}
       <div id="cardContainer" className="p-4 space-y-4 min-h-[100dvh]">
         {filteredList.map((item, index) => {
 

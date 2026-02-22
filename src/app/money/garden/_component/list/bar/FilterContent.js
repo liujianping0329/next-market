@@ -52,7 +52,7 @@ const FilterContent = ({ onConfirm }) => {
           })}
         </div>
       </div >
-      <div className="py-2 flex items-center justify-center gap-2 border-y shadow-sm">
+      {categories && <div className="py-2 flex items-center justify-center gap-2 border-y shadow-sm">
 
         <Button
           variant="outline"
@@ -71,7 +71,7 @@ const FilterContent = ({ onConfirm }) => {
         >
           确定
         </Button>
-      </div>
+      </div>}
     </>
   )
 }
