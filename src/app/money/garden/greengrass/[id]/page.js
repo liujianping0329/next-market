@@ -9,7 +9,7 @@ export async function generateMetadata({ params }) {
   const { data } = await supabase.from("garden").select().eq("id", id).single();
 
   const title = data?.title;
-  const description = data?.content?.slice?.(0, 80) || data?.location;
+  const description = data?.content || data?.location;
 
   const ogImage = data?.pics?.[0] || "https://next-market-beta-dun.vercel.app/noImg.png";
 
