@@ -40,8 +40,7 @@ const GreengrassDetail = ({ id, showToolbar }) => {
       return
     }
     setCopied(true)
-    await navigator.clipboard.writeText(url)
-    toast.success("已复制链接", { position: "top-left" })
+    window.location.href = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(url)}`
     setTimeout(() => setCopied(false), 1200)
   }
 
