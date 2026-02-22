@@ -20,6 +20,7 @@ import { useRouter } from "next/navigation"
 import { useGardenStore } from "@/store/gardenStore"
 import { usePathname } from "next/navigation";
 import { gardenCategories, gardenCategoriesNoAll } from "@/app/money/garden/constants/gardenCategories";
+import ListBar from "@/app/money/garden/_component/list/bar/ListBar";
 
 const Greengrass = () => {
   const [expanded, setExpanded] = useState(false);
@@ -61,6 +62,7 @@ const Greengrass = () => {
           </div>
         </div>
       </div>
+      <ListBar />
       <div id="cateContainer" className="px-4 pt-2 flex gap-1 flex-wrap justify-center">
         {gardenCategories.map((cate) => (
           <Badge
