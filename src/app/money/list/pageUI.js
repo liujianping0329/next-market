@@ -33,20 +33,20 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import ky from "ky";
 import FormX from "./_component/form/formX";
-import Bar , { toBarChartData } from "./_component/chart/bar";
+import Bar, { toBarChartData } from "./_component/chart/bar";
 import FormL from "./_component/form/formL";
 import { Spinner } from "@/components/ui/spinner"
 import FormMemo from "./_component/form/formMemo";
-import { formatDateLocal } from "@/lib/date";
+import { formatDateLocal } from "@/app/utils/date";
 
 export const revalidate = 0;
 
 const MoneyListUI = ({ exchanges: { cnyToJpy, twdToJpy, usdToJpy } }) => {
-    const [openX, setOpenX] =  useState(false);
-    const [openL, setOpenL] =  useState(false);
-    const [openMemo, setOpenMemo] =  useState(false);
+    const [openX, setOpenX] = useState(false);
+    const [openL, setOpenL] = useState(false);
+    const [openMemo, setOpenMemo] = useState(false);
 
-    const [openChart, setOpenChart] =  useState(false);
+    const [openChart, setOpenChart] = useState(false);
     const [list, setList] = useState([]);
     const [isLoadX, setIsLoadX] = useState(false);
     const [isLoadL, setIsLoadL] = useState(false);
@@ -75,15 +75,15 @@ const MoneyListUI = ({ exchanges: { cnyToJpy, twdToJpy, usdToJpy } }) => {
                             <DialogHeader>
                                 <DialogTitle>记账本</DialogTitle>
                             </DialogHeader>
-                            <FormX onSuccess={()=>{
+                            <FormX onSuccess={() => {
                                 setOpenX(false);
                                 fetchList();
-                            }} exchanges = {{ cnyToJpy, twdToJpy, usdToJpy }} btnStatus = {setIsLoadX}/>
+                            }} exchanges={{ cnyToJpy, twdToJpy, usdToJpy }} btnStatus={setIsLoadX} />
                             <DialogFooter>
                                 <DialogClose asChild>
                                     <Button variant="outline">关闭</Button>
                                 </DialogClose>
-                                <Button type="submit" form="formX" disabled = {isLoadX}>
+                                <Button type="submit" form="formX" disabled={isLoadX}>
                                     {isLoadX && <Spinner />}保存
                                 </Button>
                             </DialogFooter>
@@ -98,15 +98,15 @@ const MoneyListUI = ({ exchanges: { cnyToJpy, twdToJpy, usdToJpy } }) => {
                             <DialogHeader>
                                 <DialogTitle>记账本</DialogTitle>
                             </DialogHeader>
-                            <FormL onSuccess={()=>{
+                            <FormL onSuccess={() => {
                                 setOpenL(false);
                                 fetchList();
-                            }} exchanges = {{ cnyToJpy, twdToJpy, usdToJpy }} btnStatus = {setIsLoadL}/>
+                            }} exchanges={{ cnyToJpy, twdToJpy, usdToJpy }} btnStatus={setIsLoadL} />
                             <DialogFooter>
                                 <DialogClose asChild>
                                     <Button variant="outline">关闭</Button>
                                 </DialogClose>
-                                <Button type="submit" form="formL" disabled = {isLoadL}>
+                                <Button type="submit" form="formL" disabled={isLoadL}>
                                     {isLoadL && <Spinner />}保存
                                 </Button>
                             </DialogFooter>
@@ -121,15 +121,15 @@ const MoneyListUI = ({ exchanges: { cnyToJpy, twdToJpy, usdToJpy } }) => {
                             <DialogHeader>
                                 <DialogTitle>记一笔支出/收入</DialogTitle>
                             </DialogHeader>
-                            <FormMemo onSuccess={()=>{
+                            <FormMemo onSuccess={() => {
                                 setOpenMemo(false);
                                 fetchList();
-                            }} btnStatus = {setIsLoadMemo}/>
+                            }} btnStatus={setIsLoadMemo} />
                             <DialogFooter>
                                 <DialogClose asChild>
                                     <Button variant="outline">关闭</Button>
                                 </DialogClose>
-                                <Button type="submit" form="formMemo" disabled = {isLoadMemo}>
+                                <Button type="submit" form="formMemo" disabled={isLoadMemo}>
                                     {isLoadMemo && <Spinner />}保存
                                 </Button>
                             </DialogFooter>
@@ -137,9 +137,9 @@ const MoneyListUI = ({ exchanges: { cnyToJpy, twdToJpy, usdToJpy } }) => {
                     </Dialog>
                     <Button variant="outline" asChild
                         className="bg-green-50 border-green-300 text-green-700 hover:bg-green-100">
-                      <Link href={`/money/garden/`}>
-                        青青草原
-                      </Link>
+                        <Link href={`/money/garden/`}>
+                            青青草原
+                        </Link>
                     </Button>
                 </div>
                 <Dialog open={openChart} onOpenChange={setOpenChart}>
@@ -185,9 +185,9 @@ const MoneyListUI = ({ exchanges: { cnyToJpy, twdToJpy, usdToJpy } }) => {
                             <TableCell>
                                 <div className="flex items-center gap-2">
                                     <Button size="sm" variant="outline" asChild>
-                                      <Link href={`/money/memo/-1`}>
-                                        详情
-                                      </Link>
+                                        <Link href={`/money/memo/-1`}>
+                                            详情
+                                        </Link>
                                     </Button>
                                 </div>
                             </TableCell>
@@ -198,55 +198,55 @@ const MoneyListUI = ({ exchanges: { cnyToJpy, twdToJpy, usdToJpy } }) => {
                                 next ? Number(row.total) - Number(next.total) : null;
                             const isPositive = profit !== null && profit > 0;
                             const isNegative = profit !== null && profit < 0;
-                            
-                                return (
-                                    <TableRow key={row.id}>
-                                        <TableCell>{row.date}</TableCell>
-                                        <TableCell>{row.usdToJpy}</TableCell>
-                                        <TableCell>{row.cnyToJpy}</TableCell>
-                                        <TableCell>{row.twdToJpy}</TableCell>
 
-                                        {/* total 显示两位小数 */}
-                                        <TableCell>{Number(row.total).toFixed(2)}</TableCell>
+                            return (
+                                <TableRow key={row.id}>
+                                    <TableCell>{row.date}</TableCell>
+                                    <TableCell>{row.usdToJpy}</TableCell>
+                                    <TableCell>{row.cnyToJpy}</TableCell>
+                                    <TableCell>{row.twdToJpy}</TableCell>
 
-                                        {/* 盈亏先留空 */}
-                                        <TableCell className="flex items-center gap-1">
-                                            {profit === null ? (
-                                                  "—"
-                                                ) : (
-                                                  <>
-                                                    <span
-                                                      className={
+                                    {/* total 显示两位小数 */}
+                                    <TableCell>{Number(row.total).toFixed(2)}</TableCell>
+
+                                    {/* 盈亏先留空 */}
+                                    <TableCell className="flex items-center gap-1">
+                                        {profit === null ? (
+                                            "—"
+                                        ) : (
+                                            <>
+                                                <span
+                                                    className={
                                                         isPositive
-                                                          ? "text-red-600"
-                                                          : isNegative
-                                                          ? "text-green-600"
-                                                          : ""
-                                                      }
-                                                    >
-                                                      {isPositive && "▲"}
-                                                      {isNegative && "▼"}
-                                                      {profit >= 0
+                                                            ? "text-red-600"
+                                                            : isNegative
+                                                                ? "text-green-600"
+                                                                : ""
+                                                    }
+                                                >
+                                                    {isPositive && "▲"}
+                                                    {isNegative && "▼"}
+                                                    {profit >= 0
                                                         ? `+${profit.toFixed(2)}`
                                                         : profit.toFixed(2)}
-                                                    </span>
-                                                  </>
-                                                )}
-                                        </TableCell>
+                                                </span>
+                                            </>
+                                        )}
+                                    </TableCell>
 
-                                        <TableCell>
-                                            <div className="flex items-center gap-2">
-                                                <Button size="sm" variant="outline">
-                                                    编辑
-                                                </Button>
-                                                <Button size="sm" variant="outline" asChild>
-                                                  <Link href={`/money/memo/${row.id}`}>
+                                    <TableCell>
+                                        <div className="flex items-center gap-2">
+                                            <Button size="sm" variant="outline">
+                                                编辑
+                                            </Button>
+                                            <Button size="sm" variant="outline" asChild>
+                                                <Link href={`/money/memo/${row.id}`}>
                                                     详情
-                                                  </Link>
-                                                </Button>
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
+                                                </Link>
+                                            </Button>
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
                             )
                         })}
                     </TableBody>

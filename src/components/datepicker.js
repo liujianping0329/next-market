@@ -5,17 +5,17 @@ import { Calendar } from "@/components/ui/calendar"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
 } from "@/components/ui/popover"
 import { useState } from "react";
-import { formatDateLocal } from "../lib/date";
+import { formatDateLocal } from "@/app/utils/date";
 
 const Datepicker = ({ dateDf, onChange }) => {
     const [date, setDate] = useState(dateDf);
     const [open, setOpen] = useState(false);
-    
+
 
     const calendarSelect = (date) => {
         setDate(date);
@@ -30,10 +30,10 @@ const Datepicker = ({ dateDf, onChange }) => {
                 </PopoverTrigger>
                 <PopoverContent align="start">
                     <Calendar mode="single" selected={date} captionLayout="dropdown"
-                    onSelect={calendarSelect} />
+                        onSelect={calendarSelect} />
                 </PopoverContent>
             </Popover>
-            
+
         </>
     );
 }

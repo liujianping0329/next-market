@@ -1,38 +1,19 @@
 "use client";
-import { useRef } from "react";
-import { useForm } from "react-hook-form";
+import {
+    FieldGroup
+} from "@/components/ui/field";
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
-    FormMessage,
-} from "@/components/ui/form"
-import {
-    Field,
-    FieldDescription,
-    FieldGroup,
-    FieldLabel,
-    FieldSet,
-    FieldSeparator
-} from "@/components/ui/field"
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
-import { Input } from "@/components/ui/input"
+    FormMessage
+} from "@/components/ui/form";
+import { Textarea } from "@/components/ui/textarea";
 import ky from "ky";
-import { Textarea } from "@/components/ui/textarea"
+import { useForm } from "react-hook-form";
 
-import Datepicker from "@/components/datepicker";
-import PicUploader from "@/components/PicUploader";
-import { formatDateLocal } from "@/lib/date";
 
 const FormSoy = ({ onSuccess, btnStatus }) => {
     const form = useForm({

@@ -33,7 +33,7 @@ import { Textarea } from "@/components/ui/textarea"
 
 import Datepicker from "@/components/datepicker";
 import PicUploader from "@/components/PicUploader";
-import { formatDateLocal, parseLocalDate } from "@/lib/date";
+import { formatDateLocal, parseLocalDate } from "@/app/utils/date";
 import {
     Dialog,
     DialogClose,

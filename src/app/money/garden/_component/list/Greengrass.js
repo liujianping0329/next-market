@@ -19,7 +19,7 @@ import FormGarden from "../form/FormGarden";
 import { useRouter } from "next/navigation"
 import { useGardenStore } from "@/store/gardenStore"
 import { usePathname } from "next/navigation";
-import { gardenCategories, gardenCategoriesNoAll } from "@/app/money/garden/_component/constants/gardenCategories";
+import { gardenCategories, gardenCategoriesNoAll } from "@/app/money/garden/constants/gardenCategories";
 
 const Greengrass = () => {
   const [expanded, setExpanded] = useState(false);

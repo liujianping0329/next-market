@@ -10,8 +10,9 @@ import ky from "ky"
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner"
 import FormGarden from "@/app/money/garden/_component/form/FormGarden";
-import { gardenCategories, gardenCategoriesNoAll } from "@/app/money/garden/_component/constants/gardenCategories";
+import { gardenCategories, gardenCategoriesNoAll } from "@/app/money/garden/constants/gardenCategories";
 import { MapPin } from "lucide-react";
+import ActionButton from "@/components/ActionButton";
 
 const GreengrassDetail = ({ id, showToolbar }) => {
   const router = useRouter()
@@ -59,49 +60,20 @@ const GreengrassDetail = ({ id, showToolbar }) => {
 
   return (
     <>
-      {showToolbar && <div id="toolBar" className="flex p-2.5 justify-between overflow-x-auto items-center border-b">
+      {showToolbar && detail && <div id="toolBar" className="flex p-2.5 justify-between overflow-x-auto items-center border-b">
         <div className="flex space-x-2 items-center">
-          <Button variant="ghost" size="sm" onClick={() => router.back()} className="h-auto px-2 py-2">
-            <span className="flex flex-col items-center gap-1">
-              <ArrowLeft className="h-5 w-5" />
-              <span className="text-[11px] leading-none text-muted-foreground">返回</span>
-            </span>
-          </Button>
+          <ActionButton icon={ArrowLeft} label="返回" onClick={() => router.back()} />
         </div>
         <div className="flex space-x-2 items-center">
-          {detail && (
-            <FormGarden
-              key={`${detail?.id}-${editVer}`}
-              trigger={
-                <Button variant="ghost" size="sm" className="h-auto px-2 py-2">
-                  <span className="flex flex-col items-center gap-1">
-                    <Pencil className="h-5 w-5" />
-                    <span className="text-[11px] leading-none text-muted-foreground">修改</span>
-                  </span>
-                </Button>
-              } onSuccess={() => fetchDetail()} defaultValues={detail} categories={gardenCategoriesNoAll} />
-          )}
-
-
-          <Button variant="ghost" size="sm" className="h-auto px-2 py-2" onClick={handleDelete}
-            disabled={deleting || !detail}>
-            <span className="flex flex-col items-center gap-1">
-              <Trash2 className="h-5 w-5" />
-              <span className="text-[11px] leading-none text-muted-foreground">删除</span>
-            </span>
-          </Button>
-
-          <Button variant="ghost" size="sm" disabled={copied} className="h-auto px-2 py-2"
-            onClick={handleShare}>
-            <span className="flex flex-col items-center gap-1">
-              <Share2 className="h-5 w-5" />
-              <span className="text-[11px] leading-none text-muted-foreground">
-                分享
-              </span>
-            </span>
-          </Button>
+          <FormGarden
+            key={`${detail?.id}-${editVer}`}
+            trigger={
+              <ActionButton icon={Pencil} label="修改" />
+            } onSuccess={() => fetchDetail()} defaultValues={detail} categories={gardenCategoriesNoAll} />
+          <ActionButton icon={Trash2} label="删除" onClick={handleDelete} disabled={deleting || !detail} />
+          <ActionButton icon={Share2} label="分享" onClick={handleShare} disabled={copied || !detail} />
         </div>
-      </div >}
+      </div>}
       <p className="whitespace-pre-line">
         <img
           src={detail?.pics?.[0]}
