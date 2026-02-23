@@ -4,7 +4,7 @@ import supabase from "@/app/utils/database";
 export async function POST(request, context) {
     const requestBody = await request.json();
 
-    let query = supabase.from("constants").select().match(requestBody);
+    let query = supabase.from("constants").select().match(requestBody).order('sort', { ascending: true });
 
     const { data: matchList } = await query;
     return NextResponse.json({ list: matchList });

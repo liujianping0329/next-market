@@ -7,6 +7,7 @@ import ky from "ky";
 const FilterContent = ({ onConfirm }) => {
 
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [openedCategory, setOpenedCategory] = useState(null);
   const [categories, setCategories] = useState(null);
 
   const fetchValues = async () => {
@@ -35,13 +36,16 @@ const FilterContent = ({ onConfirm }) => {
             return (
               <Button
                 key={category.id}
-                onClick={() =>
-                  setSelectedCategory(selectedCategory === category ? null : category)
-                }
+                onClick={() => {
+                  setOpenedCategory(category?.children ? category : null);
+                  setSelectedCategory(selectedCategory?.id === category.id ? null : category)
+                  console.log("selected category:", selectedCategory?.id === category.id ? null : category);
+                  console.log("opened category:", category?.children ? category : null);
+                }}
                 className={cn(
                   "px-4 py-2 text-sm rounded-md border-2 transition",
                   "bg-background hover:bg-muted",
-                  selectedCategory === category
+                  selectedCategory?.id === category.id
                     ? "border-foreground/60 bg-foreground text-background"
                     : "border-border text-foreground"
                 )}
@@ -51,6 +55,44 @@ const FilterContent = ({ onConfirm }) => {
             );
           })}
         </div>
+
+        {openedCategory && (
+          <div className="mt-4 px-4 py-3 rounded-lg bg-muted/40 border">
+            <div className="text-sm font-medium mb-2 text-muted-foreground">子分类</div>
+
+            <div className="flex flex-wrap gap-2">
+              {openedCategory.children.map((child) => {
+                return (
+                  <Button
+                    key={child.id}
+                    size="sm"
+                    onClick={() => {
+                      setSelectedCategory({
+                        ...child,
+                        _level: "child",
+                        _parentId: openedCategory.id,
+                      });
+                      console.log("CCCselected category:", {
+                        ...child,
+                        _level: "child",
+                        _parentId: openedCategory.id,
+                      });
+                    }}
+                    className={cn(
+                      "px-4 py-2 text-sm rounded-md border-2 transition",
+                      "bg-background hover:bg-muted",
+                      selectedCategory?.id === child.id
+                        ? "border-foreground/60 bg-foreground text-background"
+                        : "border-border text-foreground"
+                    )}
+                  >
+                    {child.label}
+                  </Button>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div >
       {categories && <div className="py-2 flex items-center justify-center gap-2 border-y shadow-sm">
 
