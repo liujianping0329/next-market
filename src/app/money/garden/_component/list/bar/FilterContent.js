@@ -2,11 +2,13 @@
 import { Button } from "@/components/ui/button";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
-import { ca } from "date-fns/locale";
+import { ca, fi } from "date-fns/locale";
 import ky from "ky";
 import { Spinner } from "@/components/ui/spinner";
 import { Input } from "@/components/ui/input";
 import { Plus, X, Check } from "lucide-react";
+import { slugify } from "transliteration";
+import { toast } from "sonner";
 
 const FilterContent = ({ onConfirm }) => {
 
@@ -38,6 +40,31 @@ const FilterContent = ({ onConfirm }) => {
       if (!next) setNewLabel("");
       return next;
     });
+  };
+
+  const submitNewCategory = async () => {
+
+    setIsSavingNew(true);
+    try {
+      await ky.post("/api/constants/upsert", {
+        json: {
+          category: "gardenCategory",
+          label: newLabel,
+          value: slugify(newLabel, {
+            separator: "",
+          })
+        },
+      }).json();
+      fetchValues();
+      setIsAdding(false);
+      setNewLabel("");
+    } catch (error) {
+      if (error.errorCode) {
+        toast.error(error.errorMsg);
+      }
+    } finally {
+      setIsSavingNew(false);
+    }
   };
 
   return (
@@ -75,9 +102,10 @@ const FilterContent = ({ onConfirm }) => {
               variant="outline"
               size="icon"
               disabled={isSavingNew}
-            // onClick={submitNewCategory}
+              className="bg-black text-white hover:bg-black/90"
+              onClick={submitNewCategory}
             >
-              {isSavingNew ? <Spinner /> : <Check className="h-4 w-4" />}
+              {isSavingNew ? <Spinner /> : <Check className="h-5 w-5 stroke-[5]" />}
             </Button>
           </div>
         )}
