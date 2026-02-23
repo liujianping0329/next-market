@@ -5,6 +5,8 @@ import { cn } from "@/lib/utils";
 import { ca } from "date-fns/locale";
 import ky from "ky";
 import { Spinner } from "@/components/ui/spinner";
+import { Input } from "@/components/ui/input";
+import { Plus, X, Check } from "lucide-react";
 
 const FilterContent = ({ onConfirm }) => {
 
@@ -12,6 +14,10 @@ const FilterContent = ({ onConfirm }) => {
   const [openedCategory, setOpenedCategory] = useState(null);
   const [categories, setCategories] = useState(null);
   const [isLoadCategories, setIsLoadCategories] = useState(false);
+
+  const [isAdding, setIsAdding] = useState(false);
+  const [newLabel, setNewLabel] = useState("");
+  const [isSavingNew, setIsSavingNew] = useState(false);
 
   const fetchValues = async () => {
     setIsLoadCategories(true);
@@ -26,6 +32,14 @@ const FilterContent = ({ onConfirm }) => {
     fetchValues();
   }, []);
 
+  const toggleAdd = () => {
+    setIsAdding((v) => {
+      const next = !v;
+      if (!next) setNewLabel("");
+      return next;
+    });
+  };
+
   return (
     <>
       <div className="space-y-3 pb-6 px-4">
@@ -34,7 +48,39 @@ const FilterContent = ({ onConfirm }) => {
           <span className="h-5 w-1 rounded-sm bg-foreground/80" />
           <div className="font-semibold">类别</div>
           {isLoadCategories && <Spinner />}
+          {categories && <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={toggleAdd}
+            className={cn(
+              "rounded-full",
+              isAdding ? "bg-muted" : "hover:bg-muted"
+            )}
+            aria-label={isAdding ? "取消新增类别" : "新增类别"}
+          >
+            {isAdding ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+          </Button>}
         </div>
+        {isAdding && (
+          <div className="flex items-center gap-2 px-3">
+            <Input
+              value={newLabel}
+              onChange={(e) => setNewLabel(e.target.value)}
+              placeholder="新增类别名称"
+              disabled={isSavingNew}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              disabled={isSavingNew}
+            // onClick={submitNewCategory}
+            >
+              {isSavingNew ? <Spinner /> : <Check className="h-4 w-4" />}
+            </Button>
+          </div>
+        )}
 
         {/* 胶囊选项：单选 */}
         <div className="flex flex-wrap gap-2 px-3">
