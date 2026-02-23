@@ -21,6 +21,7 @@ const GreengrassDetail = ({ id, showToolbar }) => {
 
   const [editVer, setEditVer] = useState(0);
   const [deleting, setDeleting] = useState(false);
+  const [categories, setCategories] = useState([]);
 
   const fetchDetail = async () => {
     const response = await ky.post('/api/money/garden/list/match', {
@@ -29,9 +30,16 @@ const GreengrassDetail = ({ id, showToolbar }) => {
     setDetail(response.list[0]);
     setEditVer(prev => prev + 1)
   }
+  const fetchCategory = async () => {
+    const response = await ky.post('/api/constants/list/match', {
+      json: { category: "gardenCategory" }
+    }).json();
+    setCategories(response.list);
+  }
 
   useEffect(() => {
     fetchDetail();
+    fetchCategory();
   }, []);
   const handleShare = async () => {
     const url = window.location.href
@@ -69,7 +77,7 @@ const GreengrassDetail = ({ id, showToolbar }) => {
             key={`${detail?.id}-${editVer}`}
             trigger={
               <ActionButton icon={Pencil} label="修改" />
-            } onSuccess={() => fetchDetail()} defaultValues={detail} categories={gardenCategoriesNoAll} />
+            } onSuccess={() => fetchDetail()} defaultValues={detail} categories={categories} />
           <ActionButton icon={Trash2} label="删除" onClick={handleDelete} disabled={deleting || !detail} />
           <ActionButton icon={Share2} label="分享" onClick={handleShare} disabled={copied || !detail} />
         </div>

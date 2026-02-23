@@ -1,20 +1,25 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { ca } from "date-fns/locale";
 import ky from "ky";
+import { Spinner } from "@/components/ui/spinner";
 
 const FilterContent = ({ onConfirm }) => {
 
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [openedCategory, setOpenedCategory] = useState(null);
   const [categories, setCategories] = useState(null);
+  const [isLoadCategories, setIsLoadCategories] = useState(false);
 
   const fetchValues = async () => {
+    setIsLoadCategories(true);
     const response = await ky.post('/api/constants/list/match', {
       json: { category: "gardenCategory" }
     }).json();
     setCategories(response.list);
+    setIsLoadCategories(false);
   }
 
   useEffect(() => {
@@ -28,6 +33,7 @@ const FilterContent = ({ onConfirm }) => {
         <div className="flex items-center gap-4">
           <span className="h-5 w-1 rounded-sm bg-foreground/80" />
           <div className="font-semibold">类别</div>
+          {isLoadCategories && <Spinner />}
         </div>
 
         {/* 胶囊选项：单选 */}

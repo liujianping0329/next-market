@@ -119,7 +119,23 @@ const FormGarden = ({ trigger, onSuccess, categories, defaultValues = null }) =>
                                                         </SelectTrigger>
                                                         <SelectContent>
                                                             {categories.map(cate => (
-                                                                <SelectItem key={cate.value} value={cate.value}>{cate.label}</SelectItem>
+                                                                <div key={cate.value}>
+                                                                    {/* 父项（可选） */}
+                                                                    <SelectItem value={cate.value} className="font-medium">
+                                                                        {cate.label}
+                                                                    </SelectItem>
+
+                                                                    {/* 子项（缩进） */}
+                                                                    {cate.children?.map((child) => (
+                                                                        <SelectItem
+                                                                            key={child.value}
+                                                                            value={child.value}
+                                                                            className="pl-8 text-muted-foreground"
+                                                                        >
+                                                                            {child.label}
+                                                                        </SelectItem>
+                                                                    ))}
+                                                                </div>
                                                             ))}
                                                         </SelectContent>
                                                     </Select>
