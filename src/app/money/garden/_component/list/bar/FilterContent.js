@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
-import { ca, fi } from "date-fns/locale";
+import { ca, fi, id } from "date-fns/locale";
 import ky from "ky";
 import { Spinner } from "@/components/ui/spinner";
 import { Input } from "@/components/ui/input";
@@ -28,6 +28,7 @@ const FilterContent = ({ onConfirm }) => {
     }).json();
     setCategories(response.list);
     setIsLoadCategories(false);
+    return response.list;
   }
 
   useEffect(() => {
@@ -46,22 +47,44 @@ const FilterContent = ({ onConfirm }) => {
 
     setIsSavingNew(true);
     try {
-      await ky.post("/api/constants/upsert", {
-        json: {
+      let param = {};
+      if (selectedCategory) {
+        if (!selectedCategory._level) {
+          let childrenMaxId = Math.max(...(selectedCategory.children || []).map((child) => Number(child.id)), 0);
+          param = {
+            id: selectedCategory.id,
+            children: [...(selectedCategory.children || []), {
+              id: selectedCategory.id + String(childrenMaxId + 1).padStart(2, "0"),
+              label: newLabel,
+              value: slugify(newLabel, {
+                separator: "",
+              })
+            }]
+          }
+        } else {
+          toast.error("只能在一级分类下新增子分类");
+          return;
+        }
+      } else {
+        param = {
           category: "gardenCategory",
           label: newLabel,
           value: slugify(newLabel, {
             separator: "",
           })
-        },
+        };
+      }
+
+      await ky.post("/api/constants/upsert", {
+        json: param,
       }).json();
-      fetchValues();
+      const updatedCategories = await fetchValues();
+      selectedCategory && !selectedCategory._level ? setOpenedCategory(updatedCategories.filter(c => c.id === selectedCategory.id)[0]) : () => { };
       setIsAdding(false);
       setNewLabel("");
     } catch (error) {
-      if (error.errorCode) {
-        toast.error(error.errorMsg);
-      }
+      const { errorMsg } = await error.response.json();
+      toast.error(errorMsg);
     } finally {
       setIsSavingNew(false);
     }
@@ -179,6 +202,7 @@ const FilterContent = ({ onConfirm }) => {
         <Button
           variant="outline"
           className="w-2/5"
+          disabled={isAdding || isSavingNew}
         // onClick={() => { }}
         >
           重置
@@ -190,6 +214,7 @@ const FilterContent = ({ onConfirm }) => {
           onClick={() => {
             onConfirm(selectedCategory?.value);
           }}
+          disabled={isAdding || isSavingNew}
         >
           确定
         </Button>

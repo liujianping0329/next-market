@@ -9,7 +9,7 @@ export async function POST(request, context) {
         if (requestBody.label) {
             const { data: isExistLabel } = await supabase.from("constants").select()
                 .eq("category", requestBody.category).eq("label", requestBody.label).maybeSingle();
-
+            console.log("isExistLabel", isExistLabel);
             if (isExistLabel) {
                 return NextResponse.json({
                     errorCode: "LABEL_EXISTS",
@@ -18,15 +18,17 @@ export async function POST(request, context) {
             }
         }
 
-        const { data: maxRow } = await supabase
-            .from("constants")
-            .select("sort")
-            .eq("category", requestBody.category)
-            .order("sort", { ascending: false })
-            .limit(1)
-            .maybeSingle();
-        let currentSort = maxRow?.sort ?? 0;
-        requestBody.sort = currentSort + 1;
+        if (!requestBody.id) {
+            const { data: maxRow } = await supabase
+                .from("constants")
+                .select("sort")
+                .eq("category", requestBody.category)
+                .order("sort", { ascending: false })
+                .limit(1)
+                .maybeSingle();
+            let currentSort = maxRow?.sort ?? 0;
+            requestBody.sort = currentSort + 1;
+        }
     }
     const { data } = await supabase.from('constants').upsert(requestBody).select();
     return NextResponse.json({ id: data[0].id });
