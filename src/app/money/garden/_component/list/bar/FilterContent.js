@@ -50,10 +50,14 @@ const FilterContent = ({ onConfirm }) => {
       let param = {};
       if (selectedCategory) {
         if (!selectedCategory._level) {
-          let childrenMaxId = Math.max(...(selectedCategory.children || []).map((child) => Number(child.id)), 0);
+          const parentId = selectedCategory.id;
+          const parent = categories?.find(c => c.id === parentId);
+          const children = parent?.children || [];
+          const childrenMaxId = Math.max(...children.map(ch => Number(ch.id) || 0), 0);
+
           param = {
-            id: selectedCategory.id,
-            children: [...(selectedCategory.children || []), {
+            id: parentId,
+            children: [...children, {
               id: childrenMaxId + 1,
               label: newLabel,
               value: slugify(newLabel, {
@@ -79,7 +83,11 @@ const FilterContent = ({ onConfirm }) => {
         json: param,
       }).json();
       const updatedCategories = await fetchValues();
-      selectedCategory && !selectedCategory._level ? setOpenedCategory(updatedCategories.filter(c => c.id === selectedCategory.id)[0]) : () => { };
+      if (selectedCategory && !selectedCategory._level) {
+        const latestParent = updatedCategories.find(c => c.id === selectedCategory.id);
+        setOpenedCategory(latestParent?.children ? latestParent : null);
+        setSelectedCategory(latestParent || null);
+      }
       setIsAdding(false);
       setNewLabel("");
     } catch (error) {
