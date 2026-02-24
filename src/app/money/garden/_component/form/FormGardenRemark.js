@@ -74,7 +74,7 @@ const FormGardenRemark = ({ trigger, onSuccess, defaultValues }) => {
                 <DrawerTrigger asChild>
                     {trigger}
                 </DrawerTrigger>
-                <DrawerContent className="h-[50dvh] flex flex-col px-4 pb-4">
+                <DrawerContent className="h-[90dvh] flex flex-col px-4 pb-4">
                     <DrawerHeader>
                         <DrawerTitle>点评</DrawerTitle>
                     </DrawerHeader>
