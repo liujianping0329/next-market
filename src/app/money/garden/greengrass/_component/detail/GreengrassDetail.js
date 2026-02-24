@@ -10,8 +10,9 @@ import ky from "ky"
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner"
 import FormGarden from "@/app/money/garden/_component/form/FormGarden";
+import FormGardenRemark from "@/app/money/garden/_component/form/FormGardenRemark";
 import { gardenCategories, gardenCategoriesNoAll } from "@/app/money/garden/constants/gardenCategories";
-import { MapPin } from "lucide-react";
+import { MapPin, MessageSquare } from "lucide-react";
 import ActionButton from "@/components/ActionButton";
 
 const GreengrassDetail = ({ id, showToolbar }) => {
@@ -82,12 +83,23 @@ const GreengrassDetail = ({ id, showToolbar }) => {
           <ActionButton icon={Share2} label="分享" onClick={handleShare} disabled={copied || !detail} />
         </div>
       </div>}
-      <p className="whitespace-pre-line">
+
+      {detail && <div id="toolBarBottom" className="fixed bottom-0 left-0 right-0 flex p-2.5 justify-center overflow-x-auto items-center border-t bg-background">
+        <FormGardenRemark
+          key={`${detail?.id}-${editVer}`}
+          trigger={
+            <ActionButton icon={MessageSquare} label="点评" />
+          } onSuccess={() => fetchDetail()} defaultValues={detail} />
+      </div>}
+
+      <p className="whitespace-pre-line pb-17">
         <img
           src={detail?.pics?.[0]}
           className="w-full aspect-[3/4] object-contain bg-white"
         />
         {detail?.title}<br />
+        分数:{detail?.point}<br />
+        点评:{detail?.remark}<br />
         {detail?.location?.name &&
           <Link href={detail?.location?.path} className="flex items-center gap-1 truncate">
             <MapPin className="h-3.5 w-3.5 shrink-0" />
