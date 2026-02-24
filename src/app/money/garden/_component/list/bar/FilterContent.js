@@ -54,7 +54,7 @@ const FilterContent = ({ onConfirm }) => {
           param = {
             id: selectedCategory.id,
             children: [...(selectedCategory.children || []), {
-              id: selectedCategory.id + String(childrenMaxId + 1).padStart(2, "0"),
+              id: childrenMaxId + 1,
               label: newLabel,
               value: slugify(newLabel, {
                 separator: "",
