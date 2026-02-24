@@ -14,6 +14,7 @@ import FormGardenRemark from "@/app/money/garden/_component/form/FormGardenRemar
 import { gardenCategories, gardenCategoriesNoAll } from "@/app/money/garden/constants/gardenCategories";
 import { MapPin, MessageSquare } from "lucide-react";
 import ActionButton from "@/components/ActionButton";
+import ImageCarousel from "@/components/ImageCarousel";
 
 const GreengrassDetail = ({ id, showToolbar }) => {
   const router = useRouter()
@@ -92,14 +93,16 @@ const GreengrassDetail = ({ id, showToolbar }) => {
           } onSuccess={() => fetchDetail()} defaultValues={detail} />
       </div>}
 
-      <p className="whitespace-pre-line pb-17">
-        <img
+
+      <ImageCarousel images={detail?.pics} ratio={3 / 4} />
+      {/* <img
           src={detail?.pics?.[0]}
           className="w-full aspect-[3/4] object-contain bg-white"
-        />
+        /> */}
+      <p className="whitespace-pre-line pb-17">
         {detail?.title}<br />
-        分数:{detail?.point}<br />
-        点评:{detail?.remark}<br />
+        {detail && `评分:${detail?.point}`}<br />
+        {detail && `点评:${detail?.remark}`}<br />
         {detail?.location?.name &&
           <Link href={detail?.location?.path} className="flex items-center gap-1 truncate">
             <MapPin className="h-3.5 w-3.5 shrink-0" />
