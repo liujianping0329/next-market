@@ -53,7 +53,7 @@ const FilterContent = ({ onConfirm }) => {
           const parentId = selectedCategory.id;
           const parent = categories?.find(c => c.id === parentId);
           const children = parent?.children || [];
-          const childrenMaxId = Math.max(...children.map(ch => Number(ch.id) || 0), 0);
+          const childrenMaxId = Math.max(...children.map(ch => Number(ch.id)), parentId * 100);
 
           param = {
             id: parentId,
