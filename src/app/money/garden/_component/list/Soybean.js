@@ -6,8 +6,8 @@ import ky from "ky";
 import { Check } from "lucide-react";
 import { Loader2 } from "lucide-react";
 import { pickColor } from "@/app/utils/color";
-
-
+import ActionButton from "@/components/ActionButton";
+import FolderOpBar from "./soy/FolderOpBar";
 
 const Soybean = () => {
     const [list, setList] = useState([]);
@@ -102,8 +102,9 @@ const Soybean = () => {
                     const bg = pickColor(folder.id, "morandi");
                     return (
                         <div key={folder.id} className={`w-full pb-4 mb-4 rounded-2xl border ${bg}`}>
-                            <div className="px-4 py-4">
+                            <div className="px-4 py-4 flex items-center justify-between">
                                 <span>{folder.title}</span>
+                                <FolderOpBar />
                             </div>
                             {folder.children?.map((item, index) => {
                                 const done = item.status === "0";
