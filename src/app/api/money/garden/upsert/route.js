@@ -9,6 +9,7 @@ export async function POST(request, context) {
             .from("garden")
             .select("sort")
             .eq("topic", "SoyBean")
+            .eq("category", requestBody[0].category)
             .order("sort", { ascending: false })
             .limit(1)
             .maybeSingle();

@@ -1,20 +1,3 @@
-import {
-    Card,
-    CardAction,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle
-} from "@/components/ui/card"
-import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger
-} from "@/components/ui/dialog";
 import { Spinner } from "@/components/ui/spinner";
 import { useEffect, useState } from "react";
 import FormSoy from "../form/FormSoy";
@@ -22,21 +5,35 @@ import { Button } from "@/components/ui/button";
 import ky from "ky";
 import { Check } from "lucide-react";
 import { Loader2 } from "lucide-react";
+import { pickColor } from "@/app/utils/color";
+
 
 
 const Soybean = () => {
     const [list, setList] = useState([]);
     const [pending, setPending] = useState(new Set()); // 正在同步的 id 集合
 
-    const [openSoy, setOpenSoy] = useState(false);
-    const [isLoadSoy, setIsLoadSoy] = useState(false);
     const [isLoadCleanup, setIsLoadCleanup] = useState(false);
 
     const fetchList = async () => {
         const response = await ky.post('/api/money/garden/list/match', {
             json: { topic: "SoyBean" }
         }).json();
-        setList(response.list);
+        let dbList = response.list;
+        let list = [{
+            id: 0,
+            category: "folder",
+            title: "未分类",
+            children: dbList.filter(item => !item.category).sort((a, b) => a.sort - b.sort)
+        }]
+        dbList.filter(item => item.category === "folder").sort((a, b) => a.sort - b.sort)
+            .forEach(item => {
+                list.push({
+                    ...item,
+                    children: dbList.filter(i => i.category === "item" && i.parent === item.id).sort((a, b) => a.sort - b.sort)
+                });
+            });
+        setList(list);
     }
 
     useEffect(() => {
@@ -82,29 +79,12 @@ const Soybean = () => {
                     </span>
 
                     <div className="flex items-center justify-between">
-                        <Dialog open={openSoy} onOpenChange={setOpenSoy}>
-                            <DialogTrigger asChild>
-                                <Button size="sm" variant="outline">新增记录</Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                                <DialogHeader>
-                                    <DialogTitle>新增</DialogTitle>
-                                </DialogHeader>
-                                <FormSoy onSuccess={() => {
-                                    setOpenSoy(false);
-                                    fetchList();
-                                }} btnStatus={setIsLoadSoy} />
-                                <DialogFooter>
-                                    <DialogClose asChild>
-                                        <Button variant="outline">关闭</Button>
-                                    </DialogClose>
-                                    <Button type="submit" form="formSoy" disabled={isLoadSoy}>
-                                        {isLoadSoy && <Spinner />}保存
-                                    </Button>
-                                </DialogFooter>
-                            </DialogContent>
+                        <FormSoy trigger={
+                            <Button size="sm" variant="outline">新增便签</Button>
+                        } onSuccess={() => {
+                            fetchList();
+                        }} />
 
-                        </Dialog>
                         <Button size="sm" variant="outline" disabled={isLoadCleanup} onClick={() => {
                             setIsLoadCleanup(true);
                             ky.post("/api/money/garden/delete", {
@@ -118,44 +98,43 @@ const Soybean = () => {
                 </div>
             </div>
             <div id="cardContainer" className="p-4">
-                {list.map((item, index) => {
-                    const done = item.status === "0";
-                    const syncing = pending.has(item.id);
-
-                    let icon;
-
-                    if (syncing) {
-                        icon = (
-                            <div className="h-5 w-5 flex items-center justify-center rounded-full border border-gray-400">
-                                <Loader2 className="h-3 w-3 animate-spin text-gray-400" />
-                            </div>
-                        );
-                    } else if (done) {
-                        icon = (
-                            <div className="h-5 w-5 flex items-center justify-center rounded-full bg-gray-400 border-gray-400">
-                                <Check className="h-3 w-3 text-white" />
-                            </div>
-                        );
-                    } else {
-                        icon = (
-                            <div className="h-5 w-5 rounded-full border border-gray-400" />
-                        );
-                    }
-
+                {list.map(folder => {
+                    const bg = pickColor(folder.id, "morandi");
                     return (
-                        <div key={item.id}
-                            onClick={() => !syncing && toggleOptimistic(item)}
-                            className="flex items-center gap-3 px-4 py-3 cursor-pointer transition"
-                        >
-                            {icon}
-
-                            {/* 标题 */}
-                            <span
-                                className={`text-sm transition ${done ? "text-gray-400 line-through" : ""
-                                    }`}
-                            >
-                                {item.title}
-                            </span>
+                        <div key={folder.id} className={`w-full pb-4 mb-4 rounded-2xl border ${bg}`}>
+                            <div className="px-4 py-4">
+                                <span>{folder.title}</span>
+                            </div>
+                            {folder.children?.map((item, index) => {
+                                const done = item.status === "0";
+                                const syncing = pending.has(item.id);
+                                let icon;
+                                if (syncing) {
+                                    icon = (
+                                        <div className="h-5 w-5 flex items-center justify-center rounded-full border border-gray-400">
+                                            <Loader2 className="h-3 w-3 animate-spin text-gray-400" />
+                                        </div>
+                                    );
+                                } else if (done) {
+                                    icon = (
+                                        <div className="h-5 w-5 flex items-center justify-center rounded-full bg-gray-400 border-gray-400">
+                                            <Check className="h-3 w-3 text-white" />
+                                        </div>
+                                    );
+                                } else {
+                                    icon = (
+                                        <div className="h-5 w-5 rounded-full border border-gray-400" />
+                                    );
+                                }
+                                return (
+                                    <div key={item.id} onClick={() => !syncing && toggleOptimistic(item)}
+                                        className="flex items-center gap-3 px-4 py-3 cursor-pointer transition">
+                                        {icon}
+                                        <span className={`text-sm transition ${done ? "text-gray-400 line-through" : ""}`}>
+                                            {item.title}
+                                        </span>
+                                    </div>)
+                            })}
                         </div>
                     )
                 })}
