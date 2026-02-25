@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Info, Pencil, Trash2, Share2, ArrowLeft } from "lucide-react"
+import { Info, Pencil, Trash2, Share2, ArrowLeft, BookOpenCheck } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useMemo, useState } from "react"
 import { useGardenStore } from "@/store/gardenStore"
@@ -10,6 +10,7 @@ import ky from "ky"
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner"
 import FormGarden from "@/app/money/garden/_component/form/FormGarden";
+import FormSoy from "@/app/money/garden/_component/form/FormSoy";
 import FormGardenRemark from "@/app/money/garden/_component/form/FormGardenRemark";
 import { gardenCategories, gardenCategoriesNoAll } from "@/app/money/garden/constants/gardenCategories";
 import { MapPin, MessageSquare } from "lucide-react";
@@ -67,10 +68,9 @@ const GreengrassDetail = ({ id, showToolbar }) => {
     setDeleting(false);
   };
 
-
   return (
     <>
-      {showToolbar && detail && <div id="toolBar" className="flex p-2.5 justify-between overflow-x-auto items-center border-b">
+      {showToolbar && detail && categories && <div id="toolBar" className="flex p-2.5 justify-between overflow-x-auto items-center border-b">
         <div className="flex space-x-2 items-center">
           <ActionButton icon={ArrowLeft} label="返回" onClick={() => router.back()} />
         </div>
@@ -81,7 +81,18 @@ const GreengrassDetail = ({ id, showToolbar }) => {
               <ActionButton icon={Pencil} label="修改" />
             } onSuccess={() => fetchDetail()} defaultValues={detail} categories={categories} />
           <ActionButton icon={Trash2} label="删除" onClick={handleDelete} disabled={deleting || !detail} />
-          <ActionButton icon={Share2} label="分享" onClick={handleShare} disabled={copied || !detail} />
+          {/* <ActionButton icon={Share2} label="分享" onClick={handleShare} disabled={copied || !detail} /> */}
+
+          <FormSoy trigger={
+            <ActionButton icon={BookOpenCheck} label="待办" />
+          } defaultValues={
+            {
+              category: `【${categories.find(c => c.value === detail.category)?.label || "未分类"}】${detail.title}`,
+              titles: detail?.content
+            }} onSuccess={() => {
+              fetchDetail()
+              toast.success("已添加到待办");
+            }} />
         </div>
       </div>}
 
