@@ -104,7 +104,7 @@ const Soybean = () => {
                         <div key={folder.id} className={`w-full pb-4 mb-4 rounded-2xl border ${bg}`}>
                             <div className="px-4 py-4 flex items-center justify-between">
                                 <span>{folder.title}</span>
-                                <FolderOpBar />
+                                {folder.id !== 0 && <FolderOpBar folder={folder} onSuccess={fetchList} />}
                             </div>
                             {folder.children?.map((item, index) => {
                                 const done = item.status === "0";
