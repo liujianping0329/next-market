@@ -8,11 +8,14 @@ import { title } from "process";
 //  }
 export async function POST(request, context) {
     const requestBody = await request.json();
-    console.log("Upsert SoyBean Request:", requestBody);
-    const { data: existParent } = await supabase.from('garden')
-        .select("id").eq("category", "folder").eq("topic", "SoyBean")
-        .eq("title", requestBody.pname)
-        .limit(1).maybeSingle();
+
+    let existQuery = supabase.from('garden').select("id")
+        .eq("category", "folder").eq("topic", "SoyBean")
+        .eq("title", requestBody.pname).limit(1);
+    if (requestBody.id) {
+        existQuery = existQuery.neq("id", requestBody.id);
+    }
+    const { data: existParent } = await existQuery.maybeSingle();
     if (existParent) {
         return NextResponse.json({
             errorCode: "NAME_EXISTS",
@@ -22,8 +25,12 @@ export async function POST(request, context) {
 
     let parent = {};
     if (requestBody.id) {
-        const { data } = await supabase.from('garden').upsert(requestBody).select().single();
+        const { data } = await supabase.from('garden').upsert({
+            id: requestBody.id,
+            title: requestBody.pname
+        }).select().single();
         parent = data;
+        console.log("Upserted Parent:", parent);
         await supabase.from('garden').delete().eq("parent", requestBody.id).eq("topic", "SoyBean")
             .eq("category", "item");
     } else {

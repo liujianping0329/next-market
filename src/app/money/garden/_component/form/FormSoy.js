@@ -52,6 +52,9 @@ const FormSoy = ({ trigger, onSuccess, defaultValues = null }) => {
                         titles: values.titles
                     }
                 }).json();
+                onSuccess();
+                setOpenSoy(false);
+                form.reset();
             } catch (error) {
                 console.error("Error upserting SoyBean:", error);
                 const { errorMsg } = await error.response.json();
@@ -60,6 +63,12 @@ const FormSoy = ({ trigger, onSuccess, defaultValues = null }) => {
                 setIsLoadSoy(false);
             }
         } else {
+            if (defaultValues?.id) {
+                //修改框不输入类别
+                toast.error("修改时，便签名不能为空！");
+                setIsLoadSoy(false);
+                return;
+            }
             //新增框不输入类别
             await ky.post('/api/money/garden/upsert', {
                 json: values.titles.split("\n").map(t => t.trim()).filter(Boolean).map(title => ({
@@ -69,10 +78,11 @@ const FormSoy = ({ trigger, onSuccess, defaultValues = null }) => {
                     status: "1"
                 }))
             }).json();
+            onSuccess();
+            setIsLoadSoy(false);
+            setOpenSoy(false);
+            form.reset();
         }
-        onSuccess();
-        setIsLoadSoy(false);
-        setOpenSoy(false);
     }
 
     return (
@@ -83,7 +93,7 @@ const FormSoy = ({ trigger, onSuccess, defaultValues = null }) => {
                 </DialogTrigger>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>新增</DialogTitle>
+                        <DialogTitle>{defaultValues ? "修改" : "新增"}</DialogTitle>
                     </DialogHeader>
                     <div className="w-full max-h-dvh overflow-y-auto overscroll-contain">
                         <Form {...form}>

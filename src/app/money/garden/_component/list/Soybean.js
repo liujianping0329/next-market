@@ -15,6 +15,8 @@ const Soybean = () => {
 
     const [isLoadCleanup, setIsLoadCleanup] = useState(false);
 
+    const [editVer, setEditVer] = useState(0);
+
     const fetchList = async () => {
         const response = await ky.post('/api/money/garden/list/match', {
             json: { topic: "SoyBean" }
@@ -34,6 +36,7 @@ const Soybean = () => {
                 });
             });
         setList(list);
+        setEditVer(prev => prev + 1);
     }
 
     useEffect(() => {
@@ -104,7 +107,7 @@ const Soybean = () => {
                         <div key={folder.id} className={`w-full pb-4 mb-4 rounded-2xl border ${bg}`}>
                             <div className="px-4 py-4 flex items-center justify-between">
                                 <span>{folder.title}</span>
-                                {folder.id !== 0 && <FolderOpBar folder={folder} onSuccess={fetchList} />}
+                                {folder.id !== 0 && <FolderOpBar folder={folder} onSuccess={fetchList} editVer={editVer} />}
                             </div>
                             {folder.children?.map((item, index) => {
                                 const done = item.status === "0";
