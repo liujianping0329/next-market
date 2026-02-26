@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import supabase from "../../../utils/database";
+import supabase from "@/app/utils/database";
 
 export async function GET() {
     const { data: allList } = await supabase.from("harvest").select().order('date', { ascending: false });
