@@ -37,7 +37,7 @@ export default function ImageCarousel({ images = [], ratio = 3 / 4 }) {
         <CarouselContent>
           {images.map((img, idx) => (
             <CarouselItem key={img + idx}>
-              <div className="relative w-full overflow-hidden rounded-2xl bg-muted"
+              <div className="relative w-full overflow-hidden bg-muted"
                 style={{ aspectRatio: `${ratio}` }} >
                 <Image src={img} alt={img} fill className="object-contain" priority={idx === 0} />
               </div>

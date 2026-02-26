@@ -3,9 +3,12 @@ export const formatDateLocal = (date, format = "yyyy-MM-dd") => {
             yyyy: date.getFullYear(),
             MM: String(date.getMonth() + 1).padStart(2, "0"),
             dd: String(date.getDate()).padStart(2, "0"),
+            hh: String(date.getHours()).padStart(2, "0"),
+            mm: String(date.getMinutes()).padStart(2, "0"),
+            ss: String(date.getSeconds()).padStart(2, "0"),
       };
 
-      return format.replace(/yyyy|MM|dd/g, (token) => map[token]);
+      return format.replace(/yyyy|MM|dd|hh|mm|ss/g, (token) => map[token]);
 };
 export const parseLocalDate = (str) => {
       if (!str) return new Date();

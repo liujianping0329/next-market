@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Info, Pencil, Trash2, Share2, ArrowLeft, BookOpenCheck } from "lucide-react"
+import { Info, Pencil, Trash2, Share2, ArrowLeft, BookOpenCheck, Landmark } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useMemo, useState } from "react"
 import { useGardenStore } from "@/store/gardenStore"
@@ -16,6 +16,7 @@ import { gardenCategories, gardenCategoriesNoAll } from "@/app/money/garden/cons
 import { MapPin, MessageSquare } from "lucide-react";
 import ActionButton from "@/components/ActionButton";
 import ImageCarousel from "@/components/ImageCarousel";
+import FormHarvest from "@/app/money/garden/_component/form/FormHarvest";
 
 const GreengrassDetail = ({ id, showToolbar }) => {
   const router = useRouter()
@@ -92,6 +93,16 @@ const GreengrassDetail = ({ id, showToolbar }) => {
             }} onSuccess={() => {
               fetchDetail()
               toast.success("已添加到待办");
+            }} />
+
+          <FormHarvest trigger={
+            <ActionButton icon={Landmark} label="行程" />
+          } defaultValues={
+            {
+              gardenId: detail?.id
+            }} onSuccess={() => {
+              fetchDetail()
+              toast.success("已添加到行程");
             }} />
         </div>
       </div>}
