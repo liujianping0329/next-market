@@ -1,8 +1,11 @@
-export const formatDateLocal = (date) => {
-      const y = date.getFullYear();
-      const m = String(date.getMonth() + 1).padStart(2, "0");
-      const d = String(date.getDate()).padStart(2, "0");
-      return `${y}-${m}-${d}`;
+export const formatDateLocal = (date, format = "yyyy-MM-dd") => {
+      const map = {
+            yyyy: date.getFullYear(),
+            MM: String(date.getMonth() + 1).padStart(2, "0"),
+            dd: String(date.getDate()).padStart(2, "0"),
+      };
+
+      return format.replace(/yyyy|MM|dd/g, (token) => map[token]);
 };
 export const parseLocalDate = (str) => {
       if (!str) return new Date();

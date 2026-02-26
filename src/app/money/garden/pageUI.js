@@ -16,6 +16,8 @@ import { useEffect, useState } from "react";
 import FormGarden from "./_component/form/FormGarden";
 import Greengrass from "./_component/list/Greengrass";
 import Soybean from "./_component/list/Soybean";
+import Harvest from "./_component/list/Harvest";
+import Granary from "./_component/list/Granary";
 
 export const revalidate = 0;
 
@@ -36,13 +38,17 @@ const GardenUI = () => {
                             if (v) setTab(v);
                         }}>
                         <ToggleGroupItem value="Soybean" className="data-[state=on]:bg-blue-500 data-[state=on]:text-white">春盛园</ToggleGroupItem>
-                        <ToggleGroupItem value="Greengrass" className="data-[state=on]:bg-blue-500 data-[state=on]:text-white">百草园</ToggleGroupItem>
+                        <ToggleGroupItem value="Greengrass" className="data-[state=on]:bg-blue-500 data-[state=on]:text-white">夏荣园</ToggleGroupItem>
+                        <ToggleGroupItem value="Harvest" className="data-[state=on]:bg-blue-500 data-[state=on]:text-white">秋实园</ToggleGroupItem>
+                        <ToggleGroupItem value="Granary" className="data-[state=on]:bg-blue-500 data-[state=on]:text-white">冬藏园</ToggleGroupItem>
                     </ToggleGroup>
 
                 </div>
             </div>
             {tab === "Soybean" && <Soybean />}
             {tab === "Greengrass" && <Greengrass />}
+            {tab === "Harvest" && <Harvest />}
+            {tab === "Granary" && <Granary />}
         </>
     );
 }

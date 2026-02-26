@@ -12,7 +12,7 @@ import {
 import { useState } from "react";
 import { formatDateLocal } from "@/app/utils/date";
 
-const Datepicker = ({ dateDf, onChange }) => {
+const Datepicker = ({ dateDf, onChange, dtFormat = "yyyy-MM-dd" }) => {
     const [date, setDate] = useState(dateDf);
     const [open, setOpen] = useState(false);
 
@@ -26,7 +26,7 @@ const Datepicker = ({ dateDf, onChange }) => {
         <>
             <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
-                    <Input className="text-left cursor-pointer" id="date" value={formatDateLocal(date)} readOnly />
+                    <Input className="text-left cursor-pointer" id="date" value={formatDateLocal(date, dtFormat)} readOnly />
                 </PopoverTrigger>
                 <PopoverContent align="start">
                     <Calendar mode="single" selected={date} captionLayout="dropdown"
