@@ -1,5 +1,6 @@
 "use client";
 import Datepicker from "@/components/datepicker";
+import DateTimePicker from "@/components/datetimepicker";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -27,6 +28,7 @@ import ky from "ky";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { formatDateLocal, parseLocalDateTime } from "@/app/utils/date";
 
 const FormHarvest = ({ trigger, onSuccess, defaultValues = null }) => {
 
@@ -34,7 +36,7 @@ const FormHarvest = ({ trigger, onSuccess, defaultValues = null }) => {
     const [isLoadHarvest, setIsLoadHarvest] = useState(false);
     const form = useForm({
         defaultValues: {
-            startTime: defaultValues?.startTime || new Date(),
+            startTime: parseLocalDateTime(defaultValues?.startTime) || new Date(),
             title: defaultValues?.title || ""
         }
     });
@@ -48,6 +50,7 @@ const FormHarvest = ({ trigger, onSuccess, defaultValues = null }) => {
                     ...(defaultValues?.id && { id: defaultValues.id }),
                     ...values,
                     ...(defaultValues?.gardenId && { gardenId: defaultValues.gardenId }),
+                    startTime: formatDateLocal(values.startTime, "yyyy-MM-dd HH:mm")
                 }
             }).json();
             onSuccess();
@@ -81,7 +84,7 @@ const FormHarvest = ({ trigger, onSuccess, defaultValues = null }) => {
                                             <FormItem>
                                                 <FormLabel>开始时间</FormLabel>
                                                 <FormControl>
-                                                    <Datepicker dtFormat="yyyy-MM-dd hh:mm" dateDf={field.value} onChange={field.onChange} withTime />
+                                                    <DateTimePicker dtFormat="yyyy-MM-dd hh:mm" dateDf={field.value} onChange={field.onChange} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>

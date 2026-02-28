@@ -13,6 +13,5 @@ export async function POST(request, context) {
     }
 
     const { data: matchList } = await query;
-    console.log("Match Garden List:", matchList);
     return NextResponse.json({ list: matchList });
 }
