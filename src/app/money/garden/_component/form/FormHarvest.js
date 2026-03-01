@@ -29,6 +29,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { formatDateLocal, parseLocalDateTime } from "@/app/utils/date";
+import supabase from "@/app/utils/database";
 
 const FormHarvest = ({ trigger, onSuccess, defaultValues = null }) => {
 
@@ -45,12 +46,18 @@ const FormHarvest = ({ trigger, onSuccess, defaultValues = null }) => {
         setIsLoadHarvest(true);
 
         try {
+            const { data, error } = await supabase.auth.getSession()
+            const userId = data.session?.user?.id
+            console.log("session error:", error);
+            console.log("session userId:", userId);
+            console.log("payload userId field:", userId);
             await ky.post('/api/money/harvest/upsert', {
                 json: {
                     ...(defaultValues?.id && { id: defaultValues.id }),
                     ...values,
                     ...(defaultValues?.gardenId && { gardenId: defaultValues.gardenId }),
-                    startTime: formatDateLocal(values.startTime, "yyyy-MM-dd HH:mm")
+                    startTime: formatDateLocal(values.startTime, "yyyy-MM-dd HH:mm"),
+                    userId: userId
                 }
             }).json();
             onSuccess();
