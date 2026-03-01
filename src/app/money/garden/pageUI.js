@@ -19,19 +19,52 @@ import Soybean from "./_component/list/Soybean";
 import Harvest from "./_component/list/Harvest";
 import Granary from "./_component/list/Granary";
 import supabase from "@/app/utils/database";
+import { CircleUser, MessageSquare } from "lucide-react";
+import ActionButton from "@/components/ActionButton";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 export const revalidate = 0;
 
 const GardenUI = () => {
     const [tab, setTab] = useState("Greengrass");
 
+    const [user, setUser] = useState(null)
+
+    useEffect(() => {
+        supabase.auth.getSession().then(({ data }) => {
+            setUser(data.session?.user ?? null)
+        })
+
+        const { data: listener } = supabase.auth.onAuthStateChange(
+            (_event, session) => {
+                setUser(session?.user ?? null)
+            }
+        )
+
+        return () => listener.subscription.unsubscribe()
+    }, [])
+
+
     const handleLogin = async () => {
         await supabase.auth.signInWithOAuth({
             provider: "google",
             options: {
-                redirectTo: window.location.origin
+                redirectTo: window.location.href
             }
         })
+    }
+
+    const handleLogout = async () => {
+        if (!confirm("确定退出？")) return;
+        await supabase.auth.signOut()
     }
 
     return (
@@ -54,9 +87,27 @@ const GardenUI = () => {
                     </ToggleGroup>
 
                 </div>
-                <Button variant="default" size="sm" onClick={handleLogin}>
-                    登录
-                </Button>
+                {user ? (<DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="rounded-full">
+                            <Avatar>
+                                <AvatarImage src={user?.user_metadata.avatar_url} alt="img" />
+                                <AvatarFallback>CN</AvatarFallback>
+                            </Avatar>
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-32">
+                        <DropdownMenuGroup>
+                            <DropdownMenuItem>1</DropdownMenuItem>
+                            <DropdownMenuItem>2</DropdownMenuItem>
+                            <DropdownMenuItem>3</DropdownMenuItem>
+                        </DropdownMenuGroup>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuGroup>
+                            <DropdownMenuItem variant="destructive" onClick={handleLogout}>注销</DropdownMenuItem>
+                        </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                </DropdownMenu>) : <ActionButton icon={CircleUser} size="sm" onClick={handleLogin} />}
             </div>
             {tab === "Soybean" && <Soybean />}
             {tab === "Greengrass" && <Greengrass />}
