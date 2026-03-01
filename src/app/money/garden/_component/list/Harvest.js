@@ -85,7 +85,7 @@ const Harvest = () => {
             </div>
             <div className="p-4 py-2 sticky top-0 z-30 bg-background border-b">
                 <div ref={headerScrollRef}
-                    className="h-[35px] gap-3 flex overflow-x-hidden items-center font-medium">
+                    className="h-[35px] gap-1 flex overflow-x-hidden items-center font-medium">
                     {header.map((n, i) => (
                         <div
                             key={n}
@@ -99,10 +99,10 @@ const Harvest = () => {
                     ))}
                 </div>
             </div>
-            <div className="p-4">
-                <div className="flex gap-3">
+            <div className="p-4 pt-1">
+                <div className="flex gap-1">
                     {/* 左侧冻结列（不滚动） */}
-                    <div className="grid gap-3 shrink-0 [grid-template-rows:repeat(14,50px)] w-[36px]">
+                    <div className="grid gap-1 shrink-0 [grid-template-rows:repeat(14,50px)] w-[36px]">
                         {timeConst.map((n) => (
                             <div
                                 key={n}
@@ -122,7 +122,7 @@ const Harvest = () => {
                         }}
                         className="overflow-x-auto flex-1">
                         <div
-                            className="min-w-max grid grid-flow-col gap-3 [grid-template-rows:repeat(14,50px)] auto-cols-[166px] " >
+                            className="min-w-max grid grid-flow-col gap-1 [grid-template-rows:repeat(14,50px)] auto-cols-[166px] " >
                             {timelist.map((n) => (
                                 <div
                                     key={n.no}
