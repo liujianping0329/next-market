@@ -18,11 +18,21 @@ import Greengrass from "./_component/list/Greengrass";
 import Soybean from "./_component/list/Soybean";
 import Harvest from "./_component/list/Harvest";
 import Granary from "./_component/list/Granary";
+import supabase from "@/app/utils/database";
 
 export const revalidate = 0;
 
 const GardenUI = () => {
     const [tab, setTab] = useState("Greengrass");
+
+    const handleLogin = async () => {
+        await supabase.auth.signInWithOAuth({
+            provider: "google",
+            options: {
+                redirectTo: window.location.origin
+            }
+        })
+    }
 
     return (
         <>
@@ -44,6 +54,9 @@ const GardenUI = () => {
                     </ToggleGroup>
 
                 </div>
+                <Button variant="default" size="sm" onClick={handleLogin}>
+                    登录
+                </Button>
             </div>
             {tab === "Soybean" && <Soybean />}
             {tab === "Greengrass" && <Greengrass />}
