@@ -39,6 +39,7 @@ const Harvest = () => {
                 startTime__gte: formatDateLocal(pullToZero(startTime), "yyyy-MM-dd HH:mm"),
                 startTime__lt: formatDateLocal(
                     changeDay(pullToZero(startTime), 7), "yyyy-MM-dd HH:mm"),
+                view: "harvestList"
             }
         }).json();
         console.log(4)
@@ -50,12 +51,13 @@ const Harvest = () => {
                 harvest: []
             };
         });
+        console.log("dbList", response);
         dbList.forEach(element => {
             const index = diffHours(pullToHour(element.startTime), pullToZero(startTime))
+            console.log("index", index);
             allTimes[index].harvest.push(element)
             element.index = index
         });
-        console.log("dbList", dbList);
         setTimeList(allTimes);
         console.log("allTimes", allTimes);
         setEditVer(prev => prev + 1);
@@ -128,7 +130,21 @@ const Harvest = () => {
                                     key={n.no}
                                     className={`h-[50px] border rounded flex items-center justify-center ${n.hidden ? "hidden" : ""
                                         }`}>
-                                    {n.harvest?.[0]?.title}
+                                    {/* 左侧正方形 */}
+                                    {n.harvest?.[0]?.garden && (<div className="h-full aspect-square flex-shrink-0">
+                                        <img
+                                            src={n.harvest?.[0]?.garden?.pics?.[0]}
+                                            className="w-full h-full object-cover rounded-l"
+                                            alt=""
+                                        />
+                                    </div>)}
+
+
+                                    {/* 右侧内容 */}
+                                    <div className="flex-1 flex items-center justify-center px-1">
+                                        {n.harvest?.[0]?.title}
+                                    </div>
+
                                 </div>
                             ))}
                         </div>
