@@ -220,7 +220,11 @@ const FilterContent = ({ onConfirm }) => {
           variant="outline"
           className="bg-primary text-primary-foreground w-2/5"
           onClick={() => {
-            onConfirm(selectedCategory?.value);
+            let cateName = selectedCategory?.value;
+            if (selectedCategory._level === "child") {
+              cateName = `${openedCategory?.value}-${selectedCategory?.value}`
+            }
+            onConfirm(cateName);
           }}
           disabled={isAdding || isSavingNew}
         >
