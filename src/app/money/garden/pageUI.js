@@ -46,6 +46,7 @@ const GardenUI = () => {
         const { data: listener } = supabase.auth.onAuthStateChange(
             (_event, session) => {
                 setUser(session?.user ?? null)
+                console.log(session?.user);
             }
         )
 
@@ -57,9 +58,10 @@ const GardenUI = () => {
         await supabase.auth.signInWithOAuth({
             provider: "google",
             options: {
-                redirectTo: `${location.origin}/api/auth/callback?next=/harvest/list`
+                redirectTo: `${location.origin}/api/auth/callback?next=/money/garden`
             }
         })
+        console.log(user);
     }
 
     const handleLogout = async () => {
