@@ -57,7 +57,7 @@ const GardenUI = () => {
         await supabase.auth.signInWithOAuth({
             provider: "google",
             options: {
-                redirectTo: window.location.href
+                redirectTo: `${location.origin}/api/auth/callback?next=/harvest/list`
             }
         })
     }
