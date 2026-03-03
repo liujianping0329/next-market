@@ -31,23 +31,14 @@ const Greengrass = () => {
 
   const router = useRouter()
 
-  const fetchList = async () => {
-    const response = await ky.post('/api/money/garden/list/match', {
-      json: { topic: "Greengrass" }
-    }).json();
+  const fetchData = async () => {
+    const response = await ky.post('/api/money/garden/greenGrass', { json: {} }).json();
+    setCategories(response.cates);
     setList(response.list);
   }
 
-  const fetchCategory = async () => {
-    const response = await ky.post('/api/constants/list/match', {
-      json: { category: "gardenCategory" }
-    }).json();
-    setCategories(response.list);
-  }
-
   useEffect(() => {
-    fetchList();
-    fetchCategory();
+    fetchData();
   }, [pathname]);
 
   const filteredList = subCategory ? list.filter((item) =>
@@ -65,7 +56,7 @@ const Greengrass = () => {
           <div className="self-start">
             <FormGarden trigger={
               <Button size="sm" variant="outline">新增记录</Button>
-            } onSuccess={() => fetchList()} categories={categories} />
+            } onSuccess={() => fetchData()} categories={categories} />
 
             <Button size="sm" variant="outline" onClick={() => setExpanded(!expanded)}>
               {expanded ? "全收起" : "全展开"}
