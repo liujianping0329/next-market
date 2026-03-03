@@ -45,6 +45,7 @@ import {
 } from "@/components/ui/dialog";
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
+import { convertCateName } from "@/app/utils/data";
 
 const FormGarden = ({ trigger, onSuccess, categories, defaultValues = null }) => {
     const [openGarden, setOpenGarden] = useState(false);
@@ -115,7 +116,7 @@ const FormGarden = ({ trigger, onSuccess, categories, defaultValues = null }) =>
                                                 <FormControl>
                                                     <Select onValueChange={field.onChange} value={field.value}>
                                                         <SelectTrigger className="w-full">
-                                                            <SelectValue />
+                                                            <SelectValue></SelectValue>
                                                         </SelectTrigger>
                                                         <SelectContent>
                                                             {categories.map(cate => (
@@ -129,7 +130,7 @@ const FormGarden = ({ trigger, onSuccess, categories, defaultValues = null }) =>
                                                                     {cate.children?.map((child) => (
                                                                         <SelectItem
                                                                             key={child.value}
-                                                                            value={child.value}
+                                                                            value={`${cate.value}-${child.value}`}
                                                                             className="pl-8 text-muted-foreground"
                                                                         >
                                                                             {child.label}
