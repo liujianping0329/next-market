@@ -60,9 +60,9 @@ const FilterContent = ({ onConfirm }) => {
             children: [...children, {
               id: childrenMaxId + 1,
               label: newLabel,
-              value: slugify(newLabel, {
+              value: [parent.label, slugify(newLabel, {
                 separator: "",
-              })
+              })].join("-")
             }]
           }
         } else {
@@ -220,11 +220,7 @@ const FilterContent = ({ onConfirm }) => {
           variant="outline"
           className="bg-primary text-primary-foreground w-2/5"
           onClick={() => {
-            let cateName = selectedCategory?.value;
-            if (selectedCategory._level === "child") {
-              cateName = `${openedCategory?.value}-${selectedCategory?.value}`
-            }
-            onConfirm(cateName);
+            onConfirm(selectedCategory?.value);
           }}
           disabled={isAdding || isSavingNew}
         >

@@ -41,7 +41,8 @@ const Greengrass = () => {
     fetchData();
   }, [pathname]);
 
-  const filteredList = subCategory ? list.filter((item) => item.category === subCategory) : list;
+  const filteredList = subCategory ? list.filter((item) => subCategory.includes("-") ?
+    item.category === subCategory : item.category.startsWith(subCategory)) : list;
   return (
     <>
       <div id="toolBar" className="mx-2.5 mt-2 flex items-center justify-between rounded-md border bg-muted/40 px-2.5 py-2">
