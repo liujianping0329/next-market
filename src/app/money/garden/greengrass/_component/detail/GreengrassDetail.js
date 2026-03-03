@@ -17,6 +17,7 @@ import { MapPin, MessageSquare } from "lucide-react";
 import ActionButton from "@/components/ActionButton";
 import ImageCarousel from "@/components/ImageCarousel";
 import FormHarvest from "@/app/money/garden/_component/form/FormHarvest";
+import { convertCateName } from "@/app/utils/data";
 
 const GreengrassDetail = ({ id, showToolbar }) => {
   const router = useRouter()
@@ -28,22 +29,18 @@ const GreengrassDetail = ({ id, showToolbar }) => {
   const [categories, setCategories] = useState([]);
 
   const fetchDetail = async () => {
-    const response = await ky.post('/api/money/garden/list/match', {
+    const response = await ky.post('/api/money/garden/greenGrass/detail', {
       json: { id }
     }).json();
-    setDetail(response.list[0]);
+    setDetail(response.detail);
+    setCategories(response.cates);
     setEditVer(prev => prev + 1)
-  }
-  const fetchCategory = async () => {
-    const response = await ky.post('/api/constants/list/match', {
-      json: { category: "gardenCategory" }
-    }).json();
-    setCategories(response.list);
+    console.log(response.cates);
+    console.log(response.detail.category);
   }
 
   useEffect(() => {
     fetchDetail();
-    fetchCategory();
   }, []);
   const handleShare = async () => {
     const url = window.location.href
@@ -88,7 +85,8 @@ const GreengrassDetail = ({ id, showToolbar }) => {
             <ActionButton icon={BookOpenCheck} label="待办" />
           } defaultValues={
             {
-              category: `【${categories.find(c => c.value === detail.category)?.label || "未分类"}】${detail.title}`,
+              category: `【${convertCateName(detail.category, categories) || "未分类"
+                }】${detail.title}`,
               titles: detail?.content
             }} onSuccess={() => {
               fetchDetail()

@@ -32,7 +32,7 @@ const Greengrass = () => {
   const router = useRouter()
 
   const fetchData = async () => {
-    const response = await ky.post('/api/money/garden/greenGrass', { json: {} }).json();
+    const response = await ky.post('/api/money/garden/greenGrass/list', { json: {} }).json();
     setCategories(response.cates);
     setList(response.list);
   }
