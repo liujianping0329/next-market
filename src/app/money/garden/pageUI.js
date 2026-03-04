@@ -89,6 +89,16 @@ const GardenUI = () => {
                     </ToggleGroup>
 
                 </div>
+                <button
+                    onClick={async () => {
+                        window.OneSignalDeferred = window.OneSignalDeferred || [];
+                        window.OneSignalDeferred.push(async function (OneSignal) {
+                            await OneSignal.Notifications.requestPermission();
+                        });
+                    }}
+                >
+                    开启提醒
+                </button>
                 {user ? (<DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon" className="rounded-full">
