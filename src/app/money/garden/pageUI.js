@@ -89,7 +89,7 @@ const GardenUI = () => {
                     </ToggleGroup>
 
                 </div>
-                <button
+                {/* <button
                     onClick={async () => {
                         window.OneSignalDeferred = window.OneSignalDeferred || [];
                         window.OneSignalDeferred.push(async function (OneSignal) {
@@ -98,7 +98,7 @@ const GardenUI = () => {
                     }}
                 >
                     开启提醒
-                </button>
+                </button> */}
                 {user ? (<DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon" className="rounded-full">
