@@ -39,7 +39,7 @@ const mergeDateTime = (d, t) => {
 
 const DateTimePicker = ({ dateDf = new Date(), onChange, dtFormat = "yyyy-MM-dd HH:mm" }) => {
     const [date, setDate] = useState(dateDf);
-    const [timeStr, setTimeStr] = useState("08:00");
+    const [timeStr, setTimeStr] = useState(`${String(dateDf.getHours()).padStart(2, "0")}:${String(dateDf.getMinutes()).padStart(2, "0")}`);
     const [open, setOpen] = useState(false);
     const dateTime = useMemo(() => mergeDateTime(date, timeStr), [date, timeStr]);
 

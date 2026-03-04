@@ -18,7 +18,7 @@ export const parseLocalDate = (str) => {
 };
 
 export const parseLocalDateTime = (str) => {
-      if (!str) return new Date();
+      if (!str) return null;
       const [datePart, timePart] = str.split(" ");
       const [y, m, d] = datePart.split("-");
       const [hh, mm] = timePart.split(":");

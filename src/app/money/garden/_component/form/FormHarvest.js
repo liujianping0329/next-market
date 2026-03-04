@@ -37,7 +37,7 @@ const FormHarvest = ({ trigger, onSuccess, defaultValues = null }) => {
     const [isLoadHarvest, setIsLoadHarvest] = useState(false);
     const form = useForm({
         defaultValues: {
-            startTime: parseLocalDateTime(defaultValues?.startTime) || new Date(),
+            startTime: parseLocalDateTime(defaultValues?.startTime) || new Date(new Date().setHours(8, 0, 0, 0)),
             title: defaultValues?.title || ""
         }
     });
