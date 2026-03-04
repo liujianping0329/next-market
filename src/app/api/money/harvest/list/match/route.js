@@ -7,7 +7,7 @@ export async function POST(request, context) {
     console.log("sss", requestBody)
     let query = supabase.from("harvest").select();
     if (requestBody.view === "harvestList") {
-        query = query.select("*,garden(pics)")
+        query = query.select("*,garden(pics),f_user(raw_user_meta_data)")
     }
     if (requestBody.startTime__gte) {
         query = query.gte("startTime", requestBody.startTime__gte)

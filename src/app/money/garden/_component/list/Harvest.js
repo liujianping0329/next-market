@@ -128,7 +128,7 @@ const Harvest = () => {
                             {timelist.map((n) => (
                                 <div
                                     key={n.no}
-                                    className={`h-[50px] border rounded flex items-center justify-center ${n.hidden ? "hidden" : ""
+                                    className={`relative h-[50px] border rounded flex items-center justify-center ${n.hidden ? "hidden" : ""
                                         }`}>
                                     {/* 左侧正方形 */}
                                     {n.harvest?.[0]?.garden && (<div className="h-full aspect-square flex-shrink-0">
@@ -144,6 +144,14 @@ const Harvest = () => {
                                     <div className="flex-1 flex items-center justify-center px-1">
                                         {n.harvest?.[0]?.title}
                                     </div>
+
+                                    {n.harvest?.[0]?.f_user?.raw_user_meta_data?.avatar_url && (
+                                        <img
+                                            src={n.harvest?.[0]?.f_user?.raw_user_meta_data?.avatar_url}
+                                            className="absolute -top-2 -right-2 w-6 h-6 rounded-full border-2 border-white object-cover"
+                                            alt=""
+                                        />
+                                    )}
 
                                 </div>
                             ))}
