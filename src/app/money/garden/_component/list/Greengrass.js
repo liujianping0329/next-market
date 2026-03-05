@@ -93,12 +93,21 @@ const Greengrass = () => {
           return (
             <Card key={item.id} onClick={() => router.push(`/money/garden/greengrass/${item.id}`)} className="mx-auto w-full max-w-sm pt-0 overflow-hidden">
               {hasPic ? (
-                <img
-                  src={item.pics[0]}
-                  loading="lazy"
-                  decoding="async"
-                  className="aspect-video w-full object-cover"
-                />
+                <div className="relative">
+                  <img
+                    src={item.pics[0]}
+                    loading="lazy"
+                    decoding="async"
+                    className="aspect-video w-full object-cover"
+                  />
+
+                  {/* 左上角评分 */}
+                  <div className="absolute top-0 left-0 flex items-center gap-0.5 bg-black/50 backdrop-blur-sm px-2 py-1 rounded">
+                    {Array.from({ length: item.point }).map((_, i) => (
+                      <span key={i} className="text-yellow-400 text-sm">★</span>
+                    ))}
+                  </div>
+                </div>
               ) : (
                 <div className="relative aspect-video w-full overflow-hidden">
 
@@ -120,6 +129,13 @@ const Greengrass = () => {
                       {item.title}
                     </h3>
 
+                  </div>
+
+                  {/* 左上角评分 */}
+                  <div className="absolute top-0 left-0 flex items-center gap-0.5 bg-black/50 backdrop-blur-sm px-2 py-1 rounded">
+                    {Array.from({ length: item.point }).map((_, i) => (
+                      <span key={i} className="text-yellow-400 text-sm">★</span>
+                    ))}
                   </div>
 
                 </div>
