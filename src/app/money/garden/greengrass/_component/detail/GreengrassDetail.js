@@ -18,6 +18,7 @@ import ActionButton from "@/components/ActionButton";
 import ImageCarousel from "@/components/ImageCarousel";
 import FormHarvest from "@/app/money/garden/_component/form/FormHarvest";
 import { convertCateName } from "@/app/utils/data";
+import StarBar from "@/components/StarBar";
 
 const GreengrassDetail = ({ id, showToolbar }) => {
   const router = useRouter()
@@ -122,6 +123,7 @@ const GreengrassDetail = ({ id, showToolbar }) => {
       <p className="whitespace-pre-line pb-17">
         {detail?.title}<br />
         {detail && `评分:${detail?.point}`}<br />
+        {/* {detail && <StarBar value={detail?.point} />} */}
         {detail && `点评:${detail?.remark}`}<br />
         {detail?.location?.name &&
           <Link href={detail?.location?.path} className="flex items-center gap-1 truncate">

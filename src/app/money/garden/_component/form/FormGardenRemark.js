@@ -32,7 +32,7 @@ import ky from "ky";
 import { Textarea } from "@/components/ui/textarea"
 
 import Datepicker from "@/components/datepicker";
-import PicUploader from "@/components/PicUploader";
+import StarBar from "@/components/StarBar";
 import { formatDateLocal, parseLocalDate } from "@/app/utils/date";
 import {
     Drawer,
@@ -74,7 +74,7 @@ const FormGardenRemark = ({ trigger, onSuccess, defaultValues }) => {
                 <DrawerTrigger asChild>
                     {trigger}
                 </DrawerTrigger>
-                <DrawerContent className="h-[90dvh] flex flex-col px-4 pb-4">
+                <DrawerContent className="h-[55dvh] flex flex-col px-4 pb-4">
                     <DrawerHeader>
                         <DrawerTitle>点评</DrawerTitle>
                     </DrawerHeader>
@@ -85,9 +85,9 @@ const FormGardenRemark = ({ trigger, onSuccess, defaultValues }) => {
                                     <FormField name="point" control={form.control}
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>分数</FormLabel>
+                                                {/* <FormLabel>分数</FormLabel> */}
                                                 <FormControl>
-                                                    <Input {...field} />
+                                                    <StarBar {...field} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -95,7 +95,7 @@ const FormGardenRemark = ({ trigger, onSuccess, defaultValues }) => {
                                     <FormField name="remark" control={form.control}
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>内容</FormLabel>
+                                                {/* <FormLabel>内容</FormLabel> */}
                                                 <FormControl>
                                                     <Textarea {...field} className="min-h-[120px] resize-none"
                                                         onFocus={(e) => {
