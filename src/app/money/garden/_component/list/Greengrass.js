@@ -102,11 +102,11 @@ const Greengrass = () => {
                   />
 
                   {/* 左上角评分 */}
-                  <div className="absolute top-0 left-0 flex items-center gap-0.5 bg-black/50 backdrop-blur-sm px-2 py-1 rounded">
+                  {item.point && <div className="absolute top-0 left-0 flex items-center gap-0.5 bg-black/50 backdrop-blur-sm px-2 py-1 rounded">
                     {Array.from({ length: item.point }).map((_, i) => (
                       <span key={i} className="text-yellow-400 text-sm">★</span>
                     ))}
-                  </div>
+                  </div>}
                 </div>
               ) : (
                 <div className="relative aspect-video w-full overflow-hidden">
@@ -132,11 +132,11 @@ const Greengrass = () => {
                   </div>
 
                   {/* 左上角评分 */}
-                  <div className="absolute top-0 left-0 flex items-center gap-0.5 bg-black/50 backdrop-blur-sm px-2 py-1 rounded">
+                  {item.point && <div className="absolute top-0 left-0 flex items-center gap-0.5 bg-black/50 backdrop-blur-sm px-2 py-1 rounded">
                     {Array.from({ length: item.point }).map((_, i) => (
                       <span key={i} className="text-yellow-400 text-sm">★</span>
                     ))}
-                  </div>
+                  </div>}
 
                 </div>
               )}
