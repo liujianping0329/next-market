@@ -12,6 +12,8 @@ import Datepicker from "@/components/datepicker";
 import { pullToZero, pushToLast, pullToHour, diffHours, formatDateLocal, changeDay, parseLocalDate } from "@/app/utils/date";
 import { id } from "date-fns/locale";
 import FormHarvest from "../form/FormHarvest";
+import useLongPress from "@/app/hooks/useLongPress";
+import MoreOpMenu from "@/app/money/garden/_component/list/harvest/MoreOpMenu";
 
 const Harvest = () => {
 
@@ -20,6 +22,8 @@ const Harvest = () => {
     const [editVer, setEditVer] = useState(0);
 
     const [timelist, setTimeList] = useState([]);
+
+    const [moreOpMenuOpen, setMoreOpMenuOpen] = useState(false);
 
     const timeConst = Array.from({ length: 14 }).map((_, i) => i + 8);     // 1-12 冻结列
     const rest = Array.from({ length: 98 }).map((_, i) => i + 1);           // 13+ 右侧滚动区
@@ -72,6 +76,10 @@ const Harvest = () => {
         { title: "大阪游", startDate: "2026-03-19" },
         { title: "哈尔滨游", startDate: "2026-04-24" }
     ]
+
+    const itemLongPress = useLongPress(() => {
+        setMoreOpMenuOpen(true);
+    });
 
     return (
         <>
@@ -144,10 +152,11 @@ const Harvest = () => {
                         <div
                             className="min-w-max grid grid-flow-col gap-1 [grid-template-rows:repeat(14,50px)] auto-cols-[166px] " >
                             {timelist.map((n) => (
-                                <div
-                                    key={n.no}
-                                    className={`relative h-[50px] border rounded flex items-center justify-center ${n.hidden ? "hidden" : ""
-                                        }`}>
+                                <div key={n.no}
+                                    className={`relative h-[50px] border rounded flex items-center justify-center select-none ${n.hidden ? "hidden" : ""
+                                        }`}
+                                    {...itemLongPress}
+                                    onContextMenu={(e) => e.preventDefault()}>
                                     {/* 左侧正方形 */}
                                     {n.harvest?.[0]?.garden && (<div className="h-full aspect-square flex-shrink-0">
                                         <img
@@ -173,6 +182,7 @@ const Harvest = () => {
 
                                 </div>
                             ))}
+                            <MoreOpMenu open={moreOpMenuOpen} onOpenChange={setMoreOpMenuOpen} />
                         </div>
                     </div>
                 </div>
