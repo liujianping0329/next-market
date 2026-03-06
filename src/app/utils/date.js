@@ -1,3 +1,4 @@
+// date->string
 export const formatDateLocal = (date, format = "yyyy-MM-dd") => {
       const map = {
             yyyy: date.getFullYear(),
@@ -11,12 +12,15 @@ export const formatDateLocal = (date, format = "yyyy-MM-dd") => {
 
       return format.replace(/yyyy|MM|dd|HH|hh|mm|ss/g, (token) => map[token]);
 };
+
+// string -> date
 export const parseLocalDate = (str) => {
       if (!str) return new Date();
       const [y, m, d] = str.split("-");
       return new Date(Number(y), Number(m) - 1, Number(d));
 };
 
+// string -> datetime
 export const parseLocalDateTime = (str) => {
       if (!str) return null;
       const [datePart, timePart] = str.split(" ");
@@ -33,11 +37,9 @@ export const parseLocalDateTime = (str) => {
 };
 
 export const pullToZero = (date, days = 0) => {
-      console.log("1", date)
       const d = new Date(date)
       d.setHours(0, 0, 0, 0)
       d.setDate(d.getDate() + days)
-      console.log("2", d)
       return d;
 };
 

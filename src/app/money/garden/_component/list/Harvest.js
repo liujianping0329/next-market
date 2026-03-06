@@ -9,7 +9,7 @@ import { pickColor } from "@/app/utils/color";
 import ActionButton from "@/components/ActionButton";
 import FolderOpBar from "./soy/FolderOpBar";
 import Datepicker from "@/components/datepicker";
-import { pullToZero, pushToLast, pullToHour, diffHours, formatDateLocal, changeDay } from "@/app/utils/date";
+import { pullToZero, pushToLast, pullToHour, diffHours, formatDateLocal, changeDay, parseLocalDate } from "@/app/utils/date";
 import { id } from "date-fns/locale";
 import FormHarvest from "../form/FormHarvest";
 
@@ -68,6 +68,11 @@ const Harvest = () => {
         fetchList(startTime);
     }, [startTime]);
 
+    const journeys = [
+        { title: "大阪游", startDate: "2026-03-19" },
+        { title: "哈尔滨游", startDate: "2026-04-24" }
+    ]
+
     return (
         <>
             <div id="toolBar" className="mx-2.5 mt-2 flex items-center justify-between rounded-md border bg-muted/40 px-2.5 py-2">
@@ -81,7 +86,14 @@ const Harvest = () => {
                             <Datepicker dateDf={startTime} dtFormat="MM/dd" onChange={(date) => {
                                 setStartTime(date);
                             }} />
-                            <ActionButton icon={ChevronRight} />
+                            <Button size="sm" variant="ghost" className="underline px-1" onClick={() => {
+                                setStartTime(pullToZero(startTime, 7));
+                            }}>下周</Button>
+                            {journeys.map((n, i) => (
+                                <Button key={n.title} size="sm" variant="ghost" className="underline px-1" onClick={() => {
+                                    setStartTime(parseLocalDate(n.startDate));
+                                }}>{n.title}</Button>
+                            ))}
                         </div>
                         <div>
                             <FormHarvest trigger={

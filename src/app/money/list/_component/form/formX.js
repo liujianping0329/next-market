@@ -56,10 +56,6 @@ const FormX = ({ onSuccess, exchanges, btnStatus }) => {
                         <FieldGroup>
                             <FieldSet>
                                 <FieldGroup>
-                                    {/* <Field>
-                                <FieldLabel htmlFor="dateX">日期</FieldLabel>
-                                <Datepicker dateDf={new Date()} />
-                            </Field> */}
                                     <FormField name="date" control={form.control}
                                         render={({ field }) => (
                                             <FormItem>
