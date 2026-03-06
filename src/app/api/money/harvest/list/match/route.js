@@ -4,7 +4,6 @@ import supabase from "@/app/utils/database";
 export async function POST(request, context) {
     const requestBody = await request.json();
 
-    console.log("sss", requestBody)
     let query = supabase.from("harvest").select();
     if (requestBody.view === "harvestList") {
         query = query.select("*,garden(pics),f_user(raw_user_meta_data)")
@@ -16,6 +15,5 @@ export async function POST(request, context) {
         query = query.lt("startTime", requestBody.startTime__lt)
     }
     const { data: matchList, error } = await query;
-    console.log("err", error);
     return NextResponse.json({ list: matchList });
 }

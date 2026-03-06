@@ -39,18 +39,34 @@ const GardenUI = () => {
     const [user, setUser] = useState(null)
 
     useEffect(() => {
-        supabase.auth.getSession().then(({ data }) => {
-            setUser(data.session?.user ?? null)
-        })
+        const syncUser = async (session) => {
+            const user = session?.user ?? null;
+            setUser(user);
 
-        const { data: listener } = supabase.auth.onAuthStateChange(
-            (_event, session) => {
-                setUser(session?.user ?? null)
-                console.log(session?.user);
+            if (user?.id) {
+                window.OneSignalDeferred = window.OneSignalDeferred || [];
+                window.OneSignalDeferred.push(async function (OneSignal) {
+                    await OneSignal.login(String(user.id));
+                });
+            } else {
+                window.OneSignalDeferred = window.OneSignalDeferred || [];
+                window.OneSignalDeferred.push(async function (OneSignal) {
+                    await OneSignal.logout();
+                });
             }
-        )
+        };
 
-        return () => listener.subscription.unsubscribe()
+        supabase.auth.getSession().then(({ data }) => {
+            syncUser(data.session);
+        });
+
+        const {
+            data: { subscription }
+        } = supabase.auth.onAuthStateChange((_event, session) => {
+            syncUser(session);
+        });
+
+        return () => subscription.unsubscribe();
     }, [])
 
 
@@ -61,7 +77,6 @@ const GardenUI = () => {
                 redirectTo: `${location.origin}/api/auth/callback?next=/money/garden`
             }
         })
-        console.log(user);
     }
 
     const handleLogout = async () => {

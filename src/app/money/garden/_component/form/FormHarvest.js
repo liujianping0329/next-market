@@ -25,16 +25,20 @@ import {
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import ky from "ky";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { formatDateLocal, parseLocalDateTime } from "@/app/utils/date";
 import supabase from "@/app/utils/database";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { AlertTriangle } from "lucide-react"
 
 const FormHarvest = ({ trigger, onSuccess, defaultValues = null }) => {
 
     const [openHarvest, setOpenHarvest] = useState(false);
     const [isLoadHarvest, setIsLoadHarvest] = useState(false);
+    const [userId, setUserId] = useState(null);
+    const [isCheckingSession, setIsCheckingSession] = useState(true);
     const form = useForm({
         defaultValues: {
             startTime: parseLocalDateTime(defaultValues?.startTime) || new Date(new Date().setHours(8, 0, 0, 0)),
@@ -42,16 +46,21 @@ const FormHarvest = ({ trigger, onSuccess, defaultValues = null }) => {
         }
     });
 
+    useEffect(() => {
+        const loadSession = async () => {
+            const { data, error } = await supabase.auth.getSession();
+            setUserId(data.session?.user?.id ?? null);
+        };
+
+        loadSession();
+        setIsCheckingSession(false);
+    }, []);
+
     const onSubmit = async (values) => {
         setIsLoadHarvest(true);
 
         try {
-            const { data, error } = await supabase.auth.getSession()
-            const userId = data.session?.user?.id
-            console.log("session error:", error);
-            console.log("session userId:", userId);
-            console.log("payload userId field:", userId);
-            await ky.post('/api/money/harvest/upsert', {
+            await ky.post('/api/money/harvest/upsertWithPush', {
                 json: {
                     ...(defaultValues?.id && { id: defaultValues.id }),
                     ...values,
@@ -82,6 +91,15 @@ const FormHarvest = ({ trigger, onSuccess, defaultValues = null }) => {
                     <DialogHeader>
                         <DialogTitle>{defaultValues?.id ? "修改" : "新增"}</DialogTitle>
                     </DialogHeader>
+
+                    {!isCheckingSession && !userId && <Alert variant="destructive" className="">
+                        <AlertTriangle className="h-4 w-4" />
+                        <AlertTitle>注意</AlertTitle>
+                        <AlertDescription>
+                            当前未登录，无法绑定个人推送提醒
+                        </AlertDescription>
+                    </Alert>}
+
                     <div className="w-full max-h-dvh overflow-y-auto overscroll-contain">
                         <Form {...form}>
                             <form onSubmit={form.handleSubmit(onSubmit)} id="formSoy" className="">
