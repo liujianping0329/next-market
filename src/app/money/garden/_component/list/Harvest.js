@@ -11,6 +11,7 @@ import FolderOpBar from "./soy/FolderOpBar";
 import Datepicker from "@/components/datepicker";
 import { pullToZero, pushToLast, pullToHour, diffHours, formatDateLocal, changeDay } from "@/app/utils/date";
 import { id } from "date-fns/locale";
+import FormHarvest from "../form/FormHarvest";
 
 const Harvest = () => {
 
@@ -81,6 +82,11 @@ const Harvest = () => {
                                 setStartTime(date);
                             }} />
                             <ActionButton icon={ChevronRight} />
+                        </div>
+                        <div>
+                            <FormHarvest trigger={
+                                <Button size="sm" variant="outline">新增</Button>
+                            } onSuccess={() => fetchList(startTime)} />
                         </div>
                     </div>
                 </div>

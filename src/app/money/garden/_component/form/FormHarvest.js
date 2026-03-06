@@ -80,7 +80,7 @@ const FormHarvest = ({ trigger, onSuccess, defaultValues = null }) => {
                 </DialogTrigger>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>{defaultValues.id ? "修改" : "新增"}</DialogTitle>
+                        <DialogTitle>{defaultValues?.id ? "修改" : "新增"}</DialogTitle>
                     </DialogHeader>
                     <div className="w-full max-h-dvh overflow-y-auto overscroll-contain">
                         <Form {...form}>
