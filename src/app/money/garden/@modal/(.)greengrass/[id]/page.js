@@ -10,7 +10,7 @@ export function GreengrassModal({ }) {
 
   return (
     <Dialog open onOpenChange={(open) => !open && router.back()}>
-      <DialogContent className="w-screen h-screen
+      <DialogContent className="w-screen h-[100dvh]
           max-w-none
           rounded-none
           p-0
