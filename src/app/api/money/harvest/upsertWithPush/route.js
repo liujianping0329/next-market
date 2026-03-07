@@ -13,14 +13,18 @@ export async function POST(request, context) {
         const sendAfter =
             calcRemindTime(requestBody.startTime?.replace(" ", "T") + ":00+09:00", requestBody.remindBefore);
         if (requestBody.id && data.pushId) {
-            await ky.delete(
-                `https://api.onesignal.com/notifications/${data.pushId}?app_id=${process.env.NEXT_PUBLIC_ONESIGNAL_APPID}`,
-                {
-                    headers: {
-                        Authorization: `Key ${process.env.ONESIGNAL_API_KEY}`,
-                    },
-                }
-            );
+            try {
+                await ky.delete(
+                    `https://api.onesignal.com/notifications/${data.pushId}?app_id=${process.env.NEXT_PUBLIC_ONESIGNAL_APPID}`,
+                    {
+                        headers: {
+                            Authorization: `Key ${process.env.ONESIGNAL_API_KEY}`,
+                        },
+                    }
+                );
+            } catch {
+
+            }
         }
         pushInfo = await ky.post(
             "https://api.onesignal.com/notifications?c=push",

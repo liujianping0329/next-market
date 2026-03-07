@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import supabase from "@/app/utils/database";
+import { formatDateLocal, parseLocalDate } from "@/app/utils/date";
 
 export async function POST(request, context) {
     const requestBody = await request.json();
@@ -15,5 +16,6 @@ export async function POST(request, context) {
         query = query.lt("startTime", requestBody.startTime__lt)
     }
     const { data: matchList, error } = await query.order('startTime', { ascending: true });
-    return NextResponse.json({ list: matchList });
+    const list = matchList.map(i => ({ ...i, startTime: i.startTime.replace("T", " ").slice(0, 16) }));
+    return NextResponse.json({ list: list });
 }

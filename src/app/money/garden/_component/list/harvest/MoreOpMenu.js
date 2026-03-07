@@ -46,14 +46,11 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import FormHarvest from "@/app/money/garden/_component/form/FormHarvest";
 
 const MoreOpMenu = ({ open, onOpenChange, target, onSuccess }) => {
 
     const [isDeleting, setIsDeleting] = useState(false);
-
-    const handleUpdate = async () => {
-        onOpenChange(false)
-    }
 
     const handleDelete = async () => {
         if (!confirm("确认删除？")) return;
@@ -84,10 +81,14 @@ const MoreOpMenu = ({ open, onOpenChange, target, onSuccess }) => {
                         </p>
                     </DrawerHeader>
                     <div className="flex flex-col divide-y pt-2">
-                        <Button variant="ghost" className="h-14 text-lg"
-                            onClick={handleUpdate}>
-                            编辑
-                        </Button>
+                        <FormHarvest trigger={
+                            <Button variant="ghost" className="h-14 text-lg">
+                                编辑
+                            </Button>
+                        } defaultValues={target?.harvest?.[0]} onSuccess={() => {
+                            onOpenChange(false)
+                            onSuccess();
+                        }} />
                         <Button variant="ghost" className="h-14 text-lg text-destructive"
                             onClick={handleDelete} disabled={isDeleting}>
                             {isDeleting && <Spinner />}删除

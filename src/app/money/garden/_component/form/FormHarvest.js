@@ -41,7 +41,9 @@ const FormHarvest = ({ trigger, onSuccess, defaultValues = null }) => {
         { label: "1小时", value: "60" },
         { label: "30分", value: "30" },
         { label: "15分", value: "15" },
+        { label: "0分", value: "0" },
     ];
+    console.log(defaultValues)
 
     const [openHarvest, setOpenHarvest] = useState(false);
     const [isLoadHarvest, setIsLoadHarvest] = useState(false);
@@ -50,7 +52,7 @@ const FormHarvest = ({ trigger, onSuccess, defaultValues = null }) => {
     const form = useForm({
         defaultValues: {
             startTime: parseLocalDateTime(defaultValues?.startTime) || new Date(new Date().setHours(8, 0, 0, 0)),
-            remindBefore: parseLocalDateTime(defaultValues?.remindBefore) || remindOptions[0].value,
+            remindBefore: `${defaultValues?.remindBefore}` || remindOptions[0].value,
             title: defaultValues?.title || ""
         }
     });
