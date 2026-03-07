@@ -32,8 +32,16 @@ import { formatDateLocal, parseLocalDateTime } from "@/app/utils/date";
 import supabase from "@/app/utils/database";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertTriangle } from "lucide-react"
+import { Label } from "@/components/ui/label"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 
 const FormHarvest = ({ trigger, onSuccess, defaultValues = null }) => {
+
+    const remindOptions = [
+        { label: "1小时", value: "60" },
+        { label: "30分", value: "30" },
+        { label: "15分", value: "15" },
+    ];
 
     const [openHarvest, setOpenHarvest] = useState(false);
     const [isLoadHarvest, setIsLoadHarvest] = useState(false);
@@ -42,6 +50,7 @@ const FormHarvest = ({ trigger, onSuccess, defaultValues = null }) => {
     const form = useForm({
         defaultValues: {
             startTime: parseLocalDateTime(defaultValues?.startTime) || new Date(new Date().setHours(8, 0, 0, 0)),
+            remindBefore: parseLocalDateTime(defaultValues?.remindBefore) || remindOptions[0].value,
             title: defaultValues?.title || ""
         }
     });
@@ -55,6 +64,8 @@ const FormHarvest = ({ trigger, onSuccess, defaultValues = null }) => {
         loadSession();
         setIsCheckingSession(false);
     }, []);
+
+
 
     const onSubmit = async (values) => {
         setIsLoadHarvest(true);
@@ -114,6 +125,25 @@ const FormHarvest = ({ trigger, onSuccess, defaultValues = null }) => {
                                                 <FormMessage />
                                             </FormItem>
                                         )} />
+                                    <FormField name="remindBefore" control={form.control}
+                                        render={({ field }) => (
+                                            <FormItem className="-mt-5">
+                                                <FormControl>
+                                                    <RadioGroup defaultValue={remindOptions[0].value}
+                                                        value={field.value} onValueChange={field.onChange}
+                                                        className="flex flex-wrap gap-3">
+                                                        {remindOptions.map((item) => (
+                                                            <div className="flex gap-2" key={item.value}>
+                                                                <RadioGroupItem value={item.value} />
+                                                                <Label className="text-muted-foreground">{item.label}</Label>
+                                                            </div>
+                                                        ))}
+                                                        <Label className="text-muted-foreground">前提醒我</Label>
+                                                    </RadioGroup>
+                                                </FormControl>
+                                            </FormItem>
+                                        )}
+                                    />
                                     <FormField name="title" control={form.control}
                                         render={({ field }) => (
                                             <FormItem>

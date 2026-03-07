@@ -12,15 +12,18 @@ export async function POST(request, context) {
         const sendAfter =
             requestBody.startTime?.replace(" ", "T") + ":00+09:00";
         pushInfo = await ky.post(
-            "https://onesignal.com/api/v1/notifications",
+            "https://api.onesignal.com/notifications?c=push",
             {
                 headers: {
-                    Authorization: `Basic ${process.env.ONESIGNAL_API_KEY}`,
+                    Authorization: `Key ${process.env.ONESIGNAL_API_KEY}`,
                 },
                 json: {
                     app_id: process.env.NEXT_PUBLIC_ONESIGNAL_APPID,
-                    include_external_user_ids: [requestBody.userId],
-                    contents: { en: requestBody.title },
+                    include_aliases: {
+                        external_id: [requestBody.userId],
+                    },
+                    target_channel: "push",
+                    contents: { en: requestBody.title || "no title" },
                     web_url: requestBody.gardenId ? `${origin}/money/garden/greengrass/${requestBody.gardenId}`
                         : `${origin}/money/garden?tag=harvest`,
                     ...(new Date(sendAfter) > new Date() && {
