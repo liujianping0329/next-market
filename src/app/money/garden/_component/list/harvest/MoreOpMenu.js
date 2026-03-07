@@ -45,8 +45,11 @@ import {
 } from "@/components/ui/drawer";
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
-const MoreOpMenu = ({ open, onOpenChange }) => {
+const MoreOpMenu = ({ open, onOpenChange, target, onSuccess }) => {
+
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const handleUpdate = async () => {
         onOpenChange(false)
@@ -54,16 +57,31 @@ const MoreOpMenu = ({ open, onOpenChange }) => {
 
     const handleDelete = async () => {
         if (!confirm("确认删除？")) return;
-
+        setIsDeleting(true);
+        await ky.post('/api/money/harvest/delete', {
+            json: { id: target.harvest[0].id }
+        }).json();
+        onSuccess();
+        setIsDeleting(false);
         onOpenChange(false)
     }
+
+    useEffect(() => {
+        if (open && !target.harvest.length) {
+            toast.error("当前没有可操作的记录");
+            onOpenChange(false);
+        }
+    }, [open, target]);
 
     return (
         <>
             <Drawer open={open} onOpenChange={onOpenChange}>
-                <DrawerContent className="h-[30dvh] flex flex-col px-4 pb-4">
+                <DrawerContent className="h-[35dvh] flex flex-col px-4 pb-0">
                     <DrawerHeader>
                         <DrawerTitle className="text-xl">更多操作</DrawerTitle>
+                        <p className="text-sm text-muted-foreground">
+                            同一时间段多条记录时，针对第一条
+                        </p>
                     </DrawerHeader>
                     <div className="flex flex-col divide-y pt-2">
                         <Button variant="ghost" className="h-14 text-lg"
@@ -71,8 +89,8 @@ const MoreOpMenu = ({ open, onOpenChange }) => {
                             编辑
                         </Button>
                         <Button variant="ghost" className="h-14 text-lg text-destructive"
-                            onClick={handleDelete}>
-                            删除
+                            onClick={handleDelete} disabled={isDeleting}>
+                            {isDeleting && <Spinner />}删除
                         </Button>
                     </div>
                 </DrawerContent>

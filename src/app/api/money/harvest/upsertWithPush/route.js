@@ -5,13 +5,23 @@ import { calcRemindTime } from "@/app/utils/date";
 
 export async function POST(request, context) {
     const requestBody = await request.json();
-    const { data, error } = await supabase.from('harvest').upsert(requestBody).select();
+    const { data, error } = await supabase.from('harvest').upsert(requestBody).select().single();
 
     let pushInfo;
     if (requestBody.userId) {
         const origin = new URL(request.url).origin;
         const sendAfter =
             calcRemindTime(requestBody.startTime?.replace(" ", "T") + ":00+09:00", requestBody.remindBefore);
+        if (requestBody.id && data.pushId) {
+            await ky.delete(
+                `https://api.onesignal.com/notifications/${data.pushId}?app_id=${process.env.NEXT_PUBLIC_ONESIGNAL_APPID}`,
+                {
+                    headers: {
+                        Authorization: `Key ${process.env.ONESIGNAL_API_KEY}`,
+                    },
+                }
+            );
+        }
         pushInfo = await ky.post(
             "https://api.onesignal.com/notifications?c=push",
             {
@@ -33,6 +43,8 @@ export async function POST(request, context) {
                 },
             }
         ).json();
+        await supabase.from('harvest').update({ pushId: pushInfo.id }).eq("id", data.id);
     }
-    return NextResponse.json({ id: data[0].id, pushInfo: pushInfo });
+
+    return NextResponse.json({ id: data.id, pushInfo: pushInfo });
 }

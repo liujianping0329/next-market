@@ -14,6 +14,6 @@ export async function POST(request, context) {
     if (requestBody.startTime__lt) {
         query = query.lt("startTime", requestBody.startTime__lt)
     }
-    const { data: matchList, error } = await query;
+    const { data: matchList, error } = await query.order('startTime', { ascending: true });
     return NextResponse.json({ list: matchList });
 }

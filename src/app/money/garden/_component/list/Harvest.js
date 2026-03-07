@@ -24,6 +24,7 @@ const Harvest = () => {
     const [timelist, setTimeList] = useState([]);
 
     const [moreOpMenuOpen, setMoreOpMenuOpen] = useState(false);
+    const [moreOpMenuTarget, setMoreOpMenuTarget] = useState(null);
 
     const timeConst = Array.from({ length: 14 }).map((_, i) => i + 8);     // 1-12 冻结列
     const rest = Array.from({ length: 98 }).map((_, i) => i + 1);           // 13+ 右侧滚动区
@@ -79,12 +80,12 @@ const Harvest = () => {
     const longPressHandle = {
         startPress: (e) => {
             clearTimeout(timerRef.current);
-
             const no = e.currentTarget.dataset.no;
             const item = timelist[no];
+
             timerRef.current = setTimeout(() => {
                 setMoreOpMenuOpen(true);
-                console.log(item)
+                setMoreOpMenuTarget(item);
             }, 500);
         },
         endPress: () => {
@@ -197,7 +198,11 @@ const Harvest = () => {
 
                                 </div>
                             ))}
-                            <MoreOpMenu open={moreOpMenuOpen} onOpenChange={setMoreOpMenuOpen} />
+                            <MoreOpMenu open={moreOpMenuOpen} onOpenChange={setMoreOpMenuOpen} target={moreOpMenuTarget} onSuccess={
+                                () => {
+                                    fetchList();
+                                }
+                            } />
                         </div>
                     </div>
                 </div>
