@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import supabase from "@/app/utils/database";
 import ky from "ky";
+import { calcRemindTime } from "@/app/utils/date";
 
 export async function POST(request, context) {
     const requestBody = await request.json();
@@ -10,7 +11,7 @@ export async function POST(request, context) {
     if (requestBody.userId) {
         const origin = new URL(request.url).origin;
         const sendAfter =
-            requestBody.startTime?.replace(" ", "T") + ":00+09:00";
+            calcRemindTime(requestBody.startTime?.replace(" ", "T") + ":00+09:00", requestBody.remindBefore);
         pushInfo = await ky.post(
             "https://api.onesignal.com/notifications?c=push",
             {
