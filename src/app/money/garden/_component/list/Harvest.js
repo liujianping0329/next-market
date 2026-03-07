@@ -38,7 +38,6 @@ const Harvest = () => {
     const bodyScrollRef = useRef(null);
 
     const fetchList = async () => {
-        console.log(3)
         const response = await ky.post('/api/money/harvest/list/match', {
             json: {
                 startTime__gte: formatDateLocal(pullToZero(startTime), "yyyy-MM-dd HH:mm"),
@@ -47,7 +46,6 @@ const Harvest = () => {
                 view: "harvestList"
             }
         }).json();
-        console.log(4)
         let dbList = response.list;
         let allTimes = Array.from({ length: 24 * 7 }).map((_, i) => {
             return {
@@ -77,9 +75,22 @@ const Harvest = () => {
         { title: "哈尔滨游", startDate: "2026-04-24" }
     ]
 
-    const itemLongPress = useLongPress(() => {
-        setMoreOpMenuOpen(true);
-    });
+    const timerRef = useRef(null);
+    const longPressHandle = {
+        startPress: (e) => {
+            clearTimeout(timerRef.current);
+
+            const no = e.currentTarget.dataset.no;
+            const item = timelist[no];
+            timerRef.current = setTimeout(() => {
+                setMoreOpMenuOpen(true);
+                console.log(item)
+            }, 500);
+        },
+        endPress: () => {
+            clearTimeout(timerRef.current);
+        }
+    }
 
     return (
         <>
@@ -153,9 +164,13 @@ const Harvest = () => {
                             className="min-w-max grid grid-flow-col gap-1 [grid-template-rows:repeat(14,50px)] auto-cols-[166px] " >
                             {timelist.map((n) => (
                                 <div key={n.no}
+                                    data-no={n.no}
                                     className={`relative h-[50px] border rounded flex items-center justify-center select-none ${n.hidden ? "hidden" : ""
-                                        }`}
-                                    {...itemLongPress}
+                                        } transition-all duration-150 active:bg-blue-100 active:scale-95`}
+                                    onPointerDown={longPressHandle.startPress}
+                                    onPointerUp={longPressHandle.endPress}
+                                    onPointerLeave={longPressHandle.endPress}
+                                    onPointerCancel={longPressHandle.endPress}
                                     onContextMenu={(e) => e.preventDefault()}>
                                     {/* 左侧正方形 */}
                                     {n.harvest?.[0]?.garden && (<div className="h-full aspect-square flex-shrink-0">

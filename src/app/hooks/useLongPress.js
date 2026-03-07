@@ -1,14 +1,17 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
-export default function useLongPress(onLongPress, delay = 350) {
+export default function useLongPress(onLongPress, delay = 500) {
   const timer = useRef(null);
+  const [isPressing, setIsPressing] = useState(false);
 
   const start = () => {
+    setIsPressing(true);
     timer.current = setTimeout(onLongPress, delay);
   };
 
   const cancel = () => {
     clearTimeout(timer.current);
+    setIsPressing(false);
   };
 
   const preventMenu = (e) => {
@@ -17,11 +20,14 @@ export default function useLongPress(onLongPress, delay = 350) {
 
 
   return {
-    onMouseDown: start,
-    onMouseUp: cancel,
-    onMouseLeave: cancel,
-    onTouchStart: start,
-    onTouchEnd: cancel,
-    onContextMenu: preventMenu
+    isPressing,
+    bind: {
+      onMouseDown: start,
+      onMouseUp: cancel,
+      onMouseLeave: cancel,
+      onTouchStart: start,
+      onTouchEnd: cancel,
+      onContextMenu: preventMenu
+    }
   };
 }
