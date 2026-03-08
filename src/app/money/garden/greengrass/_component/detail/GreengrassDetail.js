@@ -112,7 +112,7 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips }) => {
       </div>}
 
 
-      <ImageCarousel images={detail?.pics} ratio={cssTips.ImageCarousel.ratio || 3 / 4} />
+      <ImageCarousel images={detail?.pics} ratio={cssTips?.ImageCarousel?.ratio || 3 / 4} />
       {/* <img
           src={detail?.pics?.[0]}
           className="w-full aspect-[3/4] object-contain bg-white"
