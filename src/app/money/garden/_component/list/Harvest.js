@@ -34,7 +34,7 @@ const Harvest = () => {
         const curDt = pullToZero(startTime, i - 1);
         const weekMap = ["日", "月", "火", "水", "木", "金", "土"]
 
-        return i == 0 ? "日程" : `${formatDateLocal(curDt, "MM/dd")}(${weekMap[curDt.getDay()]})`
+        return i == 0 ? "行程" : `${formatDateLocal(curDt, "MM/dd")}(${weekMap[curDt.getDay()]})`
     });
 
     const headerScrollRef = useRef(null);
@@ -140,6 +140,7 @@ const Harvest = () => {
                             className={`
                                 h-full border rounded flex items-center justify-center shrink-0
                                 ${i === 0 ? "w-[36px]" : "w-[166px]"}
+                                ${/土|日/.test(n) ? "bg-red-50 text-red-500 border-red-200" : ""}
                             `}
                         >
                             {n}
