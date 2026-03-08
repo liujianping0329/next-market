@@ -68,10 +68,10 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips }) => {
   };
 
   const handleAi = async () => {
-    setAiing(true);
+    toast.info("已提交任务，请稍后")
     await ky.post("/api/ai/obtain", { json: { type: "garden", ...detail } }).json();
+
     fetchDetail();
-    setAiing(false);
   }
   return (
     <>
@@ -127,7 +127,7 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips }) => {
           src={detail?.pics?.[0]}
           className="w-full aspect-[3/4] object-contain bg-white"
         /> */}
-      <p className="whitespace-pre-line pb-17">
+      <p className="whitespace-pre-line pb-0">
         {detail?.title}<br />
         {detail && `评分:${detail?.point}`}<br />
         {/* {detail && <StarBar value={detail?.point} />} */}
@@ -146,24 +146,18 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips }) => {
             <div key={data.id} className="rounded-2xl border bg-white p-5 shadow-sm">
               <div className="mb-4 flex items-center gap-2 text-sky-700">
                 <Sparkles className="h-5 w-5" />
-                <h3 className="text-base font-semibold">AI 生成内容</h3>
+                <h3 className="text-base font-semibold">AI 补充介绍</h3>
               </div>
 
               <div className="rounded-xl bg-sky-50 px-4 py-4">
                 <p className="whitespace-pre-wrap text-sm leading-7 text-gray-700">
-                  {data?.ans || "暂无内容"}
+                  {data?.ansJSON.desp || "暂无内容"}
                 </p>
               </div>
             </div>
           ))}
         </>
       )}
-      {aiing && (<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-        <div className="flex flex-col items-center gap-3 text-white">
-          <Loader2 className="h-8 w-8 animate-spin" />
-          <span className="text-sm">AI生成中...</span>
-        </div>
-      </div>)}
     </>
   );
 }

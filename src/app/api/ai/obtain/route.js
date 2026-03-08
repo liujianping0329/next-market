@@ -19,15 +19,28 @@ export async function POST(request, context) {
 
     const result = await generateText({
         model: aiTemplate.children.model,
-        maxOutputTokens: aiTemplate.children.maxOutputTokens,
         prompt: question,
     });
     console.log(question);
+
+    const aiData = (() => {
+        try {
+            return {
+                ans: null,
+                ansJSON: JSON.parse(result.text.replace(/```json|```/g, "").trim())
+            };
+        } catch {
+            return {
+                ans: result.text,
+                ansJSON: null
+            };
+        }
+    })();
     if (requestBody.type === "garden") {
         await supabase.from('garden_ai').upsert({
             ...(requestBody.garden_ai?.[0]?.id && { id: requestBody.garden_ai?.[0]?.id }),
             gardenId: requestBody.id,
-            ans: result.text,
+            ...aiData,
             cost: result.providerMetadata.gateway.marketCost
         }).select().eq("id", requestBody.id);
     }
