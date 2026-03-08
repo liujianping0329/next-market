@@ -13,7 +13,7 @@ import FormGarden from "@/app/money/garden/_component/form/FormGarden";
 import FormSoy from "@/app/money/garden/_component/form/FormSoy";
 import FormGardenRemark from "@/app/money/garden/_component/form/FormGardenRemark";
 import { gardenCategories, gardenCategoriesNoAll } from "@/app/money/garden/constants/gardenCategories";
-import { MapPin, MessageSquare } from "lucide-react";
+import { MapPin, MessageSquare, Sparkles, Loader2 } from "lucide-react";
 import ActionButton from "@/components/ActionButton";
 import ImageCarousel from "@/components/ImageCarousel";
 import FormHarvest from "@/app/money/garden/_component/form/FormHarvest";
@@ -28,11 +28,13 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips }) => {
   const [editVer, setEditVer] = useState(0);
   const [deleting, setDeleting] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [aiing, setAiing] = useState(false);
 
   const fetchDetail = async () => {
     const response = await ky.post('/api/money/garden/greenGrass/detail', {
       json: { id }
     }).json();
+    console.log(response.detail);
     setDetail(response.detail);
     setCategories(response.cates);
     setEditVer(prev => prev + 1)
@@ -64,6 +66,13 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips }) => {
     // 如果你路由不是这个路径，就改成你的列表路径
     setDeleting(false);
   };
+
+  const handleAi = async () => {
+    setAiing(true);
+    await ky.post("/api/ai/obtain", { json: { type: "garden", ...detail } }).json();
+    fetchDetail();
+    setAiing(false);
+  }
   return (
     <>
       {showToolbar && detail && categories && <div id="toolBar" className="flex p-2.5 justify-between overflow-x-auto items-center border-b">
@@ -100,6 +109,7 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips }) => {
               fetchDetail()
               toast.success("已添加到行程");
             }} />
+          <ActionButton onClick={handleAi} icon={Sparkles} label="润色" />
         </div>
       </div>}
 
@@ -130,6 +140,30 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips }) => {
         }<br />
         {detail?.content}
       </p>
+      {detail?.garden_ai?.length > 0 && (
+        <>
+          {detail.garden_ai.map((data, i) => (
+            <div key={data.id} className="rounded-2xl border bg-white p-5 shadow-sm">
+              <div className="mb-4 flex items-center gap-2 text-sky-700">
+                <Sparkles className="h-5 w-5" />
+                <h3 className="text-base font-semibold">AI 生成内容</h3>
+              </div>
+
+              <div className="rounded-xl bg-sky-50 px-4 py-4">
+                <p className="whitespace-pre-wrap text-sm leading-7 text-gray-700">
+                  {data?.ans || "暂无内容"}
+                </p>
+              </div>
+            </div>
+          ))}
+        </>
+      )}
+      {aiing && (<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+        <div className="flex flex-col items-center gap-3 text-white">
+          <Loader2 className="h-8 w-8 animate-spin" />
+          <span className="text-sm">AI生成中...</span>
+        </div>
+      </div>)}
     </>
   );
 }

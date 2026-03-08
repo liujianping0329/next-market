@@ -4,7 +4,7 @@ import supabase from "@/app/utils/database";
 export async function POST(request, context) {
     const requestBody = await request.json();
 
-    let detailQuery = supabase.from("garden").select().match({ id: requestBody.id })
+    let detailQuery = supabase.from("garden").select("*,garden_ai(*)").match({ id: requestBody.id })
         .single();
     let cateQuery = supabase.from("constants").select().match({ category: "gardenCategory" })
         .order('sort', { ascending: true });
