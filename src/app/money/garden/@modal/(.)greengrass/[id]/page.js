@@ -21,7 +21,7 @@ export function GreengrassModal({ }) {
         </VisuallyHidden>
 
         <div className="flex-1 overflow-y-auto">
-          <GreengrassDetail id={params.id} showToolbar={true} />
+          <GreengrassDetail id={params.id} showToolbar={true} showRemarkbar={true} />
         </div>
 
       </DialogContent>

@@ -143,7 +143,7 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips }) => {
       {detail?.garden_ai?.length > 0 && (
         <>
           {detail.garden_ai.map((data, i) => (
-            <div key={data.id} className="rounded-2xl border bg-white p-5 shadow-sm">
+            <div key={data.id} className="rounded-2xl border bg-white p-5 shadow-sm pb-20">
               <div className="mb-4 flex items-center gap-2 text-sky-700">
                 <Sparkles className="h-5 w-5" />
                 <h3 className="text-base font-semibold">AI 补充介绍</h3>

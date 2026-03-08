@@ -34,6 +34,6 @@ export async function generateMetadata({ params }) {
 
 export async function GreengrassDetailPage({ params }) {
   const { id } = await params;
-  return <GreengrassDetail id={id} showToolbar={false} />;
+  return <GreengrassDetail id={id} showToolbar={false} showRemarkbar={true} />;
 }
 export default GreengrassDetailPage;
