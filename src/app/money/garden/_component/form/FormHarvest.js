@@ -52,7 +52,9 @@ const FormHarvest = ({ trigger, onSuccess, defaultValues = null }) => {
     const form = useForm({
         defaultValues: {
             startTime: parseLocalDateTime(defaultValues?.startTime) || new Date(new Date().setHours(8, 0, 0, 0)),
-            remindBefore: `${defaultValues?.remindBefore}` || remindOptions[0].value,
+            remindBefore: defaultValues?.remindBefore != null
+                ? String(defaultValues.remindBefore)
+                : remindOptions[0].value,
             title: defaultValues?.title || ""
         }
     });
@@ -131,8 +133,7 @@ const FormHarvest = ({ trigger, onSuccess, defaultValues = null }) => {
                                         render={({ field }) => (
                                             <FormItem className="-mt-5">
                                                 <FormControl>
-                                                    <RadioGroup defaultValue={remindOptions[0].value}
-                                                        value={field.value} onValueChange={field.onChange}
+                                                    <RadioGroup value={field.value} onValueChange={field.onChange}
                                                         className="flex flex-wrap gap-3">
                                                         {remindOptions.map((item) => (
                                                             <div className="flex gap-2" key={item.value}>
@@ -170,7 +171,7 @@ const FormHarvest = ({ trigger, onSuccess, defaultValues = null }) => {
                     </DialogFooter>
                 </DialogContent>
 
-            </Dialog>
+            </Dialog >
         </>
     );
 }

@@ -14,6 +14,7 @@ import { id } from "date-fns/locale";
 import FormHarvest from "../form/FormHarvest";
 import useLongPress from "@/app/hooks/useLongPress";
 import MoreOpMenu from "@/app/money/garden/_component/list/harvest/MoreOpMenu";
+import HarvestDetail from "@/app/money/garden/_component/detail/HarvestDetail";
 
 const Harvest = () => {
 
@@ -25,6 +26,7 @@ const Harvest = () => {
 
     const [moreOpMenuOpen, setMoreOpMenuOpen] = useState(false);
     const [moreOpMenuTarget, setMoreOpMenuTarget] = useState(null);
+    const [detailOpen, setDetailOpen] = useState(false);
 
     const timeConst = Array.from({ length: 14 }).map((_, i) => i + 8);     // 1-12 冻结列
     const rest = Array.from({ length: 98 }).map((_, i) => i + 1);           // 13+ 右侧滚动区
@@ -91,6 +93,12 @@ const Harvest = () => {
         endPress: () => {
             clearTimeout(timerRef.current);
         }
+    }
+    const detailHandle = (e) => {
+        const no = e.currentTarget.dataset.no;
+        const item = timelist[no];
+        setDetailOpen(true);
+        setMoreOpMenuTarget(item);
     }
 
     return (
@@ -168,6 +176,7 @@ const Harvest = () => {
                                     data-no={n.no}
                                     className={`relative h-[50px] border rounded flex items-center justify-center select-none ${n.hidden ? "hidden" : ""
                                         } transition-all duration-150 active:bg-blue-100 active:scale-95`}
+                                    onClick={detailHandle}
                                     onPointerDown={longPressHandle.startPress}
                                     onPointerUp={longPressHandle.endPress}
                                     onPointerLeave={longPressHandle.endPress}
@@ -201,6 +210,11 @@ const Harvest = () => {
                             <MoreOpMenu open={moreOpMenuOpen} onOpenChange={setMoreOpMenuOpen} target={moreOpMenuTarget} onSuccess={
                                 () => {
                                     fetchList();
+                                }
+                            } />
+                            <HarvestDetail open={detailOpen} onOpenChange={setDetailOpen} target={moreOpMenuTarget} onSuccess={
+                                () => {
+
                                 }
                             } />
                         </div>

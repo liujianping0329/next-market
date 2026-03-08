@@ -20,7 +20,7 @@ import FormHarvest from "@/app/money/garden/_component/form/FormHarvest";
 import { convertCateName } from "@/app/utils/data";
 import StarBar from "@/components/StarBar";
 
-const GreengrassDetail = ({ id, showToolbar }) => {
+const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips }) => {
   const router = useRouter()
   const [detail, setDetail] = useState(null)
   const [copied, setCopied] = useState(false)
@@ -36,8 +36,6 @@ const GreengrassDetail = ({ id, showToolbar }) => {
     setDetail(response.detail);
     setCategories(response.cates);
     setEditVer(prev => prev + 1)
-    console.log(response.cates);
-    console.log(response.detail.category);
   }
 
   useEffect(() => {
@@ -66,7 +64,6 @@ const GreengrassDetail = ({ id, showToolbar }) => {
     // 如果你路由不是这个路径，就改成你的列表路径
     setDeleting(false);
   };
-
   return (
     <>
       {showToolbar && detail && categories && <div id="toolBar" className="flex p-2.5 justify-between overflow-x-auto items-center border-b">
@@ -106,7 +103,7 @@ const GreengrassDetail = ({ id, showToolbar }) => {
         </div>
       </div>}
 
-      {detail && <div id="toolBarBottom" className="fixed bottom-0 left-0 right-0 flex p-2.5 justify-center overflow-x-auto items-center border-t bg-background">
+      {detail && showRemarkbar && <div id="toolBarBottom" className="fixed bottom-0 left-0 right-0 flex p-2.5 justify-center overflow-x-auto items-center border-t bg-background">
         <FormGardenRemark
           key={`${detail?.id}-${editVer}`}
           trigger={
@@ -115,7 +112,7 @@ const GreengrassDetail = ({ id, showToolbar }) => {
       </div>}
 
 
-      <ImageCarousel images={detail?.pics} ratio={3 / 4} />
+      <ImageCarousel images={detail?.pics} ratio={cssTips.ImageCarousel.ratio || 3 / 4} />
       {/* <img
           src={detail?.pics?.[0]}
           className="w-full aspect-[3/4] object-contain bg-white"
