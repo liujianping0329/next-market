@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import supabase from "@/app/utils/database";
+import { encode, decode } from "@/app/utils/base64";
+import { id } from "date-fns/locale";
 
 export async function POST(request, context) {
     const requestBody = await request.json();
@@ -11,5 +13,11 @@ export async function POST(request, context) {
 
     const { data: detail } = await detailQuery;
     const { data: cates } = await cateQuery;
+
+    detail.passCode = encode({
+        table: "garden",
+        id: detail.id,
+        title: detail.title
+    });
     return NextResponse.json({ detail: detail, cates: cates });
 }

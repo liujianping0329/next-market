@@ -43,7 +43,7 @@ export default function RootLayout({
         </Script>
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased  bg-[#f4efe6] text-[#40352c]`}
       >
         {children}
         <Toaster position="top-left" duration={2000} />

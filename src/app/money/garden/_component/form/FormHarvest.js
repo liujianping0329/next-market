@@ -34,8 +34,9 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertTriangle } from "lucide-react"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { encode, decode } from "@/app/utils/base64";
 
-const FormHarvest = ({ trigger, onSuccess, defaultValues = null }) => {
+const FormHarvest = ({ trigger, onSuccess, defaultValues = null, needPassCode = false }) => {
 
     const remindOptions = [
         { label: "1小时", value: "60" },
@@ -49,6 +50,7 @@ const FormHarvest = ({ trigger, onSuccess, defaultValues = null }) => {
     const [isLoadHarvest, setIsLoadHarvest] = useState(false);
     const [userId, setUserId] = useState(null);
     const [isCheckingSession, setIsCheckingSession] = useState(true);
+    const [passCodeGarden, setPassCodeGarden] = useState(null);
     const form = useForm({
         defaultValues: {
             startTime: parseLocalDateTime(defaultValues?.startTime) || new Date(new Date().setHours(8, 0, 0, 0)),
@@ -67,6 +69,20 @@ const FormHarvest = ({ trigger, onSuccess, defaultValues = null }) => {
 
         loadSession();
         setIsCheckingSession(false);
+        if (needPassCode) {
+            const loadPassCode = async () => {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    if (!text) return;
+                    let passCodeObj = decode(text);
+                    console.log(passCodeObj)
+                    setPassCodeGarden(passCodeObj);
+                } catch (e) {
+                    toast.info("未发现口令，切换为一般文字模式")
+                }
+            };
+            loadPassCode();
+        }
     }, []);
 
 
@@ -79,6 +95,7 @@ const FormHarvest = ({ trigger, onSuccess, defaultValues = null }) => {
                 json: {
                     ...(defaultValues?.id && { id: defaultValues.id }),
                     ...values,
+                    ...(passCodeGarden && { gardenId: passCodeGarden.id }),
                     ...(defaultValues?.gardenId && { gardenId: defaultValues.gardenId }),
                     startTime: formatDateLocal(values.startTime, "yyyy-MM-dd HH:mm"),
                     userId: userId
@@ -112,6 +129,14 @@ const FormHarvest = ({ trigger, onSuccess, defaultValues = null }) => {
                         <AlertTitle>注意</AlertTitle>
                         <AlertDescription>
                             当前未登录，无法绑定个人推送提醒
+                        </AlertDescription>
+                    </Alert>}
+
+                    {passCodeGarden && <Alert className="">
+                        <AlertTriangle className="h-4 w-4" />
+                        <AlertTitle>发现口令</AlertTitle>
+                        <AlertDescription>
+                            将绑定【${passCodeGarden.title}】
                         </AlertDescription>
                     </Alert>}
 

@@ -13,7 +13,7 @@ import FormGarden from "@/app/money/garden/_component/form/FormGarden";
 import FormSoy from "@/app/money/garden/_component/form/FormSoy";
 import FormGardenRemark from "@/app/money/garden/_component/form/FormGardenRemark";
 import { gardenCategories, gardenCategoriesNoAll } from "@/app/money/garden/constants/gardenCategories";
-import { MapPin, MessageSquare, Sparkles, Loader2 } from "lucide-react";
+import { MapPin, MessageSquare, Sparkles, Loader2, KeyRound } from "lucide-react";
 import ActionButton from "@/components/ActionButton";
 import ImageCarousel from "@/components/ImageCarousel";
 import FormHarvest from "@/app/money/garden/_component/form/FormHarvest";
@@ -73,6 +73,10 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips }) => {
 
     fetchDetail();
   }
+  const handlePassCode = () => {
+    navigator.clipboard.writeText(detail.passCode);
+    toast.info("口令已复制到剪贴板")
+  }
   return (
     <>
       {showToolbar && detail && categories && <div id="toolBar" className="flex p-2.5 justify-between overflow-x-auto items-center border-b">
@@ -80,6 +84,7 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips }) => {
           <ActionButton icon={ArrowLeft} label="返回" onClick={() => router.back()} />
         </div>
         <div className="flex space-x-2 items-center">
+          <ActionButton onClick={handlePassCode} icon={KeyRound} label="口令" />
           <FormGarden
             key={`${detail?.id}-${editVer}`}
             trigger={

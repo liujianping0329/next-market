@@ -195,7 +195,8 @@ const Harvest = () => {
 
                                     {/* 右侧内容 */}
                                     <div className="flex-1 flex items-center justify-center px-1">
-                                        {n.harvest?.[0]?.title}
+                                        {(n.harvest?.[0]?.title || "").slice(0, 18) +
+                                            (n.harvest?.[0]?.title?.length > 18 ? "..." : "")}
                                     </div>
 
                                     {n.harvest?.[0]?.f_user?.raw_user_meta_data?.avatar_url && (
