@@ -36,7 +36,7 @@ import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { encode, decode } from "@/app/utils/base64";
 
-const FormHarvest = ({ trigger, onSuccess, defaultValues = null, needPassCode = false }) => {
+const FormHarvest = ({ trigger, openHarvestCtrl, setOpenHarvestCtrl, onSuccess, defaultValues = null, needPassCode = false }) => {
 
     const remindOptions = [
         { label: "1小时", value: "60" },
@@ -69,23 +69,25 @@ const FormHarvest = ({ trigger, onSuccess, defaultValues = null, needPassCode = 
 
         loadSession();
         setIsCheckingSession(false);
-        if (needPassCode) {
+    }, []);
+
+    useEffect(() => {
+        if (needPassCode && (openHarvest || openHarvestCtrl)) {
             const loadPassCode = async () => {
                 try {
                     const text = await navigator.clipboard.readText();
-                    if (!text) return;
-                    let passCodeObj = decode(text);
-                    console.log(passCodeObj)
-                    setPassCodeGarden(passCodeObj);
+                    if (text) {
+                        let passCodeObj = decode(text);
+                        console.log(passCodeObj)
+                        setPassCodeGarden(passCodeObj);
+                    }
                 } catch (e) {
                     toast.info("未发现口令，切换为一般文字模式")
                 }
-            };
+            }
             loadPassCode();
         }
-    }, []);
-
-
+    }, [needPassCode, openHarvest, openHarvestCtrl]);
 
     const onSubmit = async (values) => {
         setIsLoadHarvest(true);
@@ -102,7 +104,7 @@ const FormHarvest = ({ trigger, onSuccess, defaultValues = null, needPassCode = 
                 }
             }).json();
             onSuccess();
-            setOpenHarvest(false);
+            setOpenHarvestCtrl ?? setOpenHarvest(false);
             form.reset();
         } catch (error) {
             console.error("Error upserting Harvest:", error);
@@ -115,10 +117,8 @@ const FormHarvest = ({ trigger, onSuccess, defaultValues = null, needPassCode = 
 
     return (
         <>
-            <Dialog open={openHarvest} onOpenChange={setOpenHarvest}>
-                <DialogTrigger asChild>
-                    {trigger}
-                </DialogTrigger>
+            <Dialog open={openHarvestCtrl ?? openHarvest} onOpenChange={setOpenHarvestCtrl ?? setOpenHarvest}>
+                {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>{defaultValues?.id ? "修改" : "新增"}</DialogTitle>
@@ -136,7 +136,7 @@ const FormHarvest = ({ trigger, onSuccess, defaultValues = null, needPassCode = 
                         <AlertTriangle className="h-4 w-4" />
                         <AlertTitle>发现口令</AlertTitle>
                         <AlertDescription>
-                            将绑定【${passCodeGarden.title}】
+                            将绑定【{passCodeGarden.title}】
                         </AlertDescription>
                     </Alert>}
 

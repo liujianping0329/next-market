@@ -26,6 +26,7 @@ const Harvest = () => {
 
     const [moreOpMenuOpen, setMoreOpMenuOpen] = useState(false);
     const [moreOpMenuTarget, setMoreOpMenuTarget] = useState(null);
+    const [emptyBlockAddOpen, setEmptyBlockAddOpen] = useState(false);
     const [detailOpen, setDetailOpen] = useState(false);
 
     const timeConst = Array.from({ length: 14 }).map((_, i) => i + 8);     // 1-12 冻结列
@@ -97,8 +98,12 @@ const Harvest = () => {
     const detailHandle = (e) => {
         const no = e.currentTarget.dataset.no;
         const item = timelist[no];
-        setDetailOpen(true);
-        setMoreOpMenuTarget(item);
+        if (item.harvest.length > 0) {
+            setDetailOpen(true);
+            setMoreOpMenuTarget(item);
+        } else {
+            setEmptyBlockAddOpen(true);
+        }
     }
 
     return (
@@ -217,6 +222,12 @@ const Harvest = () => {
                             <HarvestDetail open={detailOpen} onOpenChange={setDetailOpen} target={moreOpMenuTarget} onSuccess={
                                 () => {
 
+                                }
+                            } />
+                            <FormHarvest openHarvestCtrl={emptyBlockAddOpen} setOpenHarvestCtrl={setEmptyBlockAddOpen} needPassCode={true} onSuccess={
+                                () => {
+                                    fetchList(startTime)
+                                    setEmptyBlockAddOpen(false);
                                 }
                             } />
                         </div>

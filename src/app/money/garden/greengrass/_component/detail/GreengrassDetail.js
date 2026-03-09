@@ -132,7 +132,7 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips }) => {
           src={detail?.pics?.[0]}
           className="w-full aspect-[3/4] object-contain bg-white"
         /> */}
-      <p className="whitespace-pre-line pb-0">
+      <p className="whitespace-pre-line pb-20">
         {detail?.title}<br />
         {detail && `评分:${detail?.point}`}<br />
         {/* {detail && <StarBar value={detail?.point} />} */}
