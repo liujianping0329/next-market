@@ -82,7 +82,7 @@ const FormHarvest = ({ trigger, openHarvestCtrl, setOpenHarvestCtrl, onSuccess, 
                         setPassCodeGarden(passCodeObj);
                     }
                 } catch (e) {
-                    toast.info("未发现口令，切换为一般文字模式")
+
                 }
             }
             loadPassCode();
@@ -104,7 +104,7 @@ const FormHarvest = ({ trigger, openHarvestCtrl, setOpenHarvestCtrl, onSuccess, 
                 }
             }).json();
             onSuccess();
-            setOpenHarvestCtrl ?? setOpenHarvest(false);
+            setOpenHarvestCtrl ? setOpenHarvestCtrl(false) : setOpenHarvest(false);
             form.reset();
         } catch (error) {
             console.error("Error upserting Harvest:", error);
@@ -137,6 +137,14 @@ const FormHarvest = ({ trigger, openHarvestCtrl, setOpenHarvestCtrl, onSuccess, 
                         <AlertTitle>发现口令</AlertTitle>
                         <AlertDescription>
                             将绑定【{passCodeGarden.title}】
+                        </AlertDescription>
+                    </Alert>}
+
+                    {needPassCode && !passCodeGarden && <Alert className="border-yellow-300 bg-yellow-50 text-yellow-900">
+                        <AlertTriangle className="h-4 w-4" />
+                        <AlertTitle>未发现口令</AlertTitle>
+                        <AlertDescription>
+                            可在种草详情页发行口令以用于绑定
                         </AlertDescription>
                     </Alert>}
 

@@ -9,7 +9,7 @@ import { pickColor } from "@/app/utils/color";
 import ActionButton from "@/components/ActionButton";
 import FolderOpBar from "./soy/FolderOpBar";
 import Datepicker from "@/components/datepicker";
-import { pullToZero, pushToLast, pullToHour, diffHours, formatDateLocal, changeDay, parseLocalDate } from "@/app/utils/date";
+import { pullToZero, pushToLast, pullToHour, diffHours, formatDateLocal, changeDay, parseLocalDate, changeHour } from "@/app/utils/date";
 import { id } from "date-fns/locale";
 import FormHarvest from "../form/FormHarvest";
 import useLongPress from "@/app/hooks/useLongPress";
@@ -27,6 +27,7 @@ const Harvest = () => {
     const [moreOpMenuOpen, setMoreOpMenuOpen] = useState(false);
     const [moreOpMenuTarget, setMoreOpMenuTarget] = useState(null);
     const [emptyBlockAddOpen, setEmptyBlockAddOpen] = useState(false);
+    const [emptyBlockAddTarget, setEmptyBlockAddTarget] = useState(false);
     const [detailOpen, setDetailOpen] = useState(false);
 
     const timeConst = Array.from({ length: 14 }).map((_, i) => i + 8);     // 1-12 冻结列
@@ -51,11 +52,15 @@ const Harvest = () => {
             }
         }).json();
         let dbList = response.list;
+        let dayStart = pullToZero(startTime)
         let allTimes = Array.from({ length: 24 * 7 }).map((_, i) => {
             return {
                 no: i,
                 hidden: i % 24 <= 7 || i % 24 >= 22,
-                harvest: []
+                harvest: [],
+                curTime: formatDateLocal(changeHour(dayStart, i), "yyyy-MM-dd HH:mm"),
+                isNow: formatDateLocal(changeHour(dayStart, i), "yyyy-MM-dd HH:mm")
+                    === formatDateLocal(pullToHour(new Date()), "yyyy-MM-dd HH:mm")
             };
         });
         console.log("dbList", response);
@@ -102,6 +107,9 @@ const Harvest = () => {
             setDetailOpen(true);
             setMoreOpMenuTarget(item);
         } else {
+            setEmptyBlockAddTarget({
+                startTime: item.curTime
+            })
             setEmptyBlockAddOpen(true);
         }
     }
@@ -229,7 +237,7 @@ const Harvest = () => {
                                     fetchList(startTime)
                                     setEmptyBlockAddOpen(false);
                                 }
-                            } />
+                            } defaultValues={emptyBlockAddTarget} key={emptyBlockAddTarget?.startTime ?? "emptyBlockAddTarget"} />
                         </div>
                     </div>
                 </div>

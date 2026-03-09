@@ -36,6 +36,7 @@ export const parseLocalDateTime = (str) => {
       );
 };
 
+// date -> date
 export const pullToZero = (date, days = 0) => {
       const d = new Date(date)
       d.setHours(0, 0, 0, 0)
@@ -50,9 +51,17 @@ export const pushToLast = (date, days = 0) => {
       return d;
 };
 
+// date -> date
 export const changeDay = (date, days = 0) => {
       const d = new Date(date)
       d.setDate(d.getDate() + days)
+      return d;
+};
+
+// date -> date
+export const changeHour = (date, hours = 0) => {
+      const d = new Date(date)
+      d.setHours(d.getHours() + hours)
       return d;
 };
 
