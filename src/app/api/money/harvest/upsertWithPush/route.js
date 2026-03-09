@@ -7,7 +7,7 @@ export async function POST(request, context) {
     const requestBody = await request.json();
     const { data, error } = await supabase.from('harvest').upsert(requestBody).select().single();
 
-    let pushInfo;
+    let pushInfo = {};
     if (requestBody.userId) {
         const origin = new URL(request.url).origin;
         const sendAfter =
@@ -26,27 +26,31 @@ export async function POST(request, context) {
 
             }
         }
-        pushInfo = await ky.post(
-            "https://api.onesignal.com/notifications?c=push",
-            {
-                headers: {
-                    Authorization: `Key ${process.env.ONESIGNAL_API_KEY}`,
-                },
-                json: {
-                    app_id: process.env.NEXT_PUBLIC_ONESIGNAL_APPID,
-                    include_aliases: {
-                        external_id: [requestBody.userId],
+        try {
+            pushInfo = await ky.post(
+                "https://api.onesignal.com/notifications?c=push",
+                {
+                    headers: {
+                        Authorization: `Key ${process.env.ONESIGNAL_API_KEY}`,
                     },
-                    target_channel: "push",
-                    contents: { en: requestBody.title || "no title" },
-                    web_url: requestBody.gardenId ? `${origin}/money/garden/greengrass/${requestBody.gardenId}`
-                        : `${origin}/money/garden?tag=harvest`,
-                    ...(new Date(sendAfter) > new Date() && {
-                        send_after: sendAfter
-                    })
-                },
-            }
-        ).json();
+                    json: {
+                        app_id: process.env.NEXT_PUBLIC_ONESIGNAL_APPID,
+                        include_aliases: {
+                            external_id: [requestBody.userId],
+                        },
+                        target_channel: "push",
+                        contents: { en: requestBody.title || "no title" },
+                        web_url: requestBody.gardenId ? `${origin}/money/garden/greengrass/${requestBody.gardenId}`
+                            : `${origin}/money/garden?tag=harvest`,
+                        ...(new Date(sendAfter) > new Date() && {
+                            send_after: sendAfter
+                        })
+                    },
+                }
+            ).json();
+        } catch {
+
+        }
         await supabase.from('harvest').update({ pushId: pushInfo.id }).eq("id", data.id);
     }
 

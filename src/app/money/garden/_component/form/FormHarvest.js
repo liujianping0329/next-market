@@ -93,7 +93,7 @@ const FormHarvest = ({ trigger, openHarvestCtrl, setOpenHarvestCtrl, onSuccess, 
         setIsLoadHarvest(true);
 
         try {
-            await ky.post('/api/money/harvest/upsertWithPush', {
+            const response = await ky.post('/api/money/harvest/upsertWithPush', {
                 json: {
                     ...(defaultValues?.id && { id: defaultValues.id }),
                     ...values,
@@ -103,6 +103,9 @@ const FormHarvest = ({ trigger, openHarvestCtrl, setOpenHarvestCtrl, onSuccess, 
                     userId: userId
                 }
             }).json();
+            if (!response.pushInfo.id) {
+                toast.error("推送未设置成功，仅接受最早一个月之前的推送设置");
+            }
             onSuccess();
             setOpenHarvestCtrl ? setOpenHarvestCtrl(false) : setOpenHarvest(false);
             form.reset();

@@ -15,6 +15,7 @@ import FormHarvest from "../form/FormHarvest";
 import useLongPress from "@/app/hooks/useLongPress";
 import MoreOpMenu from "@/app/money/garden/_component/list/harvest/MoreOpMenu";
 import HarvestDetail from "@/app/money/garden/_component/detail/HarvestDetail";
+import { AlertCircle } from "lucide-react";
 
 const Harvest = () => {
 
@@ -212,6 +213,7 @@ const Harvest = () => {
                                             (n.harvest?.[0]?.title?.length > 18 ? "..." : "")}
                                     </div>
 
+                                    {/* 头像 */}
                                     {n.harvest?.[0]?.f_user?.raw_user_meta_data?.avatar_url && (
                                         <img
                                             src={n.harvest?.[0]?.f_user?.raw_user_meta_data?.avatar_url}
@@ -219,6 +221,22 @@ const Harvest = () => {
                                             alt=""
                                         />
                                     )}
+
+                                    {/* 惊叹号 */}
+                                    {/* {n.harvest?.[0] && !n.harvest[0].pushId && (
+                                        <div
+                                            className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center border-2 border-white "
+                                        >
+                                            !
+                                        </div>
+                                    )} */}
+
+                                    {/* 数量 */}
+                                    {/* {n.harvest.length > 1 && (
+                                        <div className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center border-2 border-white">
+                                            {n.harvest.length}
+                                        </div>
+                                    )} */}
 
                                 </div>
                             ))}

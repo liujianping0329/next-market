@@ -87,10 +87,17 @@ const HarvestDetail = ({ open, onOpenChange, target, onSuccess }) => {
                           {n?.title || "未填写说明"}
                         </p>
 
-                        <div className="mt-3 flex items-center gap-2">
-                          <span className="rounded-full bg-white px-3 py-1 text-xs text-sky-700 shadow-sm">
-                            提前 {n?.remindBefore ?? 0} 分钟提醒
-                          </span>
+                        <div className="flex flex-wrap gap-2">
+                          {!n.pushId && (<div className="mt-3 flex items-center gap-2">
+                            <span className="rounded-full bg-white px-3 py-1 text-xs text-red-700 shadow-sm">
+                              提醒未设置成功
+                            </span>
+                          </div>)}
+                          <div className="mt-3 flex items-center gap-2">
+                            <span className="rounded-full bg-white px-3 py-1 text-xs text-sky-700 shadow-sm">
+                              提前 {n?.remindBefore ?? 0} 分钟提醒
+                            </span>
+                          </div>
                         </div>
                       </div>
 
