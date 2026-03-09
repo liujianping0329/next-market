@@ -29,7 +29,9 @@ import {
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
+import { useRouter } from "next/navigation";
+
 
 export const revalidate = 0;
 
@@ -37,6 +39,7 @@ const GardenUI = () => {
     const [tab, setTab] = useState("Greengrass");
 
     const [user, setUser] = useState(null)
+    const router = useRouter();
 
     useEffect(() => {
         const syncUser = async (session) => {
@@ -53,6 +56,7 @@ const GardenUI = () => {
                 window.OneSignalDeferred.push(async function (OneSignal) {
                     await OneSignal.logout();
                 });
+                router.replace("/user/login");
             }
         };
 
