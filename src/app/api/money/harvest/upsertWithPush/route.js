@@ -5,6 +5,7 @@ import { calcRemindTime } from "@/app/utils/date";
 
 export async function POST(request, context) {
     const requestBody = await request.json();
+    console.log("requestBody", requestBody)
     const { data, error } = await supabase.from('harvest').upsert(requestBody).select().single();
 
     let pushInfo = {};
@@ -12,6 +13,7 @@ export async function POST(request, context) {
         const origin = new URL(request.url).origin;
         const sendAfter =
             calcRemindTime(requestBody.startTime?.replace(" ", "T") + ":00+09:00", requestBody.remindBefore);
+        console.log("sendAfter", sendAfter)
         if (requestBody.id && data.pushId) {
             try {
                 await ky.delete(
@@ -26,7 +28,7 @@ export async function POST(request, context) {
 
             }
         }
-        console.log({
+        let oneSignalPara = {
             app_id: process.env.NEXT_PUBLIC_ONESIGNAL_APPID,
             include_aliases: {
                 external_id: [requestBody.userId],
@@ -38,7 +40,8 @@ export async function POST(request, context) {
             ...(new Date(sendAfter) > new Date() && {
                 send_after: sendAfter
             })
-        })
+        };
+        console.log("oneSignalPara", oneSignalPara)
         try {
             pushInfo = await ky.post(
                 "https://api.onesignal.com/notifications?c=push",
@@ -46,19 +49,7 @@ export async function POST(request, context) {
                     headers: {
                         Authorization: `Key ${process.env.ONESIGNAL_API_KEY}`,
                     },
-                    json: {
-                        app_id: process.env.NEXT_PUBLIC_ONESIGNAL_APPID,
-                        include_aliases: {
-                            external_id: [requestBody.userId],
-                        },
-                        target_channel: "push",
-                        contents: { en: requestBody.title || "no title" },
-                        web_url: requestBody.gardenId ? `${origin}/money/garden/greengrass/${requestBody.gardenId}`
-                            : `${origin}/money/garden?tag=harvest`,
-                        ...(new Date(sendAfter) > new Date() && {
-                            send_after: sendAfter
-                        })
-                    },
+                    json: oneSignalPara,
                 }
             ).json();
         } catch (error) {
