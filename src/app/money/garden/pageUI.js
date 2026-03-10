@@ -30,15 +30,11 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useRouter, useSearchParams } from "next/navigation";
-
 
 export const revalidate = 0;
 
-const GardenUI = () => {
-    const searchParams = useSearchParams();
+const GardenUI = ({ searchParams }) => {
     const [tab, setTab] = useState("Greengrass");
-
     const [user, setUser] = useState(null)
 
     useEffect(() => {
