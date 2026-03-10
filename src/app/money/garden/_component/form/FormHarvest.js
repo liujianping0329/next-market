@@ -104,7 +104,7 @@ const FormHarvest = ({ trigger, openHarvestCtrl, setOpenHarvestCtrl, onSuccess, 
                 }
             }).json();
             if (!response.pushInfo.id) {
-                toast.error("推送未设置成功，仅接受最早一个月之前的推送设置");
+                toast.error(`推送未设置成功，${pushInfo.err}`);
             }
             onSuccess();
             setOpenHarvestCtrl ? setOpenHarvestCtrl(false) : setOpenHarvest(false);

@@ -48,8 +48,10 @@ export async function POST(request, context) {
                     },
                 }
             ).json();
-        } catch {
-
+        } catch (error) {
+            const err = await error.response.json();
+            console.log(err);
+            pushInfo.err = err;
         }
         await supabase.from('harvest').update({ pushId: pushInfo.id }).eq("id", data.id);
     }
