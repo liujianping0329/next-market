@@ -37,10 +37,9 @@ export const revalidate = 0;
 
 const GardenUI = () => {
     const searchParams = useSearchParams();
-    const [tab, setTab] = useState(searchParams.get("tab") || "Greengrass");
+    const [tab, setTab] = useState("Greengrass");
 
     const [user, setUser] = useState(null)
-    const router = useRouter();
 
     useEffect(() => {
         const syncUser = async (session) => {
@@ -57,7 +56,6 @@ const GardenUI = () => {
                 window.OneSignalDeferred.push(async function (OneSignal) {
                     await OneSignal.logout();
                 });
-                router.replace("/user/login");
             }
         };
 
@@ -70,6 +68,7 @@ const GardenUI = () => {
         } = supabase.auth.onAuthStateChange((_event, session) => {
             syncUser(session);
         });
+        if (searchParams.get("tab")) setTab(searchParams.get("tab"))
 
         return () => subscription.unsubscribe();
     }, [])

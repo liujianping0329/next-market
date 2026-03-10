@@ -36,7 +36,7 @@ export async function POST(request, context) {
             target_channel: "push",
             contents: { en: requestBody.title || "no title" },
             web_url: requestBody.gardenId ? `${origin}/money/garden/greengrass/${requestBody.gardenId}`
-                : `${origin}/money/garden?tab=harvest`,
+                : `${origin}/money/garden?tab=Harvest`,
             ...(new Date(sendAfter) > new Date() && {
                 send_after: sendAfter
             })
