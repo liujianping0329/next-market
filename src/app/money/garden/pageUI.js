@@ -51,6 +51,7 @@ const GardenUI = ({ }) => {
                 let userInfo = { ...user, ...(response.list[0]) }
                 setUser(userInfo);
                 console.log("userInfo", userInfo)
+                alert(userInfo.planet.id)
             } else {
                 window.OneSignalDeferred = window.OneSignalDeferred || [];
                 window.OneSignalDeferred.push(async function (OneSignal) {

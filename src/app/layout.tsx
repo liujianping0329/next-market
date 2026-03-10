@@ -47,13 +47,6 @@ export default function RootLayout({
       >
         {children}
         <Toaster position="top-left" duration={2000} />
-        <Script
-          src="https://cdn.jsdelivr.net/npm/eruda"
-          strategy="afterInteractive"
-          onLoad={() => {
-            window.eruda?.init();
-          }}
-        />
       </body>
     </html>
   );
