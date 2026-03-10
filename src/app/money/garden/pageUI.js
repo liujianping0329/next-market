@@ -97,7 +97,7 @@ const GardenUI = ({ }) => {
                             返回
                         </Link>
                     </Button>
-                    <ToggleGroup type="single" defaultValue="Greengrass" variant="outline"
+                    <ToggleGroup type="single" defaultValue={tab} variant="outline"
                         onValueChange={(v) => {
                             if (v) setTab(v);
                         }}>
