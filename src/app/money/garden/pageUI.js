@@ -30,12 +30,14 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useSearchParams } from "next/navigation";
 
 export const revalidate = 0;
 
-const GardenUI = ({ searchParams }) => {
+const GardenUI = ({ }) => {
     const [tab, setTab] = useState("Greengrass");
     const [user, setUser] = useState(null)
+    const searchParams = useSearchParams();
 
     useEffect(() => {
         const syncUser = async (session) => {
@@ -64,10 +66,14 @@ const GardenUI = ({ searchParams }) => {
         } = supabase.auth.onAuthStateChange((_event, session) => {
             syncUser(session);
         });
-        if (searchParams.get("tab")) setTab(searchParams.get("tab"))
 
         return () => subscription.unsubscribe();
     }, [])
+
+    useEffect(() => {
+        const tabFromUrl = searchParams.get("tab");
+        if (tabFromUrl) setTab(tabFromUrl);
+    }, [searchParams]);
 
 
     const handleLogin = async () => {
