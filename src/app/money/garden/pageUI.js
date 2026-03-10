@@ -30,14 +30,12 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useSearchParams } from "next/navigation";
 
 export const revalidate = 0;
 
 const GardenUI = ({ }) => {
-    const [tab, setTab] = useState("Greengrass");
+    const [tab, setTab] = useState("Harvest");
     const [user, setUser] = useState(null)
-    const searchParams = useSearchParams();
 
     useEffect(() => {
         const syncUser = async (session) => {
@@ -70,10 +68,10 @@ const GardenUI = ({ }) => {
         return () => subscription.unsubscribe();
     }, [])
 
-    useEffect(() => {
-        const tabFromUrl = searchParams.get("tab");
-        if (tabFromUrl) setTab(tabFromUrl);
-    }, [searchParams]);
+    // useEffect(() => {
+    //     const tabFromUrl = searchParams.get("tab");
+    //     if (tabFromUrl) setTab(tabFromUrl);
+    // }, [searchParams]);
 
 
     const handleLogin = async () => {
