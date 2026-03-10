@@ -26,6 +26,19 @@ export async function POST(request, context) {
 
             }
         }
+        console.log({
+            app_id: process.env.NEXT_PUBLIC_ONESIGNAL_APPID,
+            include_aliases: {
+                external_id: [requestBody.userId],
+            },
+            target_channel: "push",
+            contents: { en: requestBody.title || "no title" },
+            web_url: requestBody.gardenId ? `${origin}/money/garden/greengrass/${requestBody.gardenId}`
+                : `${origin}/money/garden?tag=harvest`,
+            ...(new Date(sendAfter) > new Date() && {
+                send_after: sendAfter
+            })
+        })
         try {
             pushInfo = await ky.post(
                 "https://api.onesignal.com/notifications?c=push",
