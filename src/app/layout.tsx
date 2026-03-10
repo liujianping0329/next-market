@@ -41,12 +41,16 @@ export default function RootLayout({
             });
           `}
         </Script>
+        <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased  bg-[#fffefa] text-[#40352c]`}
       >
         {children}
         <Toaster position="top-left" duration={2000} />
+        <script>
+          eruda.init();
+        </script>
       </body>
     </html>
   );

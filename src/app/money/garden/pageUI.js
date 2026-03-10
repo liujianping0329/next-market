@@ -47,6 +47,10 @@ const GardenUI = ({ }) => {
                 window.OneSignalDeferred.push(async function (OneSignal) {
                     await OneSignal.login(String(user.id));
                 });
+                const response = await ky.post('/api/f_user/list/match', { json: { id: user.id } }).json();
+                let userInfo = { ...user, ...(response.list[0]) }
+                setUser(userInfo);
+                console.log("userInfo", userInfo)
             } else {
                 window.OneSignalDeferred = window.OneSignalDeferred || [];
                 window.OneSignalDeferred.push(async function (OneSignal) {
