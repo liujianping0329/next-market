@@ -45,6 +45,7 @@ import {
 } from "@/components/ui/dialog";
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
+import supabase from "@/app/utils/database";
 
 const FormGarden = ({ trigger, onSuccess, categories, defaultValues = null }) => {
     const [openGarden, setOpenGarden] = useState(false);
@@ -66,6 +67,7 @@ const FormGarden = ({ trigger, onSuccess, categories, defaultValues = null }) =>
     const onSubmit = async (values) => {
         setIsLoadGarden(true);
         const urls = await picRef.current?.upload()
+        const { data: userData, error } = await supabase.auth.getSession();
 
         const { locationPath, ...rest } = values;
         await ky.post('/api/money/garden/upsert', {
@@ -74,7 +76,8 @@ const FormGarden = ({ trigger, onSuccess, categories, defaultValues = null }) =>
                 ...rest, pics: urls,
                 date: formatDateLocal(values.date),
                 location: { name: values.location, path: values.locationPath },
-                topic: "Greengrass"
+                topic: "Greengrass",
+                ...(userData?.session?.user?.id && { userId: userData.session.user.id }),
             }
         }).json();
         onSuccess();

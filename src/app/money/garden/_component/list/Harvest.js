@@ -17,7 +17,7 @@ import MoreOpMenu from "@/app/money/garden/_component/list/harvest/MoreOpMenu";
 import HarvestDetail from "@/app/money/garden/_component/detail/HarvestDetail";
 import { AlertCircle } from "lucide-react";
 
-const Harvest = () => {
+const Harvest = ({ userInfo = null }) => {
 
     const [startTime, setStartTime] = useState(new Date());
 
@@ -49,7 +49,8 @@ const Harvest = () => {
                 startTime__gte: formatDateLocal(pullToZero(startTime), "yyyy-MM-dd HH:mm"),
                 startTime__lt: formatDateLocal(
                     changeDay(pullToZero(startTime), 7), "yyyy-MM-dd HH:mm"),
-                view: "harvestList"
+                view: "harvestList",
+                ...(userInfo?.planet ? { planetId: userInfo.planet.id } : { isPlanetNull: true })
             }
         }).json();
         let dbList = response.list;

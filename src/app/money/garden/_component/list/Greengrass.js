@@ -22,7 +22,7 @@ import { usePathname } from "next/navigation";
 import { gardenCategories, gardenCategoriesNoAll } from "@/app/money/garden/constants/gardenCategories";
 import ListBar from "@/app/money/garden/_component/list/bar/ListBar";
 
-const Greengrass = () => {
+const Greengrass = ({ userInfo = null }) => {
   const [expanded, setExpanded] = useState(false);
   const [subCategory, setSubCategory] = useState(null);
   const [list, setList] = useState([]);
@@ -32,7 +32,11 @@ const Greengrass = () => {
   const router = useRouter()
 
   const fetchData = async () => {
-    const response = await ky.post('/api/money/garden/greenGrass/list', { json: {} }).json();
+    const response = await ky.post('/api/money/garden/greenGrass/list', {
+      json: {
+        ...(userInfo?.planet ? { planetId: userInfo.planet.id } : { isPlanetNull: true })
+      }
+    }).json();
     setCategories(response.cates);
     setList(response.list);
   }
@@ -43,6 +47,7 @@ const Greengrass = () => {
 
   const filteredList = subCategory ? list.filter((item) => subCategory.includes("-") ?
     item.category === subCategory : item.category.startsWith(subCategory)) : list;
+  console.log(filteredList)
   return (
     <>
       <div id="toolBar" className="mx-2.5 mt-2 flex items-center justify-between rounded-md border bg-muted/40 px-2.5 py-2">

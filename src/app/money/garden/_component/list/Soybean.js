@@ -9,7 +9,7 @@ import { pickColor } from "@/app/utils/color";
 import ActionButton from "@/components/ActionButton";
 import FolderOpBar from "./soy/FolderOpBar";
 
-const Soybean = () => {
+const Soybean = ({ userInfo = null }) => {
     const [list, setList] = useState([]);
     const [pending, setPending] = useState(new Set()); // 正在同步的 id 集合
 
@@ -19,7 +19,10 @@ const Soybean = () => {
 
     const fetchList = async () => {
         const response = await ky.post('/api/money/garden/list/match', {
-            json: { topic: "SoyBean" }
+            json: {
+                topic: "SoyBean",
+                ...(userInfo?.planet ? { planetId: userInfo.planet.id } : { isPlanetNull: true })
+            }
         }).json();
         let dbList = response.list;
         let list = [{

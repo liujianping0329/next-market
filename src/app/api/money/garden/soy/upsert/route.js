@@ -41,7 +41,8 @@ export async function POST(request, context) {
             title: requestBody.pname,
             category: "folder",
             topic: "SoyBean",
-            sort: (minParentSort?.sort ?? 0) - 1
+            sort: (minParentSort?.sort ?? 0) - 1,
+            userId: requestBody.userId
         }).select().single();
         parent = data;
     }
@@ -52,7 +53,8 @@ export async function POST(request, context) {
             category: "item",
             parent: parent.id,
             topic: "SoyBean",
-            sort: childSort++
+            sort: childSort++,
+            userId: requestBody.userId
         };
     }));
     return NextResponse.json({ id: parent.id });

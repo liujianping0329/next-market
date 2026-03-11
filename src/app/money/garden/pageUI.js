@@ -13,7 +13,6 @@ import { Spinner } from "@/components/ui/spinner";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import FormGarden from "./_component/form/FormGarden";
 import Greengrass from "./_component/list/Greengrass";
 import Soybean from "./_component/list/Soybean";
 import Harvest from "./_component/list/Harvest";
@@ -30,6 +29,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import ky from "ky"
 
 export const revalidate = 0;
 
@@ -51,7 +51,6 @@ const GardenUI = ({ }) => {
                 let userInfo = { ...user, ...(response.list[0]) }
                 setUser(userInfo);
                 console.log("userInfo", userInfo)
-                alert(userInfo.planet.id)
             } else {
                 window.OneSignalDeferred = window.OneSignalDeferred || [];
                 window.OneSignalDeferred.push(async function (OneSignal) {
@@ -145,10 +144,10 @@ const GardenUI = ({ }) => {
                     </DropdownMenuContent>
                 </DropdownMenu>) : <ActionButton icon={CircleUser} size="sm" onClick={handleLogin} />}
             </div>
-            {tab === "Soybean" && <Soybean />}
-            {tab === "Greengrass" && <Greengrass />}
-            {tab === "Harvest" && <Harvest />}
-            {tab === "Granary" && <Granary />}
+            {tab === "Soybean" && <Soybean userInfo={user} />}
+            {tab === "Greengrass" && <Greengrass userInfo={user} />}
+            {tab === "Harvest" && <Harvest userInfo={user} />}
+            {tab === "Granary" && <Granary userInfo={user} />}
         </>
     );
 }

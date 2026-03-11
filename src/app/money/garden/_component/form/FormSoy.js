@@ -28,6 +28,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
 import { Input } from "@/components/ui/input";
+import supabase from "@/app/utils/database";
 
 const FormSoy = ({ trigger, onSuccess, defaultValues = null }) => {
 
@@ -42,6 +43,7 @@ const FormSoy = ({ trigger, onSuccess, defaultValues = null }) => {
 
     const onSubmit = async (values) => {
         setIsLoadSoy(true);
+        const { data: userData, error } = await supabase.auth.getSession();
         if (values.category) {
             //新增修改框输入类别
             try {
@@ -49,7 +51,8 @@ const FormSoy = ({ trigger, onSuccess, defaultValues = null }) => {
                     json: {
                         ...(defaultValues?.id && { id: defaultValues.id }),
                         pname: values.category,
-                        titles: values.titles
+                        titles: values.titles,
+                        ...(userData?.session?.user?.id && { userId: userData.session.user.id }),
                     }
                 }).json();
                 onSuccess();
@@ -75,7 +78,8 @@ const FormSoy = ({ trigger, onSuccess, defaultValues = null }) => {
                     title,
                     category: values.category,
                     topic: "SoyBean",
-                    status: "1"
+                    status: "1",
+                    ...(userData?.session?.user?.id && { userId: userData.session.user.id }),
                 }))
             }).json();
             onSuccess();
