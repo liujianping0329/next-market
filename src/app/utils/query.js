@@ -40,23 +40,21 @@ export const PLANET_ID_SELECT = `
 `;
 
 export const PLANET_NULL_SELECT = `
-  f_user(*,planet(*)),
-  user_filter:f_user(),
-  planet_filter:f_user(planet())
+  f_user(*,planet(*))
 `;
 
-export function applyPlanetFilter(query, { planetId, isPlanetNull }, baseSel = "*,") {
-  if (planetId != null && planetId !== "") {
+export function applyPlanetFilter(query, { planetId, userId }, baseSel = "*,") {
+  if (planetId) {
     return query
       .select(baseSel + PLANET_ID_SELECT)
       .eq("f_user_filter.planetId", planetId);
-  }
-
-  if (isPlanetNull) {
+  } else if (userId) {
     return query
       .select(baseSel + PLANET_NULL_SELECT)
-      .or("user_filter.is.null,planet_filter.is.null");
+      .eq("userId", userId)
+  } else {
+    return query
+      .select(baseSel + PLANET_NULL_SELECT)
+      .is("userId", null)
   }
-
-  return query.select(baseSel);
 }

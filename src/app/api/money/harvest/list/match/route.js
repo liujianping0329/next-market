@@ -5,11 +5,11 @@ import { applyPlanetFilter } from "@/app/utils/query";
 
 export async function POST(request, context) {
     // const requestBody = await request.json();
-    const { planetId, isPlanetNull, ...harvestFilter } = await request.json();
+    const { planetId, userId, ...harvestFilter } = await request.json();
 
     let query = supabase.from("harvest").select();
     if (harvestFilter.view === "harvestList") {
-        query = applyPlanetFilter(query, { planetId, isPlanetNull }, `
+        query = applyPlanetFilter(query, { planetId, userId }, `
             *,garden(pics),
         `);
     }

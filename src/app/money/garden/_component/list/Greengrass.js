@@ -34,7 +34,7 @@ const Greengrass = ({ userInfo }) => {
   const fetchData = async () => {
     const response = await ky.post('/api/money/garden/greenGrass/list', {
       json: {
-        ...(userInfo?.planet ? { planetId: userInfo.planet.id } : { isPlanetNull: true })
+        ...(userInfo?.planet ? { planetId: userInfo.planet.id } : { userId: userInfo?.id })
       }
     }).json();
     setCategories(response.cates);

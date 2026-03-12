@@ -50,7 +50,7 @@ const Harvest = ({ userInfo, isUserReady }) => {
                 startTime__lt: formatDateLocal(
                     changeDay(pullToZero(startTime), 7), "yyyy-MM-dd HH:mm"),
                 view: "harvestList",
-                ...(userInfo?.planet ? { planetId: userInfo.planet.id } : { isPlanetNull: true })
+                ...(userInfo?.planet ? { planetId: userInfo.planet.id } : { userId: userInfo?.id })
             }
         }).json();
         let dbList = response.list;

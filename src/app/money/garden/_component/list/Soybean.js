@@ -21,7 +21,7 @@ const Soybean = ({ userInfo }) => {
         const response = await ky.post('/api/money/garden/list/match', {
             json: {
                 topic: "SoyBean",
-                ...(userInfo?.planet ? { planetId: userInfo.planet.id } : { isPlanetNull: true })
+                ...(userInfo?.planet ? { planetId: userInfo.planet.id } : { userId: userInfo?.id })
             }
         }).json();
         let dbList = response.list;

@@ -9,19 +9,19 @@ import { title } from "process";
 export async function POST(request, context) {
     const requestBody = await request.json();
 
-    let existQuery = supabase.from('garden').select("id")
-        .eq("category", "folder").eq("topic", "SoyBean")
-        .eq("title", requestBody.pname).limit(1);
-    if (requestBody.id) {
-        existQuery = existQuery.neq("id", requestBody.id);
-    }
-    const { data: existParent } = await existQuery.maybeSingle();
-    if (existParent) {
-        return NextResponse.json({
-            errorCode: "NAME_EXISTS",
-            errorMsg: "名称已存在"
-        }, { status: 400 });
-    }
+    // let existQuery = supabase.from('garden').select("id")
+    //     .eq("category", "folder").eq("topic", "SoyBean")
+    //     .eq("title", requestBody.pname).limit(1);
+    // if (requestBody.id) {
+    //     existQuery = existQuery.neq("id", requestBody.id);
+    // }
+    // const { data: existParent } = await existQuery.maybeSingle();
+    // if (existParent) {
+    //     return NextResponse.json({
+    //         errorCode: "NAME_EXISTS",
+    //         errorMsg: "名称已存在"
+    //     }, { status: 400 });
+    // }
 
     let parent = {};
     if (requestBody.id) {
