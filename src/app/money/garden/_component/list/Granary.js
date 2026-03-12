@@ -11,9 +11,37 @@ import FolderOpBar from "./soy/FolderOpBar";
 
 const Granary = ({ userInfo }) => {
     return (
-        <div className="p-4">
-            冬藏园
-        </div>
+        <>
+            <div id="toolBar" className="mx-2.5 mt-2 flex items-center justify-between rounded-md border bg-muted/40 px-2.5 py-2">
+                <div className="flex flex-col gap-2">
+                    <span className="text-sm text-muted-foreground">
+                        记下每一笔来去与积累，在春种夏耘、秋收冬藏的日子里，慢慢收成属于自己的丰盈。
+                    </span>
+                    <div className="flex items-center justify-between w-full">
+                        <div className="flex items-center gap-2">
+                            <FormSoy trigger={
+                                <Button size="sm" variant="outline">记录余额</Button>
+                            } onSuccess={() => {
+                                fetchList();
+                            }} />
+
+                            <FormSoy trigger={
+                                <Button size="sm" variant="outline">记录关键交易</Button>
+                            } onSuccess={() => {
+                                fetchList();
+                            }} />
+                        </div>
+                        <div className="flex items-center">
+                            <FormSoy trigger={
+                                <Button size="sm" variant="outline">图表</Button>
+                            } onSuccess={() => {
+                                fetchList();
+                            }} />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </>
     );
 }
 
