@@ -79,7 +79,7 @@ const Harvest = ({ userInfo = null }) => {
 
     useEffect(() => {
         fetchList(startTime);
-    }, [startTime]);
+    }, [startTime, userInfo]);
 
     const journeys = [
         { title: "大阪游", startDate: "2026-03-19" },
