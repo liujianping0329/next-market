@@ -80,7 +80,7 @@ const Harvest = ({ userInfo }) => {
     useEffect(() => {
         if (userInfo === undefined) return
         fetchList(startTime);
-    }, [startTime, userInfo?.planet?.id]);
+    }, [startTime, userInfo === undefined, userInfo?.planet?.id]);
 
     const journeys = [
         { title: "大阪游", startDate: "2026-03-19" },
