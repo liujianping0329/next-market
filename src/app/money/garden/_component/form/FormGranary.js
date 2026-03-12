@@ -24,7 +24,7 @@ import ky from "ky";
 import Datepicker from "@/components/datepicker";
 
 
-const FormGranary = ({ onSuccess, exchanges, btnStatus }) => {
+const FormGranary = ({ trigger, onSuccess, cash, defaultValues = null }) => {
     const form = useForm({
         defaultValues: {
             date: new Date(),

@@ -10,6 +10,17 @@ import ActionButton from "@/components/ActionButton";
 import FolderOpBar from "./soy/FolderOpBar";
 
 const Granary = ({ userInfo }) => {
+    const [cash, setCash] = useState(null);
+
+    const fetchCash = async () => {
+        const response = await ky.get('/api/juhe/cash').json();
+        setCash(response.cash)
+    }
+
+    useEffect(() => {
+        fetchCash();
+    }, []);
+
     return (
         <>
             <div id="toolBar" className="mx-2.5 mt-2 flex items-center justify-between rounded-md border bg-muted/40 px-2.5 py-2">
