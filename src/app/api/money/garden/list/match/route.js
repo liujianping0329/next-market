@@ -7,10 +7,11 @@ export async function POST(request, context) {
     let query = supabase.from("garden").select(`*,
         user_filter:f_user(),
         planet_filter:f_user(planet()),
-        f_user(*,planet(*))`).match(gardenFilter);
+        f_user(*,planet(*)),
+        f_user_filter:f_user!inner(planetId)`).match(gardenFilter);
 
     if (planetId) {
-        query = query.eq('f_user.planetId', planetId);
+        query = query.eq('f_user_filter.planetId', planetId);
     } else if (isPlanetNull) {
         query = query.or("user_filter.is.null,planet_filter.is.null");
     }

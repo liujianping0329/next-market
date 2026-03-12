@@ -150,8 +150,7 @@ const Harvest = ({ userInfo = null }) => {
                 <div ref={headerScrollRef}
                     className="h-[35px] gap-1 flex overflow-x-hidden items-center font-medium">
                     {header.map((n, i) => (
-                        <div
-                            key={n}
+                        <div key={n}
                             className={`
                                 h-full border rounded flex items-center justify-center shrink-0
                                 ${i === 0 ? "w-[36px]" : "w-[166px]"}
