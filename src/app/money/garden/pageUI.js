@@ -35,7 +35,7 @@ export const revalidate = 0;
 
 const GardenUI = ({ }) => {
     const [tab, setTab] = useState("Harvest");
-    const [user, setUser] = useState(null)
+    const [user, setUser] = useState(undefined)
 
     useEffect(() => {
         const syncUser = async (session) => {

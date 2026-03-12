@@ -78,6 +78,7 @@ const Harvest = ({ userInfo = null }) => {
     }
 
     useEffect(() => {
+        if (userInfo === undefined) return
         fetchList(startTime);
     }, [startTime, userInfo]);
 
