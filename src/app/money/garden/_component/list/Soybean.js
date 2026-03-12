@@ -9,7 +9,7 @@ import { pickColor } from "@/app/utils/color";
 import ActionButton from "@/components/ActionButton";
 import FolderOpBar from "./soy/FolderOpBar";
 
-const Soybean = ({ userInfo = null }) => {
+const Soybean = ({ userInfo }) => {
     const [list, setList] = useState([]);
     const [pending, setPending] = useState(new Set()); // 正在同步的 id 集合
 

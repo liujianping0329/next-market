@@ -9,7 +9,7 @@ import { pickColor } from "@/app/utils/color";
 import ActionButton from "@/components/ActionButton";
 import FolderOpBar from "./soy/FolderOpBar";
 
-const Granary = ({ userInfo = null }) => {
+const Granary = ({ userInfo }) => {
     return (
         <div className="p-4">
             冬藏园

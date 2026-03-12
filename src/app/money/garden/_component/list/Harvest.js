@@ -17,7 +17,7 @@ import MoreOpMenu from "@/app/money/garden/_component/list/harvest/MoreOpMenu";
 import HarvestDetail from "@/app/money/garden/_component/detail/HarvestDetail";
 import { AlertCircle } from "lucide-react";
 
-const Harvest = ({ userInfo = null }) => {
+const Harvest = ({ userInfo }) => {
 
     const [startTime, setStartTime] = useState(new Date());
 

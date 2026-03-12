@@ -22,7 +22,7 @@ import { usePathname } from "next/navigation";
 import { gardenCategories, gardenCategoriesNoAll } from "@/app/money/garden/constants/gardenCategories";
 import ListBar from "@/app/money/garden/_component/list/bar/ListBar";
 
-const Greengrass = ({ userInfo = null }) => {
+const Greengrass = ({ userInfo }) => {
   const [expanded, setExpanded] = useState(false);
   const [subCategory, setSubCategory] = useState(null);
   const [list, setList] = useState([]);
