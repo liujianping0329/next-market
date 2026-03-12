@@ -1,20 +1,13 @@
 import { NextResponse } from "next/server";
 import supabase from "@/app/utils/database";
+import { applyPlanetFilter } from "@/app/utils/query";
 
 export async function POST(request, context) {
     const { planetId, isPlanetNull, ...gardenFilter } = await request.json();
 
-    let listQuery = supabase.from("garden").select(`*,
-        user_filter:f_user(),
-        planet_filter:f_user(planet()),
-        f_user(*,planet(*)),
-        f_user_filter:f_user!inner(planetId)`).match({ topic: "Greengrass" });
+    let listQuery = supabase.from("garden").select().match({ topic: "Greengrass" });
 
-    if (planetId) {
-        listQuery = listQuery.eq('f_user_filter.planetId', planetId);
-    } else if (isPlanetNull) {
-        listQuery = listQuery.or("user_filter.is.null,planet_filter.is.null");
-    }
+    listQuery = applyPlanetFilter(listQuery, { planetId, isPlanetNull });
     listQuery = listQuery.order("date", { ascending: false }).order("created_at", { ascending: false });
 
     let cateQuery = supabase.from("constants").select().match({ category: "gardenCategory" })

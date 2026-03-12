@@ -1,20 +1,13 @@
 import { NextResponse } from "next/server";
 import supabase from "@/app/utils/database";
+import { applyPlanetFilter } from "@/app/utils/query";
 
 export async function POST(request, context) {
     const { planetId, isPlanetNull, ...gardenFilter } = await request.json();
 
-    let query = supabase.from("garden").select(`*,
-        user_filter:f_user(),
-        planet_filter:f_user(planet()),
-        f_user(*,planet(*)),
-        f_user_filter:f_user!inner(planetId)`).match(gardenFilter);
+    let query = supabase.from("garden").select().match(gardenFilter);
 
-    if (planetId) {
-        query = query.eq('f_user_filter.planetId', planetId);
-    } else if (isPlanetNull) {
-        query = query.or("user_filter.is.null,planet_filter.is.null");
-    }
+    query = applyPlanetFilter(query, { planetId, isPlanetNull });
 
     if (gardenFilter.topic === "SoyBean") {
         query = query.order('status', { ascending: false }).order('sort', { ascending: true });

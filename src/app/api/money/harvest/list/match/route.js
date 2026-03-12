@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import supabase from "@/app/utils/database";
 import { formatDateLocal, parseLocalDate } from "@/app/utils/date";
+import { applyPlanetFilter } from "@/app/utils/query";
 
 export async function POST(request, context) {
     // const requestBody = await request.json();
@@ -8,19 +9,9 @@ export async function POST(request, context) {
 
     let query = supabase.from("harvest").select();
     if (harvestFilter.view === "harvestList") {
-        query = query.select(`*,garden(pics),
-            user_filter:f_user(),
-            planet_filter:f_user(planet()),
-            f_user(*,planet(*)),
-            f_user_filter:f_user!inner(planetId)
-            `)
-    }
-    console.log(planetId)
-    console.log(isPlanetNull)
-    if (planetId) {
-        query = query.eq('f_user_filter.planetId', planetId);
-    } else if (isPlanetNull) {
-        query = query.or("user_filter.is.null,planet_filter.is.null");
+        query = applyPlanetFilter(query, { planetId, isPlanetNull }, `
+            *,garden(pics),
+        `);
     }
     if (harvestFilter.startTime__gte) {
         query = query.gte("startTime", harvestFilter.startTime__gte)
