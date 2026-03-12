@@ -103,9 +103,6 @@ const FormHarvest = ({ trigger, openHarvestCtrl, setOpenHarvestCtrl, onSuccess, 
                     userId: userId
                 }
             }).json();
-            if (!response.pushInfo.id) {
-                toast.error(`推送未设置成功，${pushInfo.err}`);
-            }
             onSuccess();
             setOpenHarvestCtrl ? setOpenHarvestCtrl(false) : setOpenHarvest(false);
             form.reset();

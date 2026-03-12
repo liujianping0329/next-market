@@ -46,17 +46,17 @@ export const PLANET_NULL_SELECT = `
 `;
 
 export function applyPlanetFilter(query, { planetId, isPlanetNull }, baseSel = "*,") {
-    if (planetId != null && planetId !== "") {
-        return query
-            .select(baseSel + PLANET_ID_SELECT)
-            .eq("f_user_filter.planetId", planetId);
-    }
+  if (planetId != null && planetId !== "") {
+    return query
+      .select(baseSel + PLANET_ID_SELECT)
+      .eq("f_user_filter.planetId", planetId);
+  }
 
-    if (isPlanetNull) {
-        return query
-            .select(baseSel + PLANET_NULL_SELECT)
-            .or("user_filter.is.null,planet_filter.is.null");
-    }
+  if (isPlanetNull) {
+    return query
+      .select(baseSel + PLANET_NULL_SELECT)
+      .or("user_filter.is.null,planet_filter.is.null");
+  }
 
-    return query.select(baseSel);
+  return query.select(baseSel);
 }
