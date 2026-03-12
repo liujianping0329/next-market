@@ -35,13 +35,12 @@ export const revalidate = 0;
 
 const GardenUI = ({ }) => {
     const [tab, setTab] = useState("Harvest");
-    const [user, setUser] = useState(undefined)
+    const [user, setUser] = useState(null)
+    const [isUserReady, setIsUserReady] = useState(false)
 
     useEffect(() => {
         const syncUser = async (session) => {
             const user = session?.user ?? null;
-            setUser(user);
-
             if (user?.id) {
                 window.OneSignalDeferred = window.OneSignalDeferred || [];
                 window.OneSignalDeferred.push(async function (OneSignal) {
@@ -51,11 +50,13 @@ const GardenUI = ({ }) => {
                 let userInfo = { ...user, ...(response.list[0]) }
                 setUser(userInfo);
                 console.log("userInfo", userInfo)
+                setIsUserReady(true)
             } else {
                 window.OneSignalDeferred = window.OneSignalDeferred || [];
                 window.OneSignalDeferred.push(async function (OneSignal) {
                     await OneSignal.logout();
                 });
+                setIsUserReady(true)
             }
         };
 
@@ -146,7 +147,7 @@ const GardenUI = ({ }) => {
             </div>
             {tab === "Soybean" && <Soybean userInfo={user} />}
             {tab === "Greengrass" && <Greengrass userInfo={user} />}
-            {tab === "Harvest" && <Harvest userInfo={user} />}
+            {tab === "Harvest" && <Harvest userInfo={user} isUserReady={isUserReady} />}
             {tab === "Granary" && <Granary userInfo={user} />}
         </>
     );

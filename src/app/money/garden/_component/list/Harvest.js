@@ -17,7 +17,7 @@ import MoreOpMenu from "@/app/money/garden/_component/list/harvest/MoreOpMenu";
 import HarvestDetail from "@/app/money/garden/_component/detail/HarvestDetail";
 import { AlertCircle } from "lucide-react";
 
-const Harvest = ({ userInfo }) => {
+const Harvest = ({ userInfo, isUserReady }) => {
 
     const [startTime, setStartTime] = useState(new Date());
 
@@ -78,9 +78,9 @@ const Harvest = ({ userInfo }) => {
     }
 
     useEffect(() => {
-        if (userInfo === undefined) return
+        if (!isUserReady) return
         fetchList(startTime);
-    }, [startTime, userInfo === undefined, userInfo?.planet?.id]);
+    }, [startTime, isUserReady]);
 
     const journeys = [
         { title: "大阪游", startDate: "2026-03-19" },
