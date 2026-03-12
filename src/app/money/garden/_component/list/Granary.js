@@ -8,6 +8,7 @@ import { Loader2 } from "lucide-react";
 import { pickColor } from "@/app/utils/color";
 import ActionButton from "@/components/ActionButton";
 import FolderOpBar from "./soy/FolderOpBar";
+import FormGranary from "@/app/money/garden/_component/form/FormGranary";
 
 const Granary = ({ userInfo }) => {
     const [cash, setCash] = useState(null);
@@ -30,24 +31,24 @@ const Granary = ({ userInfo }) => {
                     </span>
                     <div className="flex items-center justify-between w-full">
                         <div className="flex items-center gap-2">
-                            <FormSoy trigger={
+                            <FormGranary trigger={
                                 <Button size="sm" variant="outline">记录余额</Button>
                             } onSuccess={() => {
-                                fetchList();
-                            }} />
+                                //fetchList();
+                            }} cash={cash} />
 
-                            <FormSoy trigger={
-                                <Button size="sm" variant="outline">记录关键交易</Button>
-                            } onSuccess={() => {
+                            {/* <FormSoy trigger={ */}
+                            <Button size="sm" variant="outline">记录关键交易</Button>
+                            {/* } onSuccess={() => {
                                 fetchList();
-                            }} />
+                            }} /> */}
                         </div>
                         <div className="flex items-center">
-                            <FormSoy trigger={
-                                <Button size="sm" variant="outline">图表</Button>
-                            } onSuccess={() => {
+                            {/* <FormSoy trigger={ */}
+                            <Button size="sm" variant="outline">图表</Button>
+                            {/* } onSuccess={() => {
                                 fetchList();
-                            }} />
+                            }} /> */}
                         </div>
                     </div>
                 </div>

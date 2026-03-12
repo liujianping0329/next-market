@@ -7,7 +7,16 @@ import {
     FieldSet,
     FieldSeparator
 } from "@/components/ui/field"
-
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import {
     Form,
@@ -54,74 +63,92 @@ const FormGranary = ({ trigger, onSuccess, cash, defaultValues = null }) => {
 
     return (
         <>
-            <div className="w-full">
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} id="formL" className="">
-                        <FieldGroup>
-                            <FieldSet>
+            <Dialog open={openX} onOpenChange={setOpenX}>
+                <DialogTrigger asChild>
+                    <Button variant="outline">（许）进帐</Button>
+                </DialogTrigger>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>记账本</DialogTitle>
+                    </DialogHeader>
+                    <div className="w-full">
+                        <Form {...form}>
+                            <form onSubmit={form.handleSubmit(onSubmit)} id="formL" className="">
                                 <FieldGroup>
-                                    <FormField name="date" control={form.control}
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>日期</FormLabel>
-                                                <FormControl>
-                                                    <Datepicker dateDf={field.value} onChange={field.onChange} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )} />
-                                    <FormField name="jpyL" control={form.control}
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>日币（万）</FormLabel>
-                                                <FormControl>
-                                                    <Input {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )} />
-                                    <FormField name="zfb" control={form.control}
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>支付宝</FormLabel>
-                                                <FormControl>
-                                                    <Input {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )} />
+                                    <FieldSet>
+                                        <FieldGroup>
+                                            <FormField name="date" control={form.control}
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>日期</FormLabel>
+                                                        <FormControl>
+                                                            <Datepicker dateDf={field.value} onChange={field.onChange} />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )} />
+                                            <FormField name="jpyL" control={form.control}
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>日币（万）</FormLabel>
+                                                        <FormControl>
+                                                            <Input {...field} />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )} />
+                                            <FormField name="zfb" control={form.control}
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>支付宝</FormLabel>
+                                                        <FormControl>
+                                                            <Input {...field} />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )} />
+                                        </FieldGroup>
+                                    </FieldSet>
+                                    <FieldSeparator />
+                                    <FieldSet>
+                                        <FieldLabel>金库</FieldLabel>
+                                        <FieldGroup>
+                                            <FormField name="cnbj" control={form.control}
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>中行日元（万）</FormLabel>
+                                                        <FormControl>
+                                                            <Input {...field} />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )} />
+                                            <FormField name="zsbc" control={form.control}
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel>招行人民币</FormLabel>
+                                                        <FormControl>
+                                                            <Input {...field} />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )} />
+                                        </FieldGroup>
+                                    </FieldSet>
                                 </FieldGroup>
-                            </FieldSet>
-                            <FieldSeparator />
-                            <FieldSet>
-                                <FieldLabel>金库</FieldLabel>
-                                <FieldGroup>
-                                    <FormField name="cnbj" control={form.control}
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>中行日元（万）</FormLabel>
-                                                <FormControl>
-                                                    <Input {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )} />
-                                    <FormField name="zsbc" control={form.control}
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>招行人民币</FormLabel>
-                                                <FormControl>
-                                                    <Input {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )} />
-                                </FieldGroup>
-                            </FieldSet>
-                        </FieldGroup>
-                    </form>
-                </Form>
-            </div>
+                            </form>
+                        </Form>
+                    </div>
+                    <DialogFooter>
+                        <DialogClose asChild>
+                            <Button variant="outline">关闭</Button>
+                        </DialogClose>
+                        <Button type="submit" form="formX" disabled={isLoadX}>
+                            {isLoadX && <Spinner />}保存
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </>
     );
 }
