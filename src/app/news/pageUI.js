@@ -75,7 +75,8 @@ const NewsUI = ({ }) => {
             </div>
             <div className="space-y-3 p-3">
                 {list.map((item) => {
-                    const isOpen = openId === item.id;
+                    // const isOpen = openId === item.id;
+                    const isOpen = true;
                     const props = item.ansProp;
                     return (
                         <div key={item.id} className="rounded-2xl border bg-white p-4"
