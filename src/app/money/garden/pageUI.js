@@ -18,7 +18,7 @@ import Soybean from "./_component/list/Soybean";
 import Harvest from "./_component/list/Harvest";
 import Granary from "./_component/list/Granary";
 import supabase from "@/app/utils/database";
-import { CircleUser, MessageSquare } from "lucide-react";
+import { CircleUser, Newspaper } from "lucide-react";
 import ActionButton from "@/components/ActionButton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
@@ -134,9 +134,12 @@ const GardenUI = ({ }) => {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-32">
                         <DropdownMenuGroup>
-                            <DropdownMenuItem>1</DropdownMenuItem>
-                            <DropdownMenuItem>2</DropdownMenuItem>
-                            <DropdownMenuItem>3</DropdownMenuItem>
+                            <DropdownMenuItem>
+                                <Link href="/news" className="flex items-center gap-2">
+                                    <Newspaper className="h-4 w-4" />
+                                    <span>朝花夕拾</span>
+                                </Link>
+                            </DropdownMenuItem>
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
