@@ -109,13 +109,25 @@ const NewsUI = ({ }) => {
                         <div key={item.id} className="rounded-2xl border bg-white p-4"
                             style={{ backgroundColor: `${props?.bgColor}80` }} >
                             <div className="flex-col">
-                                <div className="flex justify-between">
-                                    <div className="truncate text-base font-semibold text-gray-900">
-                                        {props?.emoji && (
-                                            <>
-                                                {props.emoji}
-                                            </>
-                                        )} {item.title}
+                                <div className="flex justify-between items-start gap-3">
+                                    <div className="min-w-0">
+                                        <div className="truncate text-base font-semibold text-gray-900">
+                                            {props?.emoji && (
+                                                <>
+                                                    {props.emoji}
+                                                </>
+                                            )} {item.title}
+                                        </div>
+                                        <div className="mt-1 text-xs text-gray-500">
+                                            更新于 {
+                                                new Date(new Date(item.updated_at).getTime() + 9 * 60 * 60 * 1000).toLocaleString("ja-JP", {
+                                                    day: "numeric",
+                                                    hour: "2-digit",
+                                                    minute: "2-digit",
+                                                    hour12: false,
+                                                })
+                                            }
+                                        </div>
                                     </div>
                                     {!isPlanetView && (<div className="flex gap-2">
                                         <ActionButton icon={Pencil} onClick={() => updateHandle(item)} />
