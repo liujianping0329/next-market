@@ -42,6 +42,7 @@ const FormNews = ({ trigger, openNewsCtrl, setOpenNewsCtrl, onSuccess, defaultVa
     const [openNews, setOpenNews] = useState(false);
     const [isLoadNews, setIsLoadNews] = useState(false);
     const [userId, setUserId] = useState(null);
+    console.log(defaultValues);
     const form = useForm({
         defaultValues: {
             title: defaultValues?.title || "",
@@ -67,7 +68,7 @@ const FormNews = ({ trigger, openNewsCtrl, setOpenNewsCtrl, onSuccess, defaultVa
                 json: {
                     ...(defaultValues?.id && { id: defaultValues.id }),
                     ...values,
-                    status: "init",
+                    status: defaultValues?.id ? "updating" : "init",
                     userId: userId
                 }
             }).json();

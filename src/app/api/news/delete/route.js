@@ -4,7 +4,7 @@ import supabase from "@/app/utils/database";
 export async function POST(request, context) {
     const requestBody = await request.json();
 
-    const { data } = await supabase.from("f_user").delete().match(requestBody).select("id");
+    const { data } = await supabase.from("news").delete().match(requestBody).select("id");
 
     return NextResponse.json({ ids: data.map(item => item.id) });
 }

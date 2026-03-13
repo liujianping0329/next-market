@@ -3,18 +3,22 @@ import supabase from "@/app/utils/database";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import ky from "ky";
+import { ArrowLeft, MessageSquarePlus, Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { ArrowLeft, MessageSquarePlus } from "lucide-react";
 import FormNews from "./_component/form/FormNews";
+import ActionButton from "@/components/ActionButton";
 
 export const revalidate = 0;
 
 const NewsUI = ({ }) => {
     const [userInfo, setUserInfo] = useState(null)
     const [list, setList] = useState([])
+    const [deleting, setDeleting] = useState(false)
 
-    const [openId, setOpenId] = useState(null);
+    const [openUpdate, setOpenUpdate] = useState(false)
+    const [updateTarget, setUpdateTarget] = useState(null)
+
 
     const fetchData = async () => {
         console.log(userInfo)
@@ -44,10 +48,22 @@ const NewsUI = ({ }) => {
         fetchData();
     }, [userInfo?.id])
 
-    const toggleCard = (id) => {
-        setOpenId((prev) => (prev === id ? null : id));
-    };
+    const updateHandle = async (item) => {
+        setUpdateTarget(item);
+        setOpenUpdate(true);
+    }
 
+    const deleteHandle = async (item) => {
+        if (!confirm("确认删除？")) return
+        setDeleting(true)
+        await ky.post('/api/news/delete', {
+            json: {
+                id: item.id
+            }
+        }).json();
+        fetchData();
+        setDeleting(false)
+    }
     return (
         <>
             <div id="toolBar" className="flex p-2.5 justify-between overflow-x-auto items-center">
@@ -75,30 +91,37 @@ const NewsUI = ({ }) => {
             </div>
             <div className="space-y-3 p-3">
                 {list.map((item) => {
-                    // const isOpen = openId === item.id;
-                    const isOpen = true;
                     const props = item.ansProp;
                     return (
                         <div key={item.id} className="rounded-2xl border bg-white p-4"
                             style={{ backgroundColor: `${props?.bgColor}80` }} >
-                            <div className="cursor-pointer" onClick={() => toggleCard(item.id)}>
-                                <h3 className="truncate text-base font-semibold text-gray-900">
-                                    {props?.emoji && (
-                                        <>
-                                            {props.emoji}
-                                        </>
-                                    )} {item.title}
-                                </h3>
+                            <div className="flex-col">
+                                <div className="flex justify-between">
+                                    <div className="truncate text-base font-semibold text-gray-900">
+                                        {props?.emoji && (
+                                            <>
+                                                {props.emoji}
+                                            </>
+                                        )} {item.title}
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <ActionButton icon={Pencil} onClick={() => updateHandle(item)} />
+                                        <ActionButton icon={Trash2} onClick={() => deleteHandle(item)} disabled={deleting} />
+                                    </div>
+                                </div>
 
-                                <p className={`mt-2 text-sm leading-6 text-gray-600 transition-all duration-200 ${isOpen ? "" : "line-clamp-2"
-                                    }`} >
+                                <div className={`mt-2 text-sm leading-6 text-gray-600 transition-all duration-200`} >
                                     {item.answer}
-                                </p>
+                                </div>
                             </div>
                         </div>
                     );
                 })}
             </div>
+
+            <FormNews openNewsCtrl={openUpdate} setOpenNewsCtrl={setOpenUpdate}
+                onSuccess={() => fetchData()} defaultValues={updateTarget}
+                key={updateTarget?.id ?? "-1"} />
         </>
     );
 }
