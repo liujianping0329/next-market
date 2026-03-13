@@ -21,6 +21,7 @@ export async function generateAI(questionTemplate) {
     model: aiTemplate.children.model,
     prompt: question,
   });
+  console.log(aiTemplate.children.model);
   console.log(question);
   console.log(result.text);
 
