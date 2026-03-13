@@ -117,10 +117,10 @@ const NewsUI = ({ }) => {
                                             </>
                                         )} {item.title}
                                     </div>
-                                    <div className="flex gap-2">
+                                    {!isPlanetView && (<div className="flex gap-2">
                                         <ActionButton icon={Pencil} onClick={() => updateHandle(item)} />
                                         <ActionButton icon={Trash2} onClick={() => deleteHandle(item)} disabled={deleting} />
-                                    </div>
+                                    </div>)}
                                 </div>
 
                                 <div className={`mt-2 text-sm leading-6 text-gray-600 transition-all duration-200`} >
