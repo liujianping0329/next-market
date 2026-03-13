@@ -20,6 +20,7 @@ const NewsUI = ({ }) => {
     const [openUpdate, setOpenUpdate] = useState(false)
     const [isPlanetView, setIsPlanetView] = useState(false)
     const [updateTarget, setUpdateTarget] = useState(null)
+    const [formVersion, setFormVersion] = useState(0);
 
 
     const fetchData = async () => {
@@ -48,10 +49,11 @@ const NewsUI = ({ }) => {
     useEffect(() => {
         if (!userInfo) return
         fetchData();
-    }, [userInfo?.id])
+    }, [userInfo?.id, isPlanetView])
 
     const updateHandle = async (item) => {
         setUpdateTarget(item);
+        setFormVersion((v) => v + 1)
         setOpenUpdate(true);
     }
 
@@ -85,8 +87,7 @@ const NewsUI = ({ }) => {
                     {userInfo?.planet && (
                         <Button variant="outline" className={cn("p-3", isPlanetView && "text-white bg-gradient-to-r from-indigo-600 to-sky-500")}
                             onClick={() => {
-                                setIsPlanetView(!isPlanetView)
-                                fetchData();
+                                setIsPlanetView((prev) => !prev);
                             }}>
                             <Orbit className="h-4 w-4" />
                             <span>星海回响</span>
@@ -133,7 +134,7 @@ const NewsUI = ({ }) => {
 
             <FormNews openNewsCtrl={openUpdate} setOpenNewsCtrl={setOpenUpdate}
                 onSuccess={() => fetchData()} defaultValues={updateTarget}
-                key={updateTarget?.id ?? "-1"} />
+                key={`${updateTarget?.id ?? "-1"}-${formVersion}`} />
         </>
     );
 }
