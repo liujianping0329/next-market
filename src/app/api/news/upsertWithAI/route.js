@@ -17,7 +17,7 @@ export async function POST(request, context) {
 
         return supabase
             .from("news")
-            .update({ answer, ansProp, status: "done" })
+            .update({ answer, ansProp, status: "done", updated_at: new Date() })
             .eq("id", insertData.id);
     });
     return NextResponse.json({ id: insertData.id });

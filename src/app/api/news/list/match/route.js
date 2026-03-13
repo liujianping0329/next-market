@@ -9,6 +9,6 @@ export async function POST(request, context) {
     let query = supabase.from("news").select();
     query = applyPlanetFilter(query, { planetId, userId });
 
-    const { data: matchList, error } = await query;
+    const { data: matchList, error } = await query.order('title', { ascending: true });
     return NextResponse.json({ list: matchList });
 }
