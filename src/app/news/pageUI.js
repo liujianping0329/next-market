@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import ky from "ky";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, MessageSquarePlus } from "lucide-react";
+import FormNews from "./_component/form/FormNews";
 
 export const revalidate = 0;
 
@@ -51,6 +52,12 @@ const NewsUI = ({ }) => {
                             <span>返回</span>
                         </Link>
                     </Button>
+                    <FormNews trigger={
+                        <Button variant="outline" className="p-3">
+                            <MessageSquarePlus className="h-4 w-4" />
+                            <span>新建议题</span>
+                        </Button>
+                    } onSuccess={() => fetchData()} />
                 </div>
 
                 <Button variant="ghost" size="icon" className="rounded-full">
@@ -63,9 +70,11 @@ const NewsUI = ({ }) => {
             {list.map((n, i) => {
 
                 return (
-                    <>
-                        {n.question}
-                    </>
+                    <div key={n.id}>
+                        {n.title}<br />
+                        {n.answer}
+                        <hr />
+                    </div>
                 );
             })}
         </>
