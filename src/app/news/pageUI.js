@@ -14,6 +14,8 @@ const NewsUI = ({ }) => {
     const [userInfo, setUserInfo] = useState(null)
     const [list, setList] = useState([])
 
+    const [openId, setOpenId] = useState(null);
+
     const fetchData = async () => {
         console.log(userInfo)
         const response = await ky.post('/api/news/list/match', {
@@ -42,6 +44,10 @@ const NewsUI = ({ }) => {
         fetchData();
     }, [userInfo?.id])
 
+    const toggleCard = (id) => {
+        setOpenId((prev) => (prev === id ? null : id));
+    };
+
     return (
         <>
             <div id="toolBar" className="flex p-2.5 justify-between overflow-x-auto items-center">
@@ -67,16 +73,31 @@ const NewsUI = ({ }) => {
                     </Avatar>
                 </Button>
             </div>
-            {list.map((n, i) => {
+            <div className="space-y-3 p-3">
+                {list.map((item) => {
+                    const isOpen = openId === item.id;
+                    const props = item.ansProp;
+                    return (
+                        <div key={item.id} className="rounded-2xl border bg-white p-4"
+                            style={{ backgroundColor: `${props?.bgColor}80` }} >
+                            <div className="cursor-pointer" onClick={() => toggleCard(item.id)}>
+                                <h3 className="truncate text-base font-semibold text-gray-900">
+                                    {props?.emoji && (
+                                        <>
+                                            {props.emoji}
+                                        </>
+                                    )} {item.title}
+                                </h3>
 
-                return (
-                    <div key={n.id}>
-                        {n.title}<br />
-                        {n.answer}
-                        <hr />
-                    </div>
-                );
-            })}
+                                <p className={`mt-2 text-sm leading-6 text-gray-600 transition-all duration-200 ${isOpen ? "" : "line-clamp-2"
+                                    }`} >
+                                    {item.answer}
+                                </p>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
         </>
     );
 }

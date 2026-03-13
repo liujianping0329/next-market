@@ -12,12 +12,12 @@ export async function POST(request, context) {
             content: requestBody.questionDetail
         }
     }).then((aiData) => {
-        const answer = aiData?.ansJSON?.ans;
+        const { ans: answer, ...ansProp } = aiData?.ansJSON;
         if (answer === undefined || answer === null) return null;
 
         return supabase
             .from("news")
-            .update({ answer, status: "done" })
+            .update({ answer, ansProp, status: "done" })
             .eq("id", insertData.id);
     });
     return NextResponse.json({ id: insertData.id });

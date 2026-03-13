@@ -22,6 +22,7 @@ export async function generateAI(questionTemplate) {
     prompt: question,
   });
   console.log(question);
+  console.log(result.text);
 
   const aiData = (() => {
     try {
