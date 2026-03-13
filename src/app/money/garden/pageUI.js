@@ -91,6 +91,8 @@ const GardenUI = ({ }) => {
     const handleLogout = async () => {
         if (!confirm("确定退出？")) return;
         await supabase.auth.signOut()
+
+        window.location.reload()
     }
 
     return (

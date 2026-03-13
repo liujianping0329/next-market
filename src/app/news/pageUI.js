@@ -3,11 +3,12 @@ import supabase from "@/app/utils/database";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import ky from "ky";
-import { ArrowLeft, MessageSquarePlus, Pencil, Trash2 } from "lucide-react";
+import { ArrowLeft, MessageSquarePlus, Pencil, Trash2, Orbit } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import FormNews from "./_component/form/FormNews";
 import ActionButton from "@/components/ActionButton";
+import { cn } from "@/lib/utils"
 
 export const revalidate = 0;
 
@@ -17,6 +18,7 @@ const NewsUI = ({ }) => {
     const [deleting, setDeleting] = useState(false)
 
     const [openUpdate, setOpenUpdate] = useState(false)
+    const [isPlanetView, setIsPlanetView] = useState(false)
     const [updateTarget, setUpdateTarget] = useState(null)
 
 
@@ -24,7 +26,7 @@ const NewsUI = ({ }) => {
         console.log(userInfo)
         const response = await ky.post('/api/news/list/match', {
             json: {
-                ...(userInfo?.planet ? { planetId: userInfo.planet.id } : { userId: userInfo?.id })
+                ...((userInfo?.planet && isPlanetView) ? { planetId: userInfo.planet.id } : { userId: userInfo?.id })
             }
         }).json();
         setList(response.list);
@@ -80,6 +82,16 @@ const NewsUI = ({ }) => {
                             <span>新建议题</span>
                         </Button>
                     } onSuccess={() => fetchData()} />
+                    {userInfo?.planet && (
+                        <Button variant="outline" className={cn("p-3", isPlanetView && "text-white bg-gradient-to-r from-indigo-600 to-sky-500")}
+                            onClick={() => {
+                                setIsPlanetView(!isPlanetView)
+                                fetchData();
+                            }}>
+                            <Orbit className="h-4 w-4" />
+                            <span>星海回响</span>
+                        </Button>
+                    )}
                 </div>
 
                 <Button variant="ghost" size="icon" className="rounded-full">
