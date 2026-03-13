@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { generateText } from "ai";
+import { openai } from "@ai-sdk/openai";
 
 import supabase from "@/app/utils/database";
 // {
@@ -20,6 +21,13 @@ export async function generateAI(questionTemplate) {
   const result = await generateText({
     model: aiTemplate.children.model,
     prompt: question,
+    ...(aiTemplate.children.web
+      ? {
+        tools: {
+          web_search: openai.tools.webSearch({}),
+        },
+      }
+      : {}),
   });
   console.log(aiTemplate.children.model);
   console.log(question);
