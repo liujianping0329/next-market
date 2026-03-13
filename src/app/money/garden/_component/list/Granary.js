@@ -12,14 +12,22 @@ import FormGranary from "@/app/money/garden/_component/form/FormGranary";
 
 const Granary = ({ userInfo }) => {
     const [cash, setCash] = useState(null);
+    const [userTemplate, setUserTemplate] = useState(null);
 
     const fetchCash = async () => {
         const response = await ky.get('/api/juhe/cash').json();
         setCash(response.cash)
     }
+    const fetchData = async () => {
+        const response = await ky.post('/api/granary/list/template',
+            { json: { userId: userInfo.id } }
+        ).json();
+        setUserTemplate(response.matchList)
+    }
 
     useEffect(() => {
         fetchCash();
+        fetchData();
     }, []);
 
     return (
@@ -35,7 +43,7 @@ const Granary = ({ userInfo }) => {
                                 <Button size="sm" variant="outline">记录余额</Button>
                             } onSuccess={() => {
                                 //fetchList();
-                            }} cash={cash} />
+                            }} cash={cash} userTemplate={userTemplate} />
 
                             {/* <FormSoy trigger={ */}
                             <Button size="sm" variant="outline">记录关键交易</Button>

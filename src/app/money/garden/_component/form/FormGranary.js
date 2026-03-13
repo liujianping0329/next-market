@@ -31,9 +31,17 @@ import { useForm } from "react-hook-form";
 import { formatDateLocal } from "@/app/utils/date";
 import ky from "ky";
 import Datepicker from "@/components/datepicker";
+import { Spinner } from "@/components/ui/spinner";
+import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
 
+const FormGranary = ({ trigger, openGranaryCtrl, setOpenGranaryCtrl, onSuccess, cash, defaultValues = null, userTemplate }) => {
 
-const FormGranary = ({ trigger, onSuccess, cash, defaultValues = null }) => {
+    const [openGranary, setOpenGranary] = useState(false);
+
+    const [isLoadGranary, setIsLoadGranary] = useState(false);
+
+    console.log({ userTemplate });
     const form = useForm({
         defaultValues: {
             date: new Date(),
@@ -63,78 +71,71 @@ const FormGranary = ({ trigger, onSuccess, cash, defaultValues = null }) => {
 
     return (
         <>
-            <Dialog open={openX} onOpenChange={setOpenX}>
-                <DialogTrigger asChild>
-                    <Button variant="outline">（许）进帐</Button>
-                </DialogTrigger>
+            <Dialog open={openGranaryCtrl ?? openGranary} onOpenChange={openGranaryCtrl ?? setOpenGranary}>
+                {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>记账本</DialogTitle>
+                        <DialogTitle>{defaultValues?.id ? "修改" : "新增"}</DialogTitle>
                     </DialogHeader>
                     <div className="w-full">
                         <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} id="formL" className="">
+                            <form onSubmit={form.handleSubmit(onSubmit)} id="formGranary" className="">
                                 <FieldGroup>
-                                    <FieldSet>
-                                        <FieldGroup>
-                                            <FormField name="date" control={form.control}
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>日期</FormLabel>
-                                                        <FormControl>
-                                                            <Datepicker dateDf={field.value} onChange={field.onChange} />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )} />
-                                            <FormField name="jpyL" control={form.control}
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>日币（万）</FormLabel>
-                                                        <FormControl>
-                                                            <Input {...field} />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )} />
-                                            <FormField name="zfb" control={form.control}
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>支付宝</FormLabel>
-                                                        <FormControl>
-                                                            <Input {...field} />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )} />
-                                        </FieldGroup>
-                                    </FieldSet>
-                                    <FieldSeparator />
-                                    <FieldSet>
-                                        <FieldLabel>金库</FieldLabel>
-                                        <FieldGroup>
-                                            <FormField name="cnbj" control={form.control}
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>中行日元（万）</FormLabel>
-                                                        <FormControl>
-                                                            <Input {...field} />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )} />
-                                            <FormField name="zsbc" control={form.control}
-                                                render={({ field }) => (
-                                                    <FormItem>
-                                                        <FormLabel>招行人民币</FormLabel>
-                                                        <FormControl>
-                                                            <Input {...field} />
-                                                        </FormControl>
-                                                        <FormMessage />
-                                                    </FormItem>
-                                                )} />
-                                        </FieldGroup>
-                                    </FieldSet>
+                                    <FieldGroup>
+                                        <FormField name="date" control={form.control}
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>日期</FormLabel>
+                                                    <FormControl>
+                                                        <Datepicker dateDf={field.value} onChange={field.onChange} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )} />
+                                        <FieldSeparator />
+                                        <FormField name="jpyL" control={form.control}
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>日币（万）</FormLabel>
+                                                    <FormControl>
+                                                        <Input {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )} />
+                                        <FormField name="zfb" control={form.control}
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>支付宝</FormLabel>
+                                                    <FormControl>
+                                                        <Input {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )} />
+                                    </FieldGroup>
+                                    <FieldGroup>
+                                        <FormField name="cnbj" control={form.control}
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>中行日元（万）</FormLabel>
+                                                    <FormControl>
+                                                        <Input {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )} />
+                                        <FormField name="zsbc" control={form.control}
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>招行人民币</FormLabel>
+                                                    <FormControl>
+                                                        <Input {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )} />
+                                    </FieldGroup>
                                 </FieldGroup>
                             </form>
                         </Form>
@@ -143,8 +144,8 @@ const FormGranary = ({ trigger, onSuccess, cash, defaultValues = null }) => {
                         <DialogClose asChild>
                             <Button variant="outline">关闭</Button>
                         </DialogClose>
-                        <Button type="submit" form="formX" disabled={isLoadX}>
-                            {isLoadX && <Spinner />}保存
+                        <Button type="submit" form="formGranary" disabled={isLoadGranary}>
+                            {isLoadGranary && <Spinner />}保存
                         </Button>
                     </DialogFooter>
                 </DialogContent>
