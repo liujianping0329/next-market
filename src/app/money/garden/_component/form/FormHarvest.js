@@ -35,6 +35,7 @@ import { AlertTriangle } from "lucide-react"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { encode, decode } from "@/app/utils/base64";
+import { Switch } from "@/components/ui/switch"
 
 const FormHarvest = ({ trigger, openHarvestCtrl, setOpenHarvestCtrl, onSuccess, defaultValues = null, needPassCode = false }) => {
 
@@ -57,7 +58,8 @@ const FormHarvest = ({ trigger, openHarvestCtrl, setOpenHarvestCtrl, onSuccess, 
             remindBefore: defaultValues?.remindBefore != null
                 ? String(defaultValues.remindBefore)
                 : remindOptions[0].value,
-            title: defaultValues?.title || ""
+            title: defaultValues?.title || "",
+            isPlanetPush: defaultValues?.isPlanetPush || false
         }
     });
 
@@ -176,6 +178,16 @@ const FormHarvest = ({ trigger, openHarvestCtrl, setOpenHarvestCtrl, onSuccess, 
                                                         ))}
                                                         <Label className="text-muted-foreground">前提醒我</Label>
                                                     </RadioGroup>
+                                                </FormControl>
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField name="isPlanetPush" control={form.control}
+                                        render={({ field }) => (
+                                            <FormItem className="flex">
+                                                <FormLabel>推送全体</FormLabel>
+                                                <FormControl>
+                                                    <Switch checked={field.value} onCheckedChange={field.onChange} />
                                                 </FormControl>
                                             </FormItem>
                                         )}

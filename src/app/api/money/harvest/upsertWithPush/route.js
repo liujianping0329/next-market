@@ -28,10 +28,18 @@ export async function POST(request, context) {
 
             }
         }
+
+        let tarUsers = [requestBody.userId];
+        if (requestBody.isPlanetPush) {
+            const { data: { planetId } } = await supabase.from('f_user').select("planetId").eq("id", requestBody.userId).single();
+            const { data: tarUsersList } = await supabase.from('f_user').select("id").eq("planetId", planetId);
+            tarUsers = tarUsersList?.map(v => v.id) ?? [];
+        }
+
         let oneSignalPara = {
             app_id: process.env.NEXT_PUBLIC_ONESIGNAL_APPID,
             include_aliases: {
-                external_id: [requestBody.userId],
+                external_id: tarUsers,
             },
             target_channel: "push",
             contents: { en: requestBody.title || "no title" },
