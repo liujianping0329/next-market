@@ -51,9 +51,10 @@ export async function generateAI(questionTemplate) {
     picResult = await generateImage({
       model: aiPicTemplate.children.model,
       prompt: questionPic,
-      size: "1536x1024",
+      size: "1024x1024",
+      quality: "low",
       output_format: "jpeg",
-      output_compression: 70
+      compression: 50
     });
     picPath = await base64Upload(picResult.image.base64);
   }
