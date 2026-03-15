@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import supabase from "@/app/utils/database";
 import { generateAI } from "@/app/api/ai/_lib/generateAI";
 
+import { deleteByPublicUrls } from "@/app/api/file/_lib/delete";
+
 export async function POST(request, context) {
     const requestBody = await request.json();
     const { data: insertData, error } = await supabase.from('news').upsert(requestBody).select().single();
@@ -23,10 +25,13 @@ export async function POST(request, context) {
         }
     }).then((aiData) => {
         const { ans: answer, url, detailHtml, ...ansProp } = aiData?.ansJSON || {};
-        const pic = aiData?.pic || {};
+        const pic = aiData?.pic || null;
         console.log("aiData", aiData)
         if (answer === undefined || answer === null) return null;
 
+        if (insertData.pic) {
+            deleteByPublicUrls([insertData.pic])
+        }
         return supabase
             .from("news")
             .update({
