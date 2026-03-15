@@ -18,7 +18,7 @@ import Soybean from "./_component/list/Soybean";
 import Harvest from "./_component/list/Harvest";
 import Granary from "./_component/list/Granary";
 import supabase from "@/app/utils/database";
-import { CircleUser, Newspaper } from "lucide-react";
+import { CircleUser, Newspaper, Feather, PenTool } from "lucide-react";
 import ActionButton from "@/components/ActionButton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
@@ -138,8 +138,8 @@ const GardenUI = ({ }) => {
                         <DropdownMenuGroup>
                             <DropdownMenuItem>
                                 <Link href="/news" className="flex items-center gap-2">
-                                    <Newspaper className="h-4 w-4" />
-                                    <span>朝花夕拾</span>
+                                    <PenTool className="h-4 w-4" />
+                                    <span>妙笔生花</span>
                                 </Link>
                             </DropdownMenuItem>
                         </DropdownMenuGroup>

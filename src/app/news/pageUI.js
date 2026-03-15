@@ -75,7 +75,7 @@ const NewsUI = ({ }) => {
 
         const timer = setInterval(() => {
             fetchData();
-        }, 5000);
+        }, 10000);
 
         return () => clearInterval(timer);
     }, [list, fetchData]);
@@ -149,6 +149,16 @@ const NewsUI = ({ }) => {
                                         <ActionButton icon={Trash2} onClick={() => deleteHandle(item)} disabled={deleting} />
                                     </div>)}
                                 </div>
+
+                                {item.pic && (
+                                    <div className="mt-3 overflow-hidden rounded-xl">
+                                        <img
+                                            src={item.pic}
+                                            alt=""
+                                            className="h-auto w-full object-cover"
+                                        />
+                                    </div>
+                                )}
 
                                 <div className={`mt-2 text-sm leading-6 text-gray-600 transition-all duration-200`} >
                                     {item.answer}

@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
-import { generateText } from "ai";
+import { generateText, generateImage } from "ai";
 import { openai } from "@ai-sdk/openai";
 
 import supabase from "@/app/utils/database";
+import { base64Upload } from "@/app/api/file/_lib/upload";
 // {
 //   type: "XXX",定数表一定要有"aiTemplate_" + type的记录
+//   pic: requestBody.isPic,插图模式
 //     filled: {
 //     name1: "asasa"
 //     name2: "dsds"
@@ -34,11 +36,34 @@ export async function generateAI(questionTemplate) {
   console.log(question);
   console.log(result.text);
 
+  let ansJSON = JSON.parse(result.text.replace(/```json|```/g, "").trim())
+  let picResult = {};
+  let picPath = "";
+  if (questionTemplate.pic) {
+    const { data: aiPicTemplate } = await supabase.from("constants").select().match({
+      category: "aiPicTemplate_" + questionTemplate.type
+    }).single();
+
+    let questionPic = aiPicTemplate.value
+    questionPic = questionPic.replace(/\$\{ans\}/g, ansJSON.ans);
+    console.log(questionPic);
+
+    picResult = await generateImage({
+      model: aiPicTemplate.children.model,
+      prompt: questionPic,
+      size: "1536x1024",
+      output_format: "jpeg",
+      output_compression: 70
+    });
+    picPath = await base64Upload(picResult.image.base64);
+  }
+
   const aiData = (() => {
     try {
       return {
         ans: null,
-        ansJSON: JSON.parse(result.text.replace(/```json|```/g, "").trim())
+        ansJSON,
+        ...(questionTemplate.pic && picResult ? { pic: picPath } : {}),
       };
     } catch {
       return {

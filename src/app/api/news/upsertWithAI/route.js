@@ -7,7 +7,6 @@ export async function POST(request, context) {
     const { data: insertData, error } = await supabase.from('news').upsert(requestBody).select().single();
 
     const ext = [
-        requestBody.isPic ? "返回内容中要包含pic字段" : "",
         requestBody.isDetail ? "返回内容中要包含detailHtml字段" : "",
     ]
         .filter(Boolean)
@@ -16,13 +15,16 @@ export async function POST(request, context) {
     await supabase.from("news").update({ status: "updating" }).eq("id", insertData.id);
     generateAI({
         type: "news",
+        ...(requestBody.isPic ? { pic: true } : {}),
         filled: {
             title: requestBody.question,
             content: requestBody.questionDetail,
-            ext,
+            ext
         }
     }).then((aiData) => {
-        const { ans: answer, url, pic, detailHtml, ...ansProp } = aiData?.ansJSON || {};
+        const { ans: answer, url, detailHtml, ...ansProp } = aiData?.ansJSON || {};
+        const pic = aiData?.pic || {};
+        console.log("aiData", aiData)
         if (answer === undefined || answer === null) return null;
 
         return supabase
