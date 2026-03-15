@@ -152,10 +152,10 @@ const FormNews = ({ trigger, openNewsCtrl, setOpenNewsCtrl, onSuccess, defaultVa
                                             render={({ field }) => (
                                                 <FormItem className="flex flex-row items-start items-center space-y-0">
                                                     <FormControl>
-                                                        <Checkbox checked={field.value} onCheckedChange={field.onChange} disabled
+                                                        <Checkbox checked={field.value} onCheckedChange={field.onChange}
                                                             className="h-5 w-5 border-2 border-gray-500 data-[state=checked]:bg-black data-[state=checked]:border-black" />
                                                     </FormControl>
-                                                    <FormLabel className="mr-0">有图模式</FormLabel>
+                                                    <FormLabel className="mr-0">灵魂画师</FormLabel>
                                                 </FormItem>
                                             )} />
                                         <FormField control={form.control} name="isDetail"
