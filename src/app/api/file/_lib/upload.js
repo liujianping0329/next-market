@@ -1,6 +1,4 @@
-import { NextResponse } from "next/server";
-import { generateText, generateImage } from "ai";
-import { openai } from "@ai-sdk/openai";
+export const runtime = "nodejs";
 import sharp from "sharp";
 
 import supabase from "@/app/utils/database";
