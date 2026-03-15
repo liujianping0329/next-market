@@ -154,9 +154,9 @@ const NewsUI = ({ }) => {
                                     {item.answer}
                                 </div>
 
-                                {item.detailHtml && (
+                                {item.isDetail && (
                                     <div
-                                        className="mt-3 text-sm text-gray-700"
+                                        className="mt-3 rounded-lg border border-black/10 bg-white/60 px-3 py-2 text-sm text-gray-700"
                                         dangerouslySetInnerHTML={{ __html: item.detailHtml }}
                                     />
                                 )}
