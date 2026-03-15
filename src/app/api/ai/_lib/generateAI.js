@@ -29,6 +29,7 @@ export async function generateAI(questionTemplate) {
       }
       : {}),
   });
+  console.log(questionTemplate);
   console.log(aiTemplate.children.model);
   console.log(question);
   console.log(result.text);

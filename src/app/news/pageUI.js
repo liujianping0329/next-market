@@ -3,12 +3,13 @@ import supabase from "@/app/utils/database";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import ky from "ky";
-import { ArrowLeft, MessageSquarePlus, Pencil, Trash2, Orbit } from "lucide-react";
+import { ArrowLeft, MessageSquarePlus, Pencil, Trash2, Orbit, Link as LinkIcon, ChevronRight } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import FormNews from "./_component/form/FormNews";
 import ActionButton from "@/components/ActionButton";
 import { cn } from "@/lib/utils"
+import { Spinner } from "@/components/ui/spinner";
 
 export const revalidate = 0;
 
@@ -23,7 +24,7 @@ const NewsUI = ({ }) => {
     const [formVersion, setFormVersion] = useState(0);
 
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         console.log(userInfo)
         const response = await ky.post('/api/news/list/match', {
             json: {
@@ -31,7 +32,7 @@ const NewsUI = ({ }) => {
             }
         }).json();
         setList(response.list);
-    }
+    }, [userInfo, isPlanetView]);
 
     useEffect(() => {
         const getUser = async (session) => {
@@ -68,6 +69,16 @@ const NewsUI = ({ }) => {
         fetchData();
         setDeleting(false)
     }
+
+    useEffect(() => {
+        if (!list.some((item) => item.status === "updating")) return;
+
+        const timer = setInterval(() => {
+            fetchData();
+        }, 5000);
+
+        return () => clearInterval(timer);
+    }, [list, fetchData]);
     return (
         <>
             <div id="toolBar" className="flex p-2.5 justify-between overflow-x-auto items-center">
@@ -129,7 +140,11 @@ const NewsUI = ({ }) => {
                                             }
                                         </div>
                                     </div>
-                                    {!isPlanetView && (<div className="flex gap-2">
+                                    {!isPlanetView && (<div className="flex gap-2 items-center">
+                                        {item.status === "updating" && <Spinner className="" />}
+                                        {item.url && (<Link href={`${item.url}`} target="_blank" className="flex items-center gap-1">
+                                            <ActionButton icon={LinkIcon} />
+                                        </Link>)}
                                         <ActionButton icon={Pencil} onClick={() => updateHandle(item)} />
                                         <ActionButton icon={Trash2} onClick={() => deleteHandle(item)} disabled={deleting} />
                                     </div>)}
@@ -138,6 +153,13 @@ const NewsUI = ({ }) => {
                                 <div className={`mt-2 text-sm leading-6 text-gray-600 transition-all duration-200`} >
                                     {item.answer}
                                 </div>
+
+                                {item.detailHtml && (
+                                    <div
+                                        className="mt-3 text-sm text-gray-700"
+                                        dangerouslySetInnerHTML={{ __html: item.detailHtml }}
+                                    />
+                                )}
                             </div>
                         </div>
                     );

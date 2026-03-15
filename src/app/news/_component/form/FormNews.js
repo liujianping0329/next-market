@@ -35,19 +35,21 @@ import { AlertTriangle } from "lucide-react"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { encode, decode } from "@/app/utils/base64";
-import { Textarea } from "@/components/ui/textarea"
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox"
 
 const FormNews = ({ trigger, openNewsCtrl, setOpenNewsCtrl, onSuccess, defaultValues = null }) => {
 
     const [openNews, setOpenNews] = useState(false);
     const [isLoadNews, setIsLoadNews] = useState(false);
     const [userId, setUserId] = useState(null);
-    console.log(defaultValues);
     const form = useForm({
         defaultValues: {
             title: defaultValues?.title || "",
             question: defaultValues?.question || "",
-            questionDetail: defaultValues?.questionDetail || ""
+            questionDetail: defaultValues?.questionDetail || "",
+            isPic: defaultValues?.isPic || false,
+            isDetail: defaultValues?.isDetail || false
         }
     });
 
@@ -62,7 +64,7 @@ const FormNews = ({ trigger, openNewsCtrl, setOpenNewsCtrl, onSuccess, defaultVa
 
     const onSubmit = async (values) => {
         setIsLoadNews(true);
-
+        console.log(values)
         try {
             const response = await ky.post('/api/news/upsertWithAI', {
                 json: {
@@ -145,6 +147,28 @@ const FormNews = ({ trigger, openNewsCtrl, setOpenNewsCtrl, onSuccess, defaultVa
                                                 <FormMessage />
                                             </FormItem>
                                         )} />
+                                    <div className="flex space-x-3">
+                                        <FormField control={form.control} name="isPic"
+                                            render={({ field }) => (
+                                                <FormItem className="flex flex-row items-start items-center space-y-0">
+                                                    <FormControl>
+                                                        <Checkbox checked={field.value} onCheckedChange={field.onChange} disabled
+                                                            className="h-5 w-5 border-2 border-gray-500 data-[state=checked]:bg-black data-[state=checked]:border-black" />
+                                                    </FormControl>
+                                                    <FormLabel className="mr-0">有图模式</FormLabel>
+                                                </FormItem>
+                                            )} />
+                                        <FormField control={form.control} name="isDetail"
+                                            render={({ field }) => (
+                                                <FormItem className="flex flex-row items-start items-center space-y-0">
+                                                    <FormControl>
+                                                        <Checkbox checked={field.value} onCheckedChange={field.onChange}
+                                                            className="h-5 w-5 border-2 border-gray-500 data-[state=checked]:bg-black data-[state=checked]:border-black" />
+                                                    </FormControl>
+                                                    <FormLabel className="mr-0">甚解模式</FormLabel>
+                                                </FormItem>
+                                            )} />
+                                    </div>
                                     <FormField name="questionDetail" control={form.control}
                                         render={({ field }) => (
                                             <FormItem>
