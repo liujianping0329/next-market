@@ -18,7 +18,7 @@ import Soybean from "./_component/list/Soybean";
 import Harvest from "./_component/list/Harvest";
 import Granary from "./_component/list/Granary";
 import supabase from "@/app/utils/database";
-import { CircleUser, Newspaper, Feather, PenTool } from "lucide-react";
+import { CircleUser, ShieldCheck, Satellite, PenTool, User } from "lucide-react";
 import ActionButton from "@/components/ActionButton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
@@ -145,12 +145,34 @@ const GardenUI = ({ }) => {
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
+                            <DropdownMenuItem>
+                                <Link href="/mng/admin" className="flex items-center gap-2">
+                                    <ShieldCheck className="h-4 w-4" />
+                                    <span>执枢司要</span>
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                                <Link href="/mng/leader" className="flex items-center gap-2">
+                                    <Satellite className="h-4 w-4" />
+                                    <span>分星主事</span>
+                                </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                                <Link href="/mng/user" className="flex items-center gap-2">
+                                    <User className="h-4 w-4" />
+                                    <span>安身立簿</span>
+                                </Link>
+                            </DropdownMenuItem>
+                        </DropdownMenuGroup>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuGroup>
                             <DropdownMenuItem variant="destructive" onClick={handleLogout}>注销</DropdownMenuItem>
                         </DropdownMenuGroup>
                     </DropdownMenuContent>
                 </DropdownMenu>) : <ActionButton icon={CircleUser} size="sm" onClick={handleLogin} />}
-            </div>
-            {tab === "Soybean" && <Soybean userInfo={user} />}
+            </div >
+            {tab === "Soybean" && <Soybean userInfo={user} />
+            }
             {tab === "Greengrass" && <Greengrass userInfo={user} />}
             {tab === "Harvest" && <Harvest userInfo={user} isUserReady={isUserReady} />}
             {tab === "Granary" && <Granary userInfo={user} />}
