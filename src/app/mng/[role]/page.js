@@ -2,6 +2,7 @@ import MngUI from './pageUI';
 import supabase from "@/app/utils/database";
 
 export async function Mng({ params }) {
-    return <MngUI role={await params.role} />;
+    const { role } = await params;
+    return <MngUI role={role} />;
 }
 export default Mng;
