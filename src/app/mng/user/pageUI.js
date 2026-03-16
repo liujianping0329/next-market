@@ -1,30 +1,24 @@
 "use client";
+import supabase from "@/app/utils/database";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import ky from "ky";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState, useCallback } from "react";
-import supabase from "@/app/utils/database";
-import ky from "ky";
-import { cn } from "@/lib/utils";
-import { isDefaultClause } from "typescript";
+import { useEffect, useState } from "react";
+import GranaryItems from "../_component/list/GranaryItems";
 
-export const revalidate = 0;
-
-const MngUI = ({ role = null }) => {
-
-    const configs = [{
-        name: "冬藏园", value: "granary", role: "user", isDefault: true, children:
-            [
-                {
-                    name: "入账项目", value: "granary_items"
-                }
-            ]
-    }];
-    const roleConfigs = configs.filter((item) => item.role === role);
-
+const configs = [{
+    name: "冬藏园", value: "granary", isDefault: true, children:
+        [
+            {
+                name: "入账项目", value: "granaryItems"
+            }
+        ]
+}];
+const MngUserUI = ({ }) => {
     const [userInfo, setUserInfo] = useState(null)
-    const [configsSel, setConfigsSel] = useState(roleConfigs?.find((item) => item.isDefault)?.value)
+    const [configsSel, setConfigsSel] = useState(configs?.find((item) => item.isDefault)?.value)
     const [configsChildSel, setConfigsChildSel] = useState("")
 
     useEffect(() => {
@@ -61,9 +55,7 @@ const MngUI = ({ role = null }) => {
                         </Link>
                     </Button>
                 </div>
-                {role === "user" && "安身立簿"}
-                {role === "leader" && "分星主事"}
-                {role === "admin" && "执枢司要"}
+                安身立簿
                 <Button variant="ghost" size="icon" className="rounded-full">
                     <Avatar>
                         <AvatarImage src={userInfo?.user_metadata.avatar_url} alt="img" />
@@ -72,7 +64,7 @@ const MngUI = ({ role = null }) => {
                 </Button>
             </div>
             <div className="flex flex-wrap gap-2 p-2">
-                {roleConfigs.map((item) => (
+                {configs.map((item) => (
                     <Button key={item.value} size="sm" variant="outline"
                         className={
                             configsSel === item.value
@@ -89,7 +81,7 @@ const MngUI = ({ role = null }) => {
                 ))}
             </div>
             <div className="flex flex-wrap gap-2 p-2 bg-sky-100">
-                {roleConfigs.find((item) => item.value === configsSel)?.children?.map((child) => (
+                {configs.find((item) => item.value === configsSel)?.children?.map((child) => (
                     <Button key={child.value}
                         size="xs"
                         variant="outline"
@@ -104,7 +96,8 @@ const MngUI = ({ role = null }) => {
                     </Button>
                 ))}
             </div>
+            {configsChildSel === "granaryItems" && userInfo && <GranaryItems userInfo={userInfo} />}
         </>
     );
 }
-export default MngUI;
+export default MngUserUI;
