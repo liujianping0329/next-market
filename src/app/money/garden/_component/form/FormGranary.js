@@ -35,6 +35,19 @@ import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 
+function normalizeObjectNumbers(obj) {
+    return Object.fromEntries(
+        Object.entries(obj).map(([key, value]) => {
+            if (value === "") return [key, 0];
+            if (value instanceof Date) return [key, value];
+            if (typeof value === "string" && !Number.isNaN(Number(value))) {
+                return [key, Number(value)];
+            }
+            return [key, value];
+        })
+    );
+}
+
 const FormGranary = ({ trigger, openGranaryCtrl, setOpenGranaryCtrl, onSuccess, cash, defaultValues = null, userTemplate }) => {
 
     const [openGranary, setOpenGranary] = useState(false);
@@ -51,21 +64,16 @@ const FormGranary = ({ trigger, openGranaryCtrl, setOpenGranaryCtrl, onSuccess, 
         }
     });
     const onSubmit = async (values) => {
-        btnStatus(true);
-        await ky.post('/api/money/upsert', {
+        setIsLoadGranary(true);
+        await ky.post('/api/granary/upsert/all', {
             json: {
-                ...values,
-                jpyL: values.jpyL === "" ? 0 : values.jpyL,
-                zfb: values.zfb === "" ? 0 : values.zfb,
-                cnbj: values.cnbj === "" ? 0 : values.cnbj,
-                zsbc: values.zsbc === "" ? 0 : values.zsbc,
+                ...normalizeObjectNumbers(values),
                 date: formatDateLocal(values.date),
-                from: "L",
-                ...exchanges
+                ...normalizeObjectNumbers(cash)
             }
         }).json();
         onSuccess();
-        btnStatus(false);
+        setIsLoadGranary(false);
     }
 
     return (
