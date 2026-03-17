@@ -54,6 +54,8 @@ const FormGranary = ({ trigger, openGranaryCtrl, setOpenGranaryCtrl, onSuccess, 
 
     const [isLoadGranary, setIsLoadGranary] = useState(false);
 
+    const [userId, setUserId] = useState(null);
+
     console.log({ userTemplate });
     const form = useForm({
         defaultValues: {
@@ -63,13 +65,24 @@ const FormGranary = ({ trigger, openGranaryCtrl, setOpenGranaryCtrl, onSuccess, 
             )
         }
     });
+
+    useEffect(() => {
+        const loadSession = async () => {
+            const { data, error } = await supabase.auth.getSession();
+            setUserId(data.session?.user?.id ?? null);
+        };
+
+        loadSession();
+    }, []);
     const onSubmit = async (values) => {
         setIsLoadGranary(true);
         await ky.post('/api/granary/upsert/all', {
             json: {
+                ...(defaultValues?.id && { id: defaultValues.id }),
                 ...normalizeObjectNumbers(values),
                 date: formatDateLocal(values.date),
-                ...normalizeObjectNumbers(cash)
+                cash: normalizeObjectNumbers(cash),
+                userId
             }
         }).json();
         onSuccess();
