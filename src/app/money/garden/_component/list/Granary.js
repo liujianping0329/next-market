@@ -19,10 +19,10 @@ const Granary = ({ userInfo }) => {
         setCash(response.cash)
     }
     const fetchData = async () => {
-        const response = await ky.post('/api/granary/list/template',
-            { json: { userId: userInfo.id } }
+        const response = await ky.post('/api/granary/granary_user_template/list/match',
+            { json: { ...(userInfo?.planet ? { planetId: userInfo.planet.id } : { userId: userInfo?.id }) } }
         ).json();
-        setUserTemplate(response.matchList)
+        setUserTemplate(response.list)
     }
 
     useEffect(() => {
