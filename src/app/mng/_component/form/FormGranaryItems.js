@@ -37,10 +37,10 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { encode, decode } from "@/app/utils/base64";
 import { Textarea } from "@/components/ui/textarea"
 
-const FormNews = ({ trigger, openNewsCtrl, setOpenNewsCtrl, onSuccess, defaultValues = null }) => {
+const FormGranaryItems = ({ trigger, openGranaryCtrl, setOpenGranaryCtrl, onSuccess, defaultValues = null }) => {
 
-    const [openNews, setOpenNews] = useState(false);
-    const [isLoadNews, setIsLoadNews] = useState(false);
+    const [openGranary, setOpenGranary] = useState(false);
+    const [isLoadGranary, setIsLoadGranary] = useState(false);
     const [userId, setUserId] = useState(null);
     const form = useForm({
         defaultValues: {
@@ -60,10 +60,10 @@ const FormNews = ({ trigger, openNewsCtrl, setOpenNewsCtrl, onSuccess, defaultVa
     }, []);
 
     const onSubmit = async (values) => {
-        setIsLoadNews(true);
+        setIsLoadGranary(true);
 
         try {
-            const response = await ky.post('/api/news/upsert', {
+            const response = await ky.post('/api/Granary/upsert', {
                 json: {
                     ...(defaultValues?.id && { id: defaultValues.id }),
                     ...values,
@@ -71,20 +71,20 @@ const FormNews = ({ trigger, openNewsCtrl, setOpenNewsCtrl, onSuccess, defaultVa
                 }
             }).json();
             onSuccess();
-            setOpenNewsCtrl ? setOpenNewsCtrl(false) : setOpenNews(false);
+            setOpenGranaryCtrl ? setOpenGranaryCtrl(false) : setOpenGranary(false);
             form.reset();
         } catch (error) {
             console.error("Error :", error);
             const { errorMsg } = await error.response.json();
             toast.error(errorMsg);
         } finally {
-            setIsLoadNews(false);
+            setIsLoadGranary(false);
         }
     }
 
     return (
         <>
-            <Dialog open={openNewsCtrl ?? openNews} onOpenChange={setOpenNewsCtrl ?? setOpenNews}>
+            <Dialog open={openGranaryCtrl ?? openGranary} onOpenChange={setOpenGranaryCtrl ?? setOpenGranary}>
                 {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
                 <DialogContent>
                     <DialogHeader>
@@ -93,7 +93,7 @@ const FormNews = ({ trigger, openNewsCtrl, setOpenNewsCtrl, onSuccess, defaultVa
 
                     <div className="w-full max-h-dvh overflow-y-auto overscroll-contain">
                         <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} id="formNews" className="">
+                            <form onSubmit={form.handleSubmit(onSubmit)} id="formGranary" className="">
                                 <FieldGroup className="gap-4">
                                     {/* <FormField name="startTime" control={form.control}
                                         render={({ field }) => (
@@ -158,8 +158,8 @@ const FormNews = ({ trigger, openNewsCtrl, setOpenNewsCtrl, onSuccess, defaultVa
                         <DialogClose asChild>
                             <Button variant="outline">关闭</Button>
                         </DialogClose>
-                        <Button type="submit" form="formNews" disabled={isLoadNews}>
-                            {isLoadNews && <Spinner />}保存
+                        <Button type="submit" form="formGranary" disabled={isLoadGranary}>
+                            {isLoadGranary && <Spinner />}保存
                         </Button>
                     </DialogFooter>
                 </DialogContent>
@@ -169,4 +169,4 @@ const FormNews = ({ trigger, openNewsCtrl, setOpenNewsCtrl, onSuccess, defaultVa
     );
 }
 
-export default FormNews;
+export default FormGranaryItems;
