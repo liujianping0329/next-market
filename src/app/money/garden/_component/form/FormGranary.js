@@ -45,10 +45,9 @@ const FormGranary = ({ trigger, openGranaryCtrl, setOpenGranaryCtrl, onSuccess, 
     const form = useForm({
         defaultValues: {
             date: new Date(),
-            jpyL: "",
-            zfb: "",
-            cnbj: "",
-            zsbc: ""
+            ...Object.fromEntries(
+                userTemplate.map((n) => [n.value, n.dfValue])
+            )
         }
     });
     const onSubmit = async (values) => {
@@ -79,64 +78,39 @@ const FormGranary = ({ trigger, openGranaryCtrl, setOpenGranaryCtrl, onSuccess, 
                     </DialogHeader>
                     <div className="w-full">
                         <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} id="formGranary" className="">
-                                <FieldGroup>
-                                    <FieldGroup>
-                                        <FormField name="date" control={form.control}
+                            <form onSubmit={form.handleSubmit(onSubmit)} id="formGranary" className="h-[70dvh] flex flex-col">
+
+                                <FormField name="date" control={form.control}
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>日期</FormLabel>
+                                            <FormControl>
+                                                <Datepicker dateDf={field.value} onChange={field.onChange} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )} />
+                                <div className="flex-1 min-h-0 overflow-y-auto">
+                                    {userTemplate.map(item => (
+                                        <FormField key={item.id} name={item.value} control={form.control}
                                             render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>日期</FormLabel>
-                                                    <FormControl>
-                                                        <Datepicker dateDf={field.value} onChange={field.onChange} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )} />
-                                        <FieldSeparator />
-                                        <FormField name="jpyL" control={form.control}
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>日币（万）</FormLabel>
-                                                    <FormControl>
-                                                        <Input {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )} />
-                                        <FormField name="zfb" control={form.control}
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>支付宝</FormLabel>
+                                                <FormItem className="py-1">
+                                                    <FormLabel>
+                                                        <div className="truncate text-sm font-medium text-gray-900">
+                                                            {item.name}
+                                                            <span className="ml-2 text-xs font-normal text-gray-500">
+                                                                （单位：{item.cashType}）
+                                                            </span>
+                                                        </div>
+                                                    </FormLabel>
                                                     <FormControl>
                                                         <Input {...field} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
                                             )} />
-                                    </FieldGroup>
-                                    <FieldGroup>
-                                        <FormField name="cnbj" control={form.control}
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>中行日元（万）</FormLabel>
-                                                    <FormControl>
-                                                        <Input {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )} />
-                                        <FormField name="zsbc" control={form.control}
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel>招行人民币</FormLabel>
-                                                    <FormControl>
-                                                        <Input {...field} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )} />
-                                    </FieldGroup>
-                                </FieldGroup>
+                                    ))}
+                                </div>
                             </form>
                         </Form>
                     </div>

@@ -39,11 +39,11 @@ const Granary = ({ userInfo }) => {
                     </span>
                     <div className="flex items-center justify-between w-full">
                         <div className="flex items-center gap-2">
-                            <FormGranary trigger={
+                            {userTemplate && <FormGranary trigger={
                                 <Button size="sm" variant="outline">记录余额</Button>
                             } onSuccess={() => {
                                 //fetchList();
-                            }} cash={cash} userTemplate={userTemplate} />
+                            }} cash={cash} userTemplate={userTemplate} />}
 
                             {/* <FormSoy trigger={ */}
                             <Button size="sm" variant="outline">记录关键交易</Button>
