@@ -5,7 +5,7 @@ import { formatDateLocal, parseLocalDate } from "@/app/utils/date";
 export async function POST(request, context) {
     const requestBody = await request.json();
 
-    let query = supabase.from("f_user").select().match(requestBody);
+    let query = supabase.from("granary").select().match(requestBody);
 
     const { data: matchList, error } = await query;
     return NextResponse.json({ list: matchList });

@@ -13,16 +13,19 @@ import FormGranary from "@/app/money/garden/_component/form/FormGranary";
 const Granary = ({ userInfo }) => {
     const [cash, setCash] = useState(null);
     const [userTemplate, setUserTemplate] = useState(null);
+    const [granaryList, setGranaryList] = useState([]);
 
     const fetchCash = async () => {
         const response = await ky.get('/api/juhe/cash').json();
         setCash(response.cash)
     }
     const fetchData = async () => {
-        const response = await ky.post('/api/granary/granary_user_template/list/match',
+        const response = await ky.post('/api/granary/listAll',
             { json: { ...(userInfo?.planet ? { planetId: userInfo.planet.id } : { userId: userInfo?.id }) } }
         ).json();
-        setUserTemplate(response.list)
+        console.log(response)
+        setUserTemplate(response.templateList)
+        setGranaryList(response.granaryList)
     }
 
     useEffect(() => {
@@ -42,7 +45,7 @@ const Granary = ({ userInfo }) => {
                             {userTemplate && <FormGranary trigger={
                                 <Button size="sm" variant="outline">记录余额</Button>
                             } onSuccess={() => {
-                                //fetchList();
+                                fetchData();
                             }} cash={cash} userTemplate={userTemplate} />}
 
                             {/* <FormSoy trigger={ */}
@@ -61,6 +64,11 @@ const Granary = ({ userInfo }) => {
                     </div>
                 </div>
             </div>
+            {granaryList.map(item => (
+                <div key={item.id}>{item.date}<br />
+                    {item.total}
+                </div>
+            ))}
         </>
     );
 }

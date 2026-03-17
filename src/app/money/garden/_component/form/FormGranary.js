@@ -34,6 +34,7 @@ import Datepicker from "@/components/datepicker";
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
+import supabase from "@/app/utils/database";
 
 function normalizeObjectNumbers(obj) {
     return Object.fromEntries(
@@ -85,6 +86,8 @@ const FormGranary = ({ trigger, openGranaryCtrl, setOpenGranaryCtrl, onSuccess, 
                 userId
             }
         }).json();
+        setOpenGranaryCtrl ? setOpenGranaryCtrl(false) : setOpenGranary(false);
+        form.reset();
         onSuccess();
         setIsLoadGranary(false);
     }
@@ -99,7 +102,7 @@ const FormGranary = ({ trigger, openGranaryCtrl, setOpenGranaryCtrl, onSuccess, 
                     </DialogHeader>
                     <div className="w-full">
                         <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} id="formGranary" className="h-[70dvh] flex flex-col">
+                            <form onSubmit={form.handleSubmit(onSubmit)} id="formGranary" className="max-h-[70dvh] flex flex-col">
 
                                 <FormField name="date" control={form.control}
                                     render={({ field }) => (
