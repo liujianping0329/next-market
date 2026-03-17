@@ -40,20 +40,25 @@ const GranaryItems = ({ userInfo }) => {
           }} />
         </div>
       </div>
-      <div id="cardContainer" className="p-4">
+      <div id="cardContainer" className="p-4 gap-2">
         {list.map(item => {
           let picPosition = "";
           switch (item.cashType) {
             case "cny":
               picPosition = "object-left-top";
+              break;
             case "twd":
               picPosition = "object-right-top";
+              break;
             case "wjpy":
               picPosition = "object-right-bottom";
+              break;
             case "usd":
               picPosition = "object-left-bottom";
+              break;
             default:
               picPosition = "object-center";
+              break;
           }
 
 
