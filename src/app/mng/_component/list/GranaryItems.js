@@ -58,7 +58,7 @@ const GranaryItems = ({ userInfo }) => {
 
 
           return (
-            <div className="flex gap-3 rounded-2xl border border-gray-200 bg-white p-3 transition hover:shadow-md">
+            <div key={item.id} className="flex gap-3 rounded-2xl border border-gray-200 bg-white p-3 transition hover:shadow-md">
               <div className="h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-gray-100">
                 <img
                   src="/location.png"
