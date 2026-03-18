@@ -8,6 +8,7 @@ import { Loader2 } from "lucide-react";
 import { pickColor } from "@/app/utils/color";
 import ActionButton from "@/components/ActionButton";
 import FormGranaryItems from "../form/FormGranaryItems"
+import { ArrowLeft, MessageSquarePlus, Pencil, Trash2, Orbit, Link as LinkIcon, ChevronRight } from "lucide-react";
 
 const GranaryItems = ({ userInfo }) => {
   const [list, setList] = useState([]);
@@ -28,6 +29,24 @@ const GranaryItems = ({ userInfo }) => {
     fetchList();
   }, []);
 
+  const updateHandle = async (item) => {
+    setUpdateTarget(item);
+    setFormVersion((v) => v + 1)
+    setOpenUpdate(true);
+  }
+
+  const deleteHandle = async (item) => {
+    if (!confirm("确认删除？")) return
+    setDeleting(true)
+    await ky.post('/api/news/delete', {
+      json: {
+        id: item.id
+      }
+    }).json();
+    fetchData();
+    setDeleting(false)
+  }
+
   return (
     <>
       <div id="toolBar" className="mx-2.5 mt-2 flex items-center justify-between rounded-md border bg-muted/40 px-2.5 py-2">
@@ -40,35 +59,15 @@ const GranaryItems = ({ userInfo }) => {
           }} />
         </div>
       </div>
-      <div id="cardContainer" className="p-4 gap-2">
+      <div id="cardContainer" className="flex flex-col p-4 gap-3">
         {list.map(item => {
-          let picPosition = "";
-          switch (item.cashType) {
-            case "cny":
-              picPosition = "object-left-top";
-              break;
-            case "twd":
-              picPosition = "object-right-top";
-              break;
-            case "wjpy":
-              picPosition = "object-right-bottom";
-              break;
-            case "usd":
-              picPosition = "object-left-bottom";
-              break;
-            default:
-              picPosition = "object-center";
-              break;
-          }
-
-
           return (
             <div key={item.id} className="flex gap-3 rounded-2xl border border-gray-200 bg-white p-3 transition hover:shadow-md">
               <div className="h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-gray-100">
                 <img
-                  src="/location.png"
+                  src={`/location/${item.cashType}.png`}
                   alt={item.name}
-                  className={`h-full w-full object-cover ${picPosition}`}
+                  className={`h-full w-full object-cover`}
                 />
               </div>
 
@@ -79,20 +78,13 @@ const GranaryItems = ({ userInfo }) => {
                   </div>
 
                   <div className="flex shrink-0 items-center gap-1">
-                    <button className="rounded-md border px-2 py-1 text-xs hover:bg-gray-50">
-                      编辑
-                    </button>
-                    <button className="rounded-md border px-2 py-1 text-xs hover:bg-gray-50">
-                      置顶
-                    </button>
-                    <button className="rounded-md border px-2 py-1 text-xs text-red-500 hover:bg-red-50">
-                      删除
-                    </button>
+                    <ActionButton icon={Pencil} onClick={() => updateHandle(item)} />
+                    <ActionButton icon={Trash2} onClick={() => deleteHandle(item)} />
                   </div>
                 </div>
 
                 <div className="mt-2 line-clamp-1 text-sm text-gray-500">
-                  {item.dfValue}
+                  默认值:   {item.dfValue}
                 </div>
               </div>
             </div>
