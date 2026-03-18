@@ -83,8 +83,9 @@ const GranaryItems = ({ userInfo }) => {
                   </div>
                 </div>
 
-                <div className="mt-2 line-clamp-1 text-sm text-gray-500">
-                  默认值:   {item.dfValue}
+                <div className="mt-2 line-clamp-1 text-gray-500 flex gap-2">
+                  <span>币种:   {item.cashType}  </span>
+                  <span>默认值:   {item.dfValue}  </span>
                 </div>
               </div>
             </div>
