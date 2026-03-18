@@ -13,17 +13,24 @@ export async function POST(request, context) {
 
     let granaryList = [];
     if (planetId) {
-        const { data: granary } = await supabase.from('granary').select().eq("planetId", planetId);
+        const { data: granary } = await supabase.from('granary').select().eq("planetId", planetId).order("date", { ascending: false });
         granaryList = granary;
     } else {
         if (userId) {
-            const { data: granary } = await supabase.from('granary').select().eq("orphanUserId", userId);
+            const { data: granary } = await supabase.from('granary').select().eq("orphanUserId", userId).order("date", { ascending: false });
             granaryList = granary;
         } else {
-            const { data: granary } = await supabase.from('granary').select().is("planetId", null).is("orphanUserId", null);
+            const { data: granary } = await supabase.from('granary').select().is("planetId", null).is("orphanUserId", null).order("date", { ascending: false });
             granaryList = granary;
         }
     }
+
+    granaryList = granaryList.map((item, index, arr) => ({
+        ...item,
+        diffToNext: index < arr.length - 1
+            ? item.total - arr[index + 1].total
+            : null // 最后一个没有下一个
+    }));
 
 
     return NextResponse.json({ templateList, granaryList });

@@ -4,7 +4,7 @@ import FormSoy from "../form/FormSoy";
 import { Button } from "@/components/ui/button";
 import ky from "ky";
 import { Check } from "lucide-react";
-import { Loader2 } from "lucide-react";
+import { Loader2, ChevronRight } from "lucide-react";
 import { pickColor } from "@/app/utils/color";
 import ActionButton from "@/components/ActionButton";
 import FolderOpBar from "./soy/FolderOpBar";
@@ -69,11 +69,52 @@ const Granary = ({ userInfo }) => {
                     </div>
                 </div>
             </div>
-            {granaryList.map(item => (
-                <div key={item.id}>{item.date}<br />
-                    {item.total}
-                </div>
-            ))}
+            <div id="cardContainer" className="flex flex-col p-4 gap-3">
+                {granaryList.map(item => {
+                    return (
+                        <div key={item.id} className="flex gap-3 rounded-2xl border border-gray-200 bg-white p-3 transition hover:shadow-md">
+                            <div className="flex flex-col h-32 w-24 shrink-0 overflow-hidden rounded-xl bg-gray-100">
+                                <img
+                                    src={`/monthDog/${item.date.split("-")[1].padStart(2, '0')}.jpg`}
+                                    alt={item.id}
+                                    className={`h-24 w-24 object-cover`}
+                                />
+                                <div className="border-t border-gray-200" />
+                                <span className="flex-1 flex items-center justify-center text-gray-500 text-sm">
+                                    {item.date}
+                                </span>
+                            </div>
+
+                            <div className="min-w-0 flex-1">
+                                <div className="flex items-start justify-between gap-2">
+                                    <div className=" text-lg min-w-0 line-clamp-1 text-base font-semibold text-gray-900">
+                                        {item.total}
+                                    </div>
+                                    <div className={`text-lg min-w-0 line-clamp-1 font-semibold ${item.diffToNext > 0
+                                        ? "text-red-500"
+                                        : item.diffToNext < 0
+                                            ? "text-green-500"
+                                            : "text-gray-900"
+                                        }`}>
+                                        {item.diffToNext != null ? item.diffToNext.toFixed(2) : "-"}
+                                    </div>
+                                </div>
+
+                                <div className=" text-sm mt-6 line-clamp-1 text-gray-500 flex gap-0 flex flex-col">
+                                    <span>对日元汇率</span>
+                                    <span>cny:{item.cnyToJpy} twd:{item.twdToJpy} usd:{item.usdToJpy}</span>
+                                </div>
+                                <div className="flex gap-4 justify-end">
+                                    <Button variant="outline" className="p-3">
+                                        <span>详情</span>
+                                        <ChevronRight className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    )
+                })}
+            </div>
         </>
     );
 }
