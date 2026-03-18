@@ -21,7 +21,12 @@ const Granary = ({ userInfo }) => {
     }
     const fetchData = async () => {
         const response = await ky.post('/api/granary/listAll',
-            { json: { ...(userInfo?.planet ? { planetId: userInfo.planet.id } : { userId: userInfo?.id }) } }
+            {
+                json: {
+                    ...(userInfo?.planet ? { planetId: userInfo.planet.id } : {}),
+                    ...(userInfo ? { userId: userInfo.id } : {})
+                }
+            }
         ).json();
         console.log(response)
         setUserTemplate(response.templateList)

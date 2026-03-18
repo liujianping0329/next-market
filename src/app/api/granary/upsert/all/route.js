@@ -27,6 +27,22 @@ export async function POST(request, context) {
         }
     }
 
+    const { data: granaryUpserted } = await supabase.from('granary').upsert({
+        ...(curGranary && { id: curGranary.id }),
+        date, ...(cash || {}),
+        ...(planetId && { planetId }),
+        ...((!planetId && userId) && { orphanUserId: userId }),
+    }).select().single();
+
+    //重置子表
+    if (curGranary) {
+        if (userId) {
+            await supabase.from('granary_detail').delete().eq("granaryId", curGranary.id).eq("userId", userId);
+        } else {
+            await supabase.from('granary_detail').delete().eq("granaryId", curGranary.id).is("userId", null);
+        }
+    }
+
     //拿用户模板
     let query = supabase.from("granary_user_template").select();
     query = applyPlanetFilter(query, { planetId: null, userId });
@@ -39,38 +55,28 @@ export async function POST(request, context) {
         usd: cash.usdToJpy / 10000
     };
 
-    //算总和
-    const total = Object.entries(detail).reduce((sum, [value, price]) => {
-        const template = granaryTemplates.find(n => n.value === value);
-        if (!template) return sum;
-
-        const rate = cashRateMap[template.cashType] ?? 1;
-        return sum + price * rate;
-    }, 0);
-
-    const { data: granaryUpserted } = await supabase.from('granary').upsert({
-        ...(curGranary && { id: curGranary.id }),
-        date, ...(cash || {}),
-        ...(planetId && { planetId }),
-        total,
-        ...((!planetId && userId) && { orphanUserId: userId }),
-    }).select().single();
-
-
-    if (curGranary) {
-        if (userId) {
-            await supabase.from('granary_detail').delete().eq("granaryId", curGranary.id).eq("userId", userId);
-        } else {
-            await supabase.from('granary_detail').delete().eq("granaryId", curGranary.id).is("userId", null);
-        }
-    }
-
     const detailRows = Object.entries(detail).map(([value, price]) => ({
         price,
         ...(userId && { userId }),
         templateId: granaryTemplates.find(n => n.value === value)?.id,
         granaryId: granaryUpserted.id
     }));
-    const { data: details } = await supabase.from('granary_detail').insert(detailRows).select();
-    return NextResponse.json({ details });
+    const { data: detailsInsert } = await supabase.from('granary_detail').insert(detailRows).select();
+
+    //重拿子表所有记录
+    const { data: detailAll } = await supabase.from('granary_detail').select("*, granary_user_template(*)").eq("granaryId", granaryUpserted.id);
+
+    console.log(detailAll);
+    //算总和
+    const total = detailAll.reduce((sum, detailItem) => {
+        const rate = cashRateMap[detailItem.granary_user_template.cashType] ?? 1;
+        return sum + detailItem.price * rate;
+    }, 0);
+
+    const { data: granaryUpsertedTotal } = await supabase.from('granary').update({
+        id: granaryUpserted.id,
+        total
+    }).select().single();
+
+    return NextResponse.json({ detailsInsert });
 }
