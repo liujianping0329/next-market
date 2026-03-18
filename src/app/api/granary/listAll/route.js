@@ -7,7 +7,7 @@ export async function POST(request, context) {
     const { planetId, userId, ...granaryFilter } = await request.json();
 
     let query = supabase.from("granary_user_template").select().match(granaryFilter);
-    query = applyPlanetFilter(query, { planetId, userId });
+    query = applyPlanetFilter(query, { planetId: null, userId });
 
     const { data: templateList, error } = await query;
 
