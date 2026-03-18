@@ -35,7 +35,22 @@ import { AlertTriangle } from "lucide-react"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { encode, decode } from "@/app/utils/base64";
-import { Textarea } from "@/components/ui/textarea"
+import { Textarea } from "@/components/ui/textarea";
+
+import { slugify } from "transliteration";
+
+const cashList = [
+    {
+        label: "万日元",
+        value: "wjpy"
+    }, {
+        label: "台币",
+        value: "twd"
+    }, {
+        label: "人民币",
+        value: "cny"
+    }
+]
 
 const FormGranaryItems = ({ trigger, openGranaryCtrl, setOpenGranaryCtrl, onSuccess, defaultValues = null }) => {
 
@@ -44,9 +59,9 @@ const FormGranaryItems = ({ trigger, openGranaryCtrl, setOpenGranaryCtrl, onSucc
     const [userId, setUserId] = useState(null);
     const form = useForm({
         defaultValues: {
-            title: defaultValues?.title || "",
-            question: defaultValues?.question || "",
-            questionDetail: defaultValues?.questionDetail || ""
+            name: defaultValues?.name || "",
+            cashType: defaultValues?.cashType || "wjpy",
+            dfValue: defaultValues?.dfValue || 0
         }
     });
 
@@ -63,11 +78,14 @@ const FormGranaryItems = ({ trigger, openGranaryCtrl, setOpenGranaryCtrl, onSucc
         setIsLoadGranary(true);
 
         try {
-            const response = await ky.post('/api/Granary/upsert', {
+            const response = await ky.post('/api/granary/granary_user_template/upsert', {
                 json: {
                     ...(defaultValues?.id && { id: defaultValues.id }),
                     ...values,
-                    userId: userId
+                    userId: userId,
+                    value: slugify(values.name, {
+                        separator: "",
+                    })
                 }
             }).json();
             onSuccess();
@@ -123,29 +141,40 @@ const FormGranaryItems = ({ trigger, openGranaryCtrl, setOpenGranaryCtrl, onSucc
                                         </FormItem>
                                     )}
                                 /> */}
-                                    <FormField name="title" control={form.control}
+                                    <FormField name="name" control={form.control}
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>日程说明</FormLabel>
+                                                <FormLabel>条目名称</FormLabel>
                                                 <FormControl>
                                                     <Input {...field} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
                                         )} />
-                                    <FormField name="questionDetail" control={form.control}
+                                    <FormField name="cashType" control={form.control}
+                                        render={({ field }) => (
+                                            <FormItem className="-mt-2">
+                                                <FormControl>
+                                                    <RadioGroup value={field.value} onValueChange={field.onChange}
+                                                        className="flex flex-wrap gap-3">
+                                                        <Label className="text-muted-foreground">币种</Label>
+                                                        {cashList.map((item) => (
+                                                            <div className="flex gap-2" key={item.value}>
+                                                                <RadioGroupItem value={item.value} />
+                                                                <Label className="text-muted-foreground">{item.label}</Label>
+                                                            </div>
+                                                        ))}
+                                                    </RadioGroup>
+                                                </FormControl>
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField name="dfValue" control={form.control}
                                         render={({ field }) => (
                                             <FormItem>
-                                                {/* <FormLabel>内容</FormLabel> */}
+                                                <FormLabel>默认值</FormLabel>
                                                 <FormControl>
-                                                    <Textarea {...field} className="min-h-[120px] resize-none"
-                                                        onFocus={(e) => {
-                                                            setTimeout(() => {
-                                                                const scroller = e.target.closest("[data-scroll]")
-                                                                scroller?.scrollTo({ top: scroller.scrollHeight, behavior: "smooth" })
-                                                            }, 350)
-                                                        }}
-                                                    />
+                                                    <Input type="number" {...field} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>

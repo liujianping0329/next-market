@@ -37,14 +37,12 @@ const GranaryItems = ({ userInfo }) => {
 
   const deleteHandle = async (item) => {
     if (!confirm("确认删除？")) return
-    setDeleting(true)
-    await ky.post('/api/news/delete', {
+    await ky.post('/api/granary/granary_user_template/delete', {
       json: {
         id: item.id
       }
     }).json();
-    fetchData();
-    setDeleting(false)
+    fetchList();
   }
 
   return (
