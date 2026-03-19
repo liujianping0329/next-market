@@ -83,6 +83,11 @@ const GranaryDetail = ({ open, onOpenChange, target, onSuccess }) => {
         <DrawerContent className="h-[100dvh] flex flex-col px-4 pb-0">
           <DrawerHeader className="pb-2">
             <DrawerTitle className="text-xl font-semibold">详情</DrawerTitle>
+            <div className="text-sm text-muted-foreground space-y-2">
+              <div className="flex gap-3 flex-wrap justify-center">
+                <div>结算日:{detail.date}</div>
+              </div>
+            </div>
           </DrawerHeader>
           <Tabs defaultValue={userId ?? -1}
             className="flex flex-1 min-h-0 flex-col">
