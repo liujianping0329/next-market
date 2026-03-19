@@ -38,8 +38,10 @@ export async function POST(request, context) {
     if (curGranary) {
         if (userId) {
             await supabase.from('granary_detail').delete().eq("granaryId", curGranary.id).eq("userId", userId);
+            await supabase.from('granary_user_sum').delete().eq("granaryId", curGranary.id).eq("userId", userId);
         } else {
             await supabase.from('granary_detail').delete().eq("granaryId", curGranary.id).is("userId", null);
+            await supabase.from('granary_user_sum').delete().eq("granaryId", curGranary.id).is("userId", null);
         }
     }
 
@@ -63,20 +65,28 @@ export async function POST(request, context) {
     }));
     const { data: detailsInsert } = await supabase.from('granary_detail').insert(detailRows).select();
 
+    //算个人总和
+    const totalUser = detailsInsert.reduce((sum, detailItem) => {
+        const rate = cashRateMap[granaryTemplates.find(n => n.id === detailItem.templateId)?.cashType] ?? 1;
+        return sum + detailItem.price * rate;
+    }, 0);
+
+    const { data: userSumInsert } = await supabase.from('granary_user_sum').insert({
+        granaryId: granaryUpserted.id,
+        ...(userId && { userId }),
+        total: totalUser
+    }).select();
     //重拿子表所有记录
     const { data: detailAll } = await supabase.from('granary_detail').select("*, granary_user_template(*)").eq("granaryId", granaryUpserted.id);
-
-    console.log(detailAll);
     //算总和
     const total = detailAll.reduce((sum, detailItem) => {
         const rate = cashRateMap[detailItem.granary_user_template.cashType] ?? 1;
         return sum + detailItem.price * rate;
     }, 0);
 
-    const { data: granaryUpsertedTotal } = await supabase.from('granary').update({
-        id: granaryUpserted.id,
+    const { data: granaryUpsertedTotal, error } = await supabase.from('granary').update({
         total
-    }).select().single();
+    }).eq("id", granaryUpserted.id).select().single();
 
     return NextResponse.json({ detailsInsert });
 }

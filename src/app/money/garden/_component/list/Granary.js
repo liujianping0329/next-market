@@ -9,11 +9,14 @@ import { pickColor } from "@/app/utils/color";
 import ActionButton from "@/components/ActionButton";
 import FolderOpBar from "./soy/FolderOpBar";
 import FormGranary from "@/app/money/garden/_component/form/FormGranary";
+import GranaryDetail from "@/app/money/garden/_component/detail/GranaryDetail";
 
 const Granary = ({ userInfo }) => {
     const [cash, setCash] = useState(null);
     const [userTemplate, setUserTemplate] = useState(null);
     const [granaryList, setGranaryList] = useState([]);
+    const [targetItemDetail, setTargetItemDetail] = useState(null);
+    const [openDetail, setOpenDetail] = useState(false);
 
     const fetchCash = async () => {
         const response = await ky.get('/api/juhe/cash').json();
@@ -37,6 +40,11 @@ const Granary = ({ userInfo }) => {
         fetchCash();
         fetchData();
     }, []);
+
+    const handleDetail = (item) => {
+        setTargetItemDetail(item);
+        setOpenDetail(true);
+    }
 
     return (
         <>
@@ -105,7 +113,7 @@ const Granary = ({ userInfo }) => {
                                     <span>cny:{item.cnyToJpy} twd:{item.twdToJpy} usd:{item.usdToJpy}</span>
                                 </div>
                                 <div className="flex gap-4 justify-end">
-                                    <Button variant="outline" className="p-3">
+                                    <Button variant="outline" className="p-3" onClick={() => handleDetail(item)}>
                                         <span>详情</span>
                                         <ChevronRight className="h-4 w-4" />
                                     </Button>
@@ -115,6 +123,7 @@ const Granary = ({ userInfo }) => {
                     )
                 })}
             </div>
+            <GranaryDetail open={openDetail} onOpenChange={setOpenDetail} target={targetItemDetail} />
         </>
     );
 }
