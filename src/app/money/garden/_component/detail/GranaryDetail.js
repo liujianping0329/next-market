@@ -95,10 +95,10 @@ const GranaryDetail = ({ open, onOpenChange, target, onSuccess }) => {
               {detail.granary_user_sum.map((n, i) => (
                 <TabsTrigger key={n.id} value={n.f_user?.id ?? -1}>
                   <Avatar>
-                    <AvatarImage src={n.f_user?.user_metadata?.avatar_url} alt="img" />
+                    <AvatarImage src={n.f_user?.raw_user_meta_data?.avatar_url} alt="img" />
                     <AvatarFallback>guest</AvatarFallback>
                   </Avatar>
-                  <span>{n.f_user?.user_metadata?.name}</span>
+                  <span>{n.f_user?.raw_user_meta_data?.name}</span>
                 </TabsTrigger>
               ))}
             </TabsList>
