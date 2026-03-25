@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import supabase from "@/app/utils/database";
 
 import { applyPlanetFilter } from "@/app/utils/query";
+import { calGranaryTotal } from "@/app/api/granary/_lib/biz";
 
 export async function POST(request, context) {
     const { id, userId, date, cash, ...detail } = await request.json();
@@ -76,17 +77,8 @@ export async function POST(request, context) {
         ...(userId && { userId }),
         total: totalUser
     }).select();
-    //重拿子表所有记录
-    const { data: detailAll } = await supabase.from('granary_detail').select("*, granary_user_template(*)").eq("granaryId", granaryUpserted.id);
-    //算总和
-    const total = detailAll.reduce((sum, detailItem) => {
-        const rate = cashRateMap[detailItem.granary_user_template.cashType] ?? 1;
-        return sum + detailItem.price * rate;
-    }, 0);
 
-    const { data: granaryUpsertedTotal, error } = await supabase.from('granary').update({
-        total
-    }).eq("id", granaryUpserted.id).select().single();
+    await calGranaryTotal(granaryUpserted);
 
     return NextResponse.json({ detailsInsert });
 }
