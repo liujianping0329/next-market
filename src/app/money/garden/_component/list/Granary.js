@@ -10,6 +10,7 @@ import ActionButton from "@/components/ActionButton";
 import FolderOpBar from "./soy/FolderOpBar";
 import FormGranary from "@/app/money/garden/_component/form/FormGranary";
 import GranaryDetail from "@/app/money/garden/_component/detail/GranaryDetail";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const Granary = ({ userInfo }) => {
     const [cash, setCash] = useState(null);
@@ -18,6 +19,7 @@ const Granary = ({ userInfo }) => {
     const [targetItemDetail, setTargetItemDetail] = useState(null);
     const [openDetail, setOpenDetail] = useState(false);
     const [detailVersion, setDetailVersion] = useState(0);
+    const [planetUsers, setPlanetUsers] = useState([]);
 
     const fetchCash = async () => {
         const response = await ky.get('/api/juhe/cash').json();
@@ -35,6 +37,7 @@ const Granary = ({ userInfo }) => {
         console.log(response)
         setUserTemplate(response.templateList)
         setGranaryList(response.granaryList)
+        setPlanetUsers(response.planetUsers ?? [])
     }
 
     useEffect(() => {
@@ -75,6 +78,27 @@ const Granary = ({ userInfo }) => {
                             {/* } onSuccess={() => {
                                 fetchList();
                             }} /> */}
+                        </div>
+                    </div>
+                    <div className="rounded-2xl border border-slate-200 bg-white px-3 py-3 shadow-sm">
+                        <div className="flex flex-wrap gap-2">
+                            {planetUsers.map((user) => {
+                                const name = user?.raw_user_meta_data?.name;
+                                const avatar = user?.raw_user_meta_data?.avatar_url;
+
+                                return (
+                                    <div
+                                        key={user.userId || user.id || name}
+                                        className="flex items-center gap-2 rounded-full bg-slate-50 px-2.5 py-1.5"
+                                    >
+                                        <Avatar className="h-8 w-8 border border-slate-200">
+                                            <AvatarImage src={avatar} alt={name} />
+                                            <AvatarFallback>{name.slice(0, 1)}</AvatarFallback>
+                                        </Avatar>
+                                        <span className="text-sm font-medium text-slate-700">{name}</span>
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
                 </div>

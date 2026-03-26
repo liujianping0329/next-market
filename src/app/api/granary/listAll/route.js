@@ -12,9 +12,12 @@ export async function POST(request, context) {
     const { data: templateList, error } = await query;
 
     let granaryList = [];
+    let planetUsers = [];
     if (planetId) {
         const { data: granary } = await supabase.from('granary').select().eq("planetId", planetId).order("date", { ascending: false });
         granaryList = granary;
+        const { data: users } = await supabase.from('f_user').select().eq("planetId", planetId);
+        planetUsers = users;
     } else {
         if (userId) {
             const { data: granary } = await supabase.from('granary').select().eq("orphanUserId", userId).order("date", { ascending: false });
@@ -33,5 +36,5 @@ export async function POST(request, context) {
     }));
 
 
-    return NextResponse.json({ templateList, granaryList });
+    return NextResponse.json({ templateList, granaryList, planetUsers });
 }
