@@ -15,6 +15,11 @@ export async function calGranaryTotal(granary) {
 
   //重拿子表所有记录
   const { data: detailAll } = await supabase.from('granary_detail').select("*, granary_user_template(*)").eq("granaryId", granary.id);
+  if (detailAll.length === 0) {
+    await supabase.from('granary').delete().eq("id", granary.id)
+    return null;
+  }
+
   //算总和
   const total = detailAll.reduce((sum, detailItem) => {
     const rate = cashRateMap[detailItem.granary_user_template.cashType] ?? 1;

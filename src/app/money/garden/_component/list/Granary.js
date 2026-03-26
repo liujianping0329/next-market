@@ -17,6 +17,7 @@ const Granary = ({ userInfo }) => {
     const [granaryList, setGranaryList] = useState([]);
     const [targetItemDetail, setTargetItemDetail] = useState(null);
     const [openDetail, setOpenDetail] = useState(false);
+    const [detailVersion, setDetailVersion] = useState(0);
 
     const fetchCash = async () => {
         const response = await ky.get('/api/juhe/cash').json();
@@ -43,6 +44,7 @@ const Granary = ({ userInfo }) => {
 
     const handleDetail = (item) => {
         setTargetItemDetail(item);
+        setDetailVersion(v => v + 1);
         setOpenDetail(true);
     }
 
@@ -123,7 +125,11 @@ const Granary = ({ userInfo }) => {
                     )
                 })}
             </div>
-            <GranaryDetail open={openDetail} onOpenChange={setOpenDetail} target={targetItemDetail} />
+            <GranaryDetail open={openDetail} onOpenChange={setOpenDetail} target={targetItemDetail}
+                key={`${targetItemDetail?.id ?? "empty"}-${detailVersion}`}
+                onSuccess={() => {
+                    fetchData();
+                }} />
         </>
     );
 }

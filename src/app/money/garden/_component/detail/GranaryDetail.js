@@ -84,6 +84,7 @@ const GranaryDetail = ({ open, onOpenChange, target, onSuccess }) => {
   }, [target]);
 
   const handleEdit = () => {
+    alert("待开发");
   };
 
   const handleDelete = async () => {
@@ -108,6 +109,8 @@ const GranaryDetail = ({ open, onOpenChange, target, onSuccess }) => {
     }
   };
 
+  const tabItems = detail.granary_user_sum ?? [];
+  const defaultTabValue = tabItems.find(item => item.f_user?.id === userId) ? userId : (tabItems[0]?.f_user?.id ?? -1);
   return (
     <>
       {detail && (
@@ -122,7 +125,7 @@ const GranaryDetail = ({ open, onOpenChange, target, onSuccess }) => {
               </div>
             </DrawerHeader>
 
-            <Tabs defaultValue={userId ?? -1} className="flex flex-1 min-h-0 flex-col">
+            <Tabs defaultValue={defaultTabValue} className="flex flex-1 min-h-0 flex-col">
               <TabsList variant="line">
                 {detail.granary_user_sum.map((item) => (
                   <TabsTrigger key={item.id} value={item.f_user?.id ?? -1}>
