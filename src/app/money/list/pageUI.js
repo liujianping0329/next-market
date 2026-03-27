@@ -52,7 +52,7 @@ const MoneyListUI = ({ exchanges: { cnyToJpy, twdToJpy, usdToJpy } }) => {
     const [isLoadL, setIsLoadL] = useState(false);
     const [isLoadMemo, setIsLoadMemo] = useState(false);
 
-    const chartData = useMemo(() => toBarChartData(list), [list]);
+    // const chartData = useMemo(() => toBarChartData(list), [list]);
 
     const fetchList = async () => {
         const response = await ky.get('/api/money/list').json();
@@ -62,6 +62,15 @@ const MoneyListUI = ({ exchanges: { cnyToJpy, twdToJpy, usdToJpy } }) => {
     useEffect(() => {
         fetchList();
     }, []);
+
+    const handleDelete = async (id) => {
+        console.log(id)
+        if (!confirm("确定删除？")) return
+        await ky.post('/api/money/delete', {
+            json: { id }
+        }).json();
+        fetchList();
+    }
 
     return (
         <>
@@ -142,7 +151,7 @@ const MoneyListUI = ({ exchanges: { cnyToJpy, twdToJpy, usdToJpy } }) => {
                         </Link>
                     </Button>
                 </div>
-                <Dialog open={openChart} onOpenChange={setOpenChart}>
+                {/* <Dialog open={openChart} onOpenChange={setOpenChart}>
                     <DialogTrigger asChild>
                         <Button className="" variant="outline">图表</Button>
                     </DialogTrigger>
@@ -157,7 +166,7 @@ const MoneyListUI = ({ exchanges: { cnyToJpy, twdToJpy, usdToJpy } }) => {
                             </DialogClose>
                         </DialogFooter>
                     </DialogContent>
-                </Dialog>
+                </Dialog> */}
             </div>
             <div className="p-2.5">
                 <Table>
@@ -236,8 +245,11 @@ const MoneyListUI = ({ exchanges: { cnyToJpy, twdToJpy, usdToJpy } }) => {
 
                                     <TableCell>
                                         <div className="flex items-center gap-2">
-                                            <Button size="sm" variant="outline">
-                                                编辑
+                                            <Button size="sm" variant="outline"
+                                                onClick={() => {
+                                                    handleDelete(row.id);
+                                                }}>
+                                                删除
                                             </Button>
                                             <Button size="sm" variant="outline" asChild>
                                                 <Link href={`/money/memo/${row.id}`}>
@@ -251,7 +263,7 @@ const MoneyListUI = ({ exchanges: { cnyToJpy, twdToJpy, usdToJpy } }) => {
                         })}
                     </TableBody>
                 </Table>
-            </div>
+            </div >
 
 
         </>

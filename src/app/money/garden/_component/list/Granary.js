@@ -89,7 +89,7 @@ const Granary = ({ userInfo }) => {
                             }} /> */}
                         </div>
                     </div>
-                    <div className="rounded-2xl border border-slate-200 bg-white px-3 py-3 shadow-sm">
+                    <div className=" hidden rounded-2xl border border-slate-200 bg-white px-3 py-3 shadow-sm">
                         <div className="flex text-sm p-2 items-center">
                             <ChevronRight className="h-5" />按用户筛选:
                         </div>

@@ -31,3 +31,18 @@ export async function calGranaryTotal(granary) {
   }).eq("id", granary.id).select().single();
   return granaryUpsertedTotal;
 }
+
+export async function outputOldSys(userId, date, cash, total) {
+  if (userId !== "c0db971f-d334-46ec-9080-ce9c64617dd0" && userId !== "09909ed0-70ca-4c96-93ed-ba3301573a75") return
+  const { data: oldMoney, error } = await supabase.from('money').select().eq("date", date).maybeSingle();
+  console.log({ error })
+  if (oldMoney) {
+    await supabase.from('money').update({
+      total: oldMoney.total + total
+    }).eq("id", oldMoney.id);
+  } else {
+    await supabase.from('money').insert({
+      ...(cash || {}), total, date
+    });
+  }
+}
