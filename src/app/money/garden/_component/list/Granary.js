@@ -20,6 +20,7 @@ const Granary = ({ userInfo }) => {
     const [openDetail, setOpenDetail] = useState(false);
     const [detailVersion, setDetailVersion] = useState(0);
     const [planetUsers, setPlanetUsers] = useState([]);
+    const [selectedUserIds, setSelectedUserIds] = useState([]);
 
     const fetchCash = async () => {
         const response = await ky.get('/api/juhe/cash').json();
@@ -51,6 +52,14 @@ const Granary = ({ userInfo }) => {
         setOpenDetail(true);
     }
 
+    const toggleUserSelect = (userId) => {
+        setSelectedUserIds((prev) =>
+            prev.includes(userId)
+                ? prev.filter((id) => id !== userId)
+                : [...prev, userId]
+        );
+    };
+
     return (
         <>
             <div id="toolBar" className="mx-2.5 mt-2 flex items-center justify-between rounded-md border bg-muted/40 px-2.5 py-2">
@@ -81,21 +90,31 @@ const Granary = ({ userInfo }) => {
                         </div>
                     </div>
                     <div className="rounded-2xl border border-slate-200 bg-white px-3 py-3 shadow-sm">
-                        <div className="flex flex-wrap gap-2">
+                        <div className="flex text-sm p-2 items-center">
+                            <ChevronRight className="h-5" />按用户筛选:
+                        </div>
+                        <div className="flex flex-wrap gap-2 max-h-18 overflow-y-auto">
                             {planetUsers.map((user) => {
+                                const userId = user.id;
                                 const name = user?.raw_user_meta_data?.name;
                                 const avatar = user?.raw_user_meta_data?.avatar_url;
+                                const isSelected = selectedUserIds.includes(userId);
 
                                 return (
                                     <div
                                         key={user.userId || user.id || name}
-                                        className="flex items-center gap-2 rounded-full bg-slate-50 px-2.5 py-1.5"
-                                    >
-                                        <Avatar className="h-8 w-8 border border-slate-200">
+                                        onClick={() => toggleUserSelect(userId)}
+                                        className={`flex items-center gap-2 rounded-full px-2.5 py-1.5
+                                            ${isSelected
+                                                ? "bg-primary/10 border-primary/30 text-primary"
+                                                : "bg-muted text-foreground border-border hover:bg-accent"
+                                            }`}>
+                                        <Avatar className="h-4 w-4 border border-primary/40">
                                             <AvatarImage src={avatar} alt={name} />
                                             <AvatarFallback>{name.slice(0, 1)}</AvatarFallback>
                                         </Avatar>
-                                        <span className="text-sm font-medium text-slate-700">{name}</span>
+                                        <span className="text-sm font-medium">{name}</span>
+                                        {isSelected && <Check className="h-3.5 w-3.5" />}
                                     </div>
                                 );
                             })}

@@ -28,7 +28,7 @@ export async function POST(request, context) {
         }
     }
 
-    granaryList = granaryList.map((item, index, arr) => ({
+    granaryList = (granaryList ?? []).map((item, index, arr) => ({
         ...item,
         diffToNext: index < arr.length - 1
             ? item.total - arr[index + 1].total
