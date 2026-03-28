@@ -35,6 +35,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import supabase from "@/app/utils/database";
+import { parseLocalDate } from "@/app/utils/date";
 
 function normalizeObjectNumbers(obj) {
     return Object.fromEntries(
@@ -57,12 +58,11 @@ const FormGranary = ({ trigger, openGranaryCtrl, setOpenGranaryCtrl, onSuccess, 
 
     const [userId, setUserId] = useState(null);
 
-    console.log({ userTemplate });
     const form = useForm({
         defaultValues: {
-            date: new Date(),
+            date: defaultValues?.date ? parseLocalDate(defaultValues.date) : new Date(),
             ...Object.fromEntries(
-                userTemplate.map((n) => [n.value, n.dfValue])
+                userTemplate.map((n) => [n.value, defaultValues?.detailList?.find(item => item.templateId === n.id)?.price ?? n.dfValue])
             )
         }
     });
@@ -79,7 +79,6 @@ const FormGranary = ({ trigger, openGranaryCtrl, setOpenGranaryCtrl, onSuccess, 
         setIsLoadGranary(true);
         await ky.post('/api/granary/upsert/all', {
             json: {
-                ...(defaultValues?.id && { id: defaultValues.id }),
                 ...normalizeObjectNumbers(values),
                 date: formatDateLocal(values.date),
                 cash: normalizeObjectNumbers(cash),
@@ -94,11 +93,11 @@ const FormGranary = ({ trigger, openGranaryCtrl, setOpenGranaryCtrl, onSuccess, 
 
     return (
         <>
-            <Dialog open={openGranaryCtrl ?? openGranary} onOpenChange={openGranaryCtrl ?? setOpenGranary}>
+            <Dialog open={openGranaryCtrl ?? openGranary} onOpenChange={setOpenGranaryCtrl ?? setOpenGranary}>
                 {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>{defaultValues?.id ? "修改" : "新增"}</DialogTitle>
+                        <DialogTitle>{defaultValues ? "修改" : "新增"}</DialogTitle>
                     </DialogHeader>
                     <div className="w-full">
                         <Form {...form}>

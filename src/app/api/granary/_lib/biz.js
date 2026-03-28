@@ -35,14 +35,23 @@ export async function calGranaryTotal(granary) {
 export async function outputOldSys(userId, date, cash, total) {
   if (userId !== "c0db971f-d334-46ec-9080-ce9c64617dd0" && userId !== "09909ed0-70ca-4c96-93ed-ba3301573a75") return
   const { data: oldMoney, error } = await supabase.from('money').select().eq("date", date).maybeSingle();
-  console.log({ error })
+  console.log({ oldMoney })
   if (oldMoney) {
+    let newSysExt = [...oldMoney.newSysExt];
+    let userTotal = newSysExt.find(item => item.userId === userId);
+    if (userTotal) {
+      userTotal.total = total;
+    } else {
+      newSysExt.push({ userId, total });
+    }
     await supabase.from('money').update({
-      total: oldMoney.total + total
+      total: newSysExt.reduce((sum, item) => sum + item.total, 0),
+      newSysExt: newSysExt
     }).eq("id", oldMoney.id);
   } else {
     await supabase.from('money').insert({
-      ...(cash || {}), total, date
+      ...(cash || {}), total, date,
+      newSysExt: [{ userId, total }]
     });
   }
 }

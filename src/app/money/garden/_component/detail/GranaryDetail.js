@@ -52,11 +52,19 @@ import GreengrassDetail from "@/app/money/garden/greengrass/_component/detail/Gr
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import supabase from "@/app/utils/database";
 import { Pencil, Trash2 } from "lucide-react";
+import FormGranary from "@/app/money/garden/_component/form/FormGranary";
+import { useGranaryStore } from "@/app/money/garden/_store/granaryStore"
 
 const GranaryDetail = ({ open, onOpenChange, target, onSuccess }) => {
   const [userId, setUserId] = useState(false);
   const [detail, setDetail] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [editDfValue, setEditDfValue] = useState([]);
+  const [editVersion, setEditVersion] = useState(0);
+
+  const cashStore = useGranaryStore(state => state.cash);
+  const userTemplateStore = useGranaryStore(state => state.userTemplate);
 
   const fetchDetail = async () => {
     if (!target?.id) return;
@@ -69,6 +77,7 @@ const GranaryDetail = ({ open, onOpenChange, target, onSuccess }) => {
     }).json();
 
     setDetail(response.detail);
+    console.log(response.detail);
   };
 
   useEffect(() => {
@@ -83,8 +92,10 @@ const GranaryDetail = ({ open, onOpenChange, target, onSuccess }) => {
     fetchDetail();
   }, [target]);
 
-  const handleEdit = () => {
-    alert("待开发");
+  const handleEdit = (detailList) => {
+    setEditDfValue({ date: detail.date, detailList });
+    setEditVersion(v => v + 1);
+    setEditOpen(true);
   };
 
   const handleDelete = async () => {
@@ -165,7 +176,9 @@ const GranaryDetail = ({ open, onOpenChange, target, onSuccess }) => {
                             <Button
                               variant="outline"
                               className="h-9 w-full justify-center gap-1.5 rounded-xl border-sky-200 bg-white/90 px-3 text-sm font-medium text-slate-700 shadow-none hover:bg-white"
-                              onClick={handleEdit}
+                              onClick={() => {
+                                handleEdit(detailList);
+                              }}
                             >
                               <Pencil className="h-3.5 w-3.5" />
                               <span>修改</span>
@@ -217,6 +230,10 @@ const GranaryDetail = ({ open, onOpenChange, target, onSuccess }) => {
                 );
               })}
             </Tabs>
+            <FormGranary key={`${detail.id}-${editVersion}`} openGranaryCtrl={editOpen} setOpenGranaryCtrl={setEditOpen} onSuccess={() => {
+              fetchDetail();
+              onSuccess?.(); // ✅ 通知外层的 Granary.js 重新 fetchData()
+            }} cash={cashStore} userTemplate={userTemplateStore} defaultValues={editDfValue} />
           </DrawerContent>
         </Drawer>
       )}

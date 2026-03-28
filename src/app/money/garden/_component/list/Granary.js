@@ -11,6 +11,7 @@ import FolderOpBar from "./soy/FolderOpBar";
 import FormGranary from "@/app/money/garden/_component/form/FormGranary";
 import GranaryDetail from "@/app/money/garden/_component/detail/GranaryDetail";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useGranaryStore } from "@/app/money/garden/_store/granaryStore"
 
 const Granary = ({ userInfo }) => {
     const [cash, setCash] = useState(null);
@@ -22,9 +23,13 @@ const Granary = ({ userInfo }) => {
     const [planetUsers, setPlanetUsers] = useState([]);
     const [selectedUserIds, setSelectedUserIds] = useState([]);
 
+    const setCashStore = useGranaryStore(state => state.setCash);
+    const setUserTemplateStore = useGranaryStore(state => state.setUserTemplate);
+
     const fetchCash = async () => {
         const response = await ky.get('/api/juhe/cash').json();
         setCash(response.cash)
+        setCashStore(response.cash)
     }
     const fetchData = async () => {
         const response = await ky.post('/api/granary/listAll',
@@ -39,6 +44,7 @@ const Granary = ({ userInfo }) => {
         setUserTemplate(response.templateList)
         setGranaryList(response.granaryList)
         setPlanetUsers(response.planetUsers ?? [])
+        setUserTemplateStore(response.templateList)
     }
 
     useEffect(() => {
@@ -76,7 +82,7 @@ const Granary = ({ userInfo }) => {
                             }} cash={cash} userTemplate={userTemplate} />}
 
                             {/* <FormSoy trigger={ */}
-                            <Button size="sm" variant="outline">记录关键交易</Button>
+                            {/* <Button size="sm" variant="outline">记录关键交易</Button> */}
                             {/* } onSuccess={() => {
                                 fetchList();
                             }} /> */}
