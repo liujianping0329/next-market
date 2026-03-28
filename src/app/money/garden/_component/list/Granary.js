@@ -71,7 +71,7 @@ const Granary = ({ userInfo }) => {
             <div id="toolBar" className="mx-2.5 mt-2 flex items-center justify-between rounded-md border bg-muted/40 px-2.5 py-2">
                 <div className="flex flex-col gap-2">
                     <span className="text-sm text-muted-foreground">
-                        记下每一笔来去与积累，在春种夏耘、秋收冬藏的日子里，慢慢收成属于自己的丰盈。
+                        记录每一笔资金的流转与结余。春种夏耘，秋收冬藏，在这里慢慢积攒属于自己的丰盈与底气。
                     </span>
                     <div className="flex items-center justify-between w-full">
                         <div className="flex items-center gap-2">

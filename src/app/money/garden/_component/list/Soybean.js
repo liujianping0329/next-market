@@ -81,7 +81,7 @@ const Soybean = ({ userInfo }) => {
             <div id="toolBar" className="mx-2.5 mt-2 flex items-center justify-between rounded-md border bg-muted/40 px-2.5 py-2">
                 <div className="flex flex-col gap-2">
                     <span className="text-sm text-muted-foreground">
-                        即时的种草记录，包含要买的东西、要去做的事情等，记录灵感和想法，方便以后回顾和实践。
+                        捕捉转瞬即逝的微小灵感与生活待办，一点一滴收集那些想去体验的闪光日常，留待日后一一实现。
                     </span>
 
                     <div className="flex items-center justify-between">

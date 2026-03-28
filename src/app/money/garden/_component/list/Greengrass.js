@@ -53,7 +53,7 @@ const Greengrass = ({ userInfo }) => {
       <div id="toolBar" className="mx-2.5 mt-2 flex items-center justify-between rounded-md border bg-muted/40 px-2.5 py-2">
         <div className="flex flex-col gap-2">
           <span className="text-sm text-muted-foreground">
-            记录一些日常的好物分享，类似于小红书的种草笔记，偶尔也会有一些生活感悟之类的东西。
+            采撷生活中的动人瞬间与好物灵感。在这里种下一片青草，记录日常的点滴感悟与美好发现。
           </span>
 
           <div className="self-start">

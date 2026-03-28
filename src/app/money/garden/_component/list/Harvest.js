@@ -122,7 +122,7 @@ const Harvest = ({ userInfo, isUserReady }) => {
             <div id="toolBar" className="mx-2.5 mt-2 flex items-center justify-between rounded-md border bg-muted/40 px-2.5 py-2">
                 <div className="flex flex-col gap-2">
                     <span className="text-sm text-muted-foreground">
-                        规划种草执行的记录，包含旅游计划等，记录执行情况和结果，方便以后回顾和总结。
+                        规划每一次满载而归的旅程与目标。将期待化成行动，记录下过程与收获，让每一段经历都有迹可循。
                     </span>
 
                     <div className="flex items-center justify-between">
