@@ -33,6 +33,7 @@ import { Textarea } from "@/components/ui/textarea"
 
 import Datepicker from "@/components/datepicker";
 import PicUploader from "@/components/PicUploader";
+import PicUploaderAdvance from "@/components/PicUploaderAdvance";
 import { formatDateLocal, parseLocalDate } from "@/app/utils/date";
 import {
     Dialog,
@@ -103,7 +104,7 @@ const FormGarden = ({ trigger, onSuccess, categories, defaultValues = null }) =>
                                 <FieldGroup>
                                     <FormField name="date" control={form.control}
                                         render={({ field }) => (
-                                            <FormItem>
+                                            <FormItem className="hidden">
                                                 <FormLabel>日期</FormLabel>
                                                 <FormControl>
                                                     <Datepicker dateDf={field.value} onChange={field.onChange} />
@@ -150,6 +151,13 @@ const FormGarden = ({ trigger, onSuccess, categories, defaultValues = null }) =>
                                         <FormLabel>图片</FormLabel>
                                         <FormControl>
                                             <PicUploader ref={picRef} defaultPics={defaultValues?.pics} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                    <FormItem>
+                                        <FormLabel>图片测试上传</FormLabel>
+                                        <FormControl>
+                                            <PicUploaderAdvance defaultPics={defaultValues?.pics} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
