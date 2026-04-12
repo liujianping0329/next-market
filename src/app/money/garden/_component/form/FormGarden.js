@@ -51,6 +51,7 @@ import supabase from "@/app/utils/database";
 const FormGarden = ({ trigger, onSuccess, categories, defaultValues = null }) => {
     const [openGarden, setOpenGarden] = useState(false);
     const [isLoadGarden, setIsLoadGarden] = useState(false);
+    const [picUrls, setPicUrls] = useState([]);
 
     const form = useForm({
         defaultValues: {
@@ -63,18 +64,18 @@ const FormGarden = ({ trigger, onSuccess, categories, defaultValues = null }) =>
         }
     });
 
-    const picRef = useRef(null)
+    // const picRef = useRef(null)
 
     const onSubmit = async (values) => {
         setIsLoadGarden(true);
-        const urls = await picRef.current?.upload()
+        // const urls = await picRef.current?.upload()
         const { data: userData, error } = await supabase.auth.getSession();
 
         const { locationPath, ...rest } = values;
         await ky.post('/api/money/garden/upsert', {
             json: {
                 ...(defaultValues?.id && { id: defaultValues.id }),
-                ...rest, pics: urls,
+                ...rest, pics: picUrls,
                 date: formatDateLocal(values.date),
                 location: { name: values.location, path: values.locationPath },
                 topic: "Greengrass",
@@ -82,7 +83,7 @@ const FormGarden = ({ trigger, onSuccess, categories, defaultValues = null }) =>
             }
         }).json();
         onSuccess();
-        picRef.current.clear()
+        // picRef.current.clear()
         setOpenGarden(false);
         setIsLoadGarden(false);
         form.reset();
@@ -147,17 +148,17 @@ const FormGarden = ({ trigger, onSuccess, categories, defaultValues = null }) =>
                                                 <FormMessage />
                                             </FormItem>
                                         )} />
-                                    <FormItem>
+                                    {/* <FormItem>
                                         <FormLabel>图片</FormLabel>
                                         <FormControl>
                                             <PicUploader ref={picRef} defaultPics={defaultValues?.pics} />
                                         </FormControl>
                                         <FormMessage />
-                                    </FormItem>
+                                    </FormItem> */}
                                     <FormItem>
                                         <FormLabel>图片测试上传</FormLabel>
                                         <FormControl>
-                                            <PicUploaderAdvance defaultPics={defaultValues?.pics} />
+                                            <PicUploaderAdvance defaultPics={defaultValues?.pics} onChange={setPicUrls} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>

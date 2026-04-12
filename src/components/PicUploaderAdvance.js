@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import imageCompression from "browser-image-compression"
 import ky from "ky"
 import Image from "next/image"
@@ -23,12 +23,12 @@ const PicUploaderAdvance = ({ defaultPics = [], onChange }) => {
     const [deletingUrl, setDeletingUrl] = useState("")
 
     const updatePics = (updater) => {
-        setPics((prev) => {
-            const next = typeof updater === "function" ? updater(prev) : updater
-            onChange?.(next)
-            return next
-        })
+        setPics((prev) => (typeof updater === "function" ? updater(prev) : updater))
     }
+
+    useEffect(() => {
+        onChange?.(pics)
+    }, [pics, onChange])
 
     const handleSelectFiles = async (event) => {
         const selectedFiles = Array.from(event.target.files || [])
