@@ -3,8 +3,7 @@ import { useEffect, useState } from "react";
 import FormSoy from "../form/FormSoy";
 import { Button } from "@/components/ui/button";
 import ky from "ky";
-import { Check } from "lucide-react";
-import { Loader2 } from "lucide-react";
+import { Heart, Loader2, Plus, Trash2 } from "lucide-react";
 import { pickColor } from "@/app/utils/color";
 import ActionButton from "@/components/ActionButton";
 import FolderOpBar from "./soy/FolderOpBar";
@@ -14,13 +13,15 @@ const Soybean = ({ userInfo }) => {
     const [pending, setPending] = useState(new Set()); // 正在同步的 id 集合
 
     const [isLoadCleanup, setIsLoadCleanup] = useState(false);
+    const [statusFilter, setStatusFilter] = useState(1);
 
     const [editVer, setEditVer] = useState(0);
 
-    const fetchList = async () => {
+    const fetchList = async (status = statusFilter) => {
         const response = await ky.post('/api/money/garden/list/match', {
             json: {
                 topic: "SoyBean",
+                status,
                 ...(userInfo?.planet ? { planetId: userInfo.planet.id } : { userId: userInfo?.id })
             }
         }).json();
@@ -43,8 +44,12 @@ const Soybean = ({ userInfo }) => {
     }
 
     useEffect(() => {
-        fetchList();
-    }, []);
+        fetchList(statusFilter);
+    }, [statusFilter]);
+
+    const toggleStatusFilter = () => {
+        setStatusFilter(prev => (prev === 2 ? 1 : 2));
+    };
 
     const toggleOptimistic = async (item) => {
         const id = item.id;
@@ -73,7 +78,7 @@ const Soybean = ({ userInfo }) => {
 
         // 3) 悄悄刷新（可选）
         //    如果你担心 DB 里还有别的字段会变（updated_at 等），就刷一下
-        fetchList();
+        fetchList(statusFilter);
     };
 
     return (
@@ -84,12 +89,22 @@ const Soybean = ({ userInfo }) => {
                         捕捉转瞬即逝的微小灵感与生活待办，一点一滴收集那些想去体验的闪光日常，留待日后一一实现。
                     </span>
 
-                    <div className="flex items-center justify-between">
-                        <FormSoy trigger={
-                            <Button size="sm" variant="outline">新增便签</Button>
-                        } onSuccess={() => {
-                            fetchList();
-                        }} />
+                    <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                            <FormSoy trigger={
+                                <Button size="sm" variant="outline">
+                                    <Plus className="h-4 w-4 text-sky-500" />
+                                    新增便签
+                                </Button>
+                            } onSuccess={() => {
+                                fetchList();
+                            }} />
+
+                            <Button size="sm" variant="outline" type="button" aria-pressed={statusFilter === 2} onClick={toggleStatusFilter} className={statusFilter === 2 ? "border-rose-500 bg-rose-500 text-white hover:bg-rose-500 hover:text-white" : ""}>
+                                <Heart className={`h-4 w-4 ${statusFilter === 2 ? "text-white" : "text-rose-500"}`} />
+                                收藏夹
+                            </Button>
+                        </div>
 
                         <Button size="sm" variant="outline" disabled={isLoadCleanup} onClick={() => {
                             setIsLoadCleanup(true);
@@ -99,7 +114,10 @@ const Soybean = ({ userInfo }) => {
                                 fetchList();
                                 setIsLoadCleanup(false);
                             });
-                        }}>{isLoadCleanup && <Spinner />}一键清理</Button>
+                        }}>
+                            {isLoadCleanup ? <Spinner /> : <Trash2 className="h-4 w-4 text-rose-600" />}
+                            一键清理
+                        </Button>
                     </div>
                 </div>
             </div>
