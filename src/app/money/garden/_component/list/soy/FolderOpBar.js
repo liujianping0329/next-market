@@ -52,6 +52,7 @@ const FolderOpBar = ({ folder, onSuccess, editVer }) => {
         {
           id: folder.id,
           category: folder.title,
+          status: folder.status,
           titles: folder.children.map(i => i.title).join("\n")
         }} onSuccess={onSuccess} key={`${folder?.id}-${editVer}`} />
       <ActionButton icon={Trash2} onClick={() => deleteHandle(folder.id)} disabled={isDeleting} />

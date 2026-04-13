@@ -21,8 +21,9 @@ const Soybean = ({ userInfo }) => {
         const response = await ky.post('/api/money/garden/list/match', {
             json: {
                 topic: "SoyBean",
-                status,
-                ...(userInfo?.planet ? { planetId: userInfo.planet.id } : { userId: userInfo?.id })
+                statuses: [status, 0],
+                ...(userInfo?.planet ? { planetId: userInfo.planet.id } : { userId: userInfo?.id }),
+                ...(status === 2 ? { filterUserId: userInfo?.id } : {})
             }
         }).json();
         let dbList = response.list;
@@ -101,19 +102,19 @@ const Soybean = ({ userInfo }) => {
                                 fetchList(1);
                             }} />
 
-                            <Button size="sm" variant="outline" type="button" aria-pressed={statusFilter === 2} onClick={toggleStatusFilter} className={statusFilter === 2 ? "border-rose-500 bg-rose-500 text-white hover:bg-rose-500 hover:text-white" : ""}>
+                            {userInfo?.id && (<Button size="sm" variant="outline" type="button" aria-pressed={statusFilter === 2} onClick={toggleStatusFilter} className={statusFilter === 2 ? "border-rose-500 bg-rose-500 text-white hover:bg-rose-500 hover:text-white" : ""}>
                                 <Heart className={`h-4 w-4 ${statusFilter === 2 ? "text-white" : "text-rose-500"}`} />
                                 收藏夹
-                            </Button>
+                            </Button>)}
+
                         </div>
 
                         <Button size="sm" variant="outline" disabled={isLoadCleanup} onClick={() => {
-                            setStatusFilter(1);
                             setIsLoadCleanup(true);
                             ky.post("/api/money/garden/delete", {
                                 json: { topic: "SoyBean", status: "0" }
                             }).then(() => {
-                                fetchList(1);
+                                fetchList(statusFilter);
                                 setIsLoadCleanup(false);
                             });
                         }}>
@@ -149,12 +150,6 @@ const Soybean = ({ userInfo }) => {
                                             <Check className="h-3 w-3 text-white" />
                                         </div>
                                     );
-                                } else if (favorite) {
-                                    icon = (
-                                        <div className="h-5 w-5 flex items-center justify-center rounded-full bg-rose-500 border-rose-500">
-                                            <Heart className="h-3 w-3 text-white" fill="currentColor" />
-                                        </div>
-                                    );
                                 } else {
                                     icon = (
                                         <div className="h-5 w-5 rounded-full border border-gray-400" />
@@ -164,7 +159,7 @@ const Soybean = ({ userInfo }) => {
                                     <div key={item.id} onClick={() => !syncing && toggleOptimistic(item)}
                                         className="flex items-center gap-3 px-4 py-3 cursor-pointer transition">
                                         {icon}
-                                        <span className={`text-sm transition ${pendingDelete ? "text-gray-400 line-through" : favorite ? "text-rose-600 font-medium" : ""}`}>
+                                        <span className={`text-sm transition ${pendingDelete ? "text-gray-400 line-through" : favorite ? "" : ""}`}>
                                             {item.title}
                                         </span>
                                     </div>)

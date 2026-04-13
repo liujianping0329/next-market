@@ -27,7 +27,9 @@ export async function POST(request, context) {
     if (requestBody.id) {
         const { data } = await supabase.from('garden').upsert({
             id: requestBody.id,
-            title: requestBody.pname
+            title: requestBody.pname,
+            status: requestBody.status,
+            userId: requestBody.userId
         }).select().single();
         parent = data;
         console.log("Upserted Parent:", parent);
@@ -39,6 +41,7 @@ export async function POST(request, context) {
             .order("sort", { ascending: true }).limit(1).maybeSingle();
         const { data } = await supabase.from('garden').upsert({
             title: requestBody.pname,
+            status: requestBody.status,
             category: "folder",
             topic: "SoyBean",
             sort: (minParentSort?.sort ?? 0) - 1,
@@ -51,6 +54,7 @@ export async function POST(request, context) {
         return {
             title,
             category: "item",
+            status: requestBody.status,
             parent: parent.id,
             topic: "SoyBean",
             sort: childSort++,

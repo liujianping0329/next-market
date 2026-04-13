@@ -11,10 +11,9 @@ import {
     FormMessage
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
-import { ca, fi } from "date-fns/locale";
 import ky from "ky";
 import { useForm } from "react-hook-form";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
     Dialog,
     DialogClose,
@@ -29,6 +28,7 @@ import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
 import { Input } from "@/components/ui/input";
 import supabase from "@/app/utils/database";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const FormSoy = ({ trigger, onSuccess, defaultValues = null }) => {
 
@@ -37,6 +37,7 @@ const FormSoy = ({ trigger, onSuccess, defaultValues = null }) => {
     const form = useForm({
         defaultValues: {
             category: defaultValues?.category || "",
+            status: defaultValues?.status || "1",
             titles: defaultValues?.titles || ""
         }
     });
@@ -52,6 +53,7 @@ const FormSoy = ({ trigger, onSuccess, defaultValues = null }) => {
                         ...(defaultValues?.id && { id: defaultValues.id }),
                         pname: values.category,
                         titles: values.titles,
+                        status: values.status,
                         ...(userData?.session?.user?.id && { userId: userData.session.user.id }),
                     }
                 }).json();
@@ -78,7 +80,7 @@ const FormSoy = ({ trigger, onSuccess, defaultValues = null }) => {
                     title,
                     category: values.category,
                     topic: "SoyBean",
-                    status: "1",
+                    status: values.status,
                     ...(userData?.session?.user?.id && { userId: userData.session.user.id }),
                 }))
             }).json();
@@ -113,6 +115,21 @@ const FormSoy = ({ trigger, onSuccess, defaultValues = null }) => {
                                                 <FormMessage />
                                             </FormItem>
                                         )} />
+                                    <div className="flex space-x-3">
+                                        <FormField control={form.control} name="status"
+                                            render={({ field }) => (
+                                                <FormItem className="flex flex-row items-start items-center space-y-0">
+                                                    <FormControl>
+                                                        <Checkbox
+                                                            checked={field.value === "2"}
+                                                            onCheckedChange={(checked) => field.onChange(checked ? "2" : "1")}
+                                                            className="h-5 w-5 border-2 border-gray-500 data-[state=checked]:bg-black data-[state=checked]:border-black"
+                                                        />
+                                                    </FormControl>
+                                                    <FormLabel className="mr-0">私人</FormLabel>
+                                                </FormItem>
+                                            )} />
+                                    </div>
                                     <FormField name="titles" control={form.control}
                                         render={({ field }) => (
                                             <FormItem>
