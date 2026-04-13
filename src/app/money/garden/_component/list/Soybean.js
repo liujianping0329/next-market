@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import FormSoy from "../form/FormSoy";
 import { Button } from "@/components/ui/button";
 import ky from "ky";
-import { Heart, Loader2, Plus, Trash2 } from "lucide-react";
+import { Check, Heart, Loader2, Plus, Trash2 } from "lucide-react";
 import { pickColor } from "@/app/utils/color";
 import ActionButton from "@/components/ActionButton";
 import FolderOpBar from "./soy/FolderOpBar";
@@ -97,7 +97,8 @@ const Soybean = ({ userInfo }) => {
                                     新增便签
                                 </Button>
                             } onSuccess={() => {
-                                fetchList();
+                                setStatusFilter(1);
+                                fetchList(1);
                             }} />
 
                             <Button size="sm" variant="outline" type="button" aria-pressed={statusFilter === 2} onClick={toggleStatusFilter} className={statusFilter === 2 ? "border-rose-500 bg-rose-500 text-white hover:bg-rose-500 hover:text-white" : ""}>
@@ -107,11 +108,12 @@ const Soybean = ({ userInfo }) => {
                         </div>
 
                         <Button size="sm" variant="outline" disabled={isLoadCleanup} onClick={() => {
+                            setStatusFilter(1);
                             setIsLoadCleanup(true);
                             ky.post("/api/money/garden/delete", {
                                 json: { topic: "SoyBean", status: "0" }
                             }).then(() => {
-                                fetchList();
+                                fetchList(1);
                                 setIsLoadCleanup(false);
                             });
                         }}>
@@ -131,7 +133,8 @@ const Soybean = ({ userInfo }) => {
                                 {folder.id !== 0 && <FolderOpBar folder={folder} onSuccess={fetchList} editVer={editVer} />}
                             </div>
                             {folder.children?.map((item, index) => {
-                                const done = item.status === "0";
+                                const pendingDelete = item.status === "0";
+                                const favorite = item.status === "2";
                                 const syncing = pending.has(item.id);
                                 let icon;
                                 if (syncing) {
@@ -140,10 +143,16 @@ const Soybean = ({ userInfo }) => {
                                             <Loader2 className="h-3 w-3 animate-spin text-gray-400" />
                                         </div>
                                     );
-                                } else if (done) {
+                                } else if (pendingDelete) {
                                     icon = (
                                         <div className="h-5 w-5 flex items-center justify-center rounded-full bg-gray-400 border-gray-400">
                                             <Check className="h-3 w-3 text-white" />
+                                        </div>
+                                    );
+                                } else if (favorite) {
+                                    icon = (
+                                        <div className="h-5 w-5 flex items-center justify-center rounded-full bg-rose-500 border-rose-500">
+                                            <Heart className="h-3 w-3 text-white" fill="currentColor" />
                                         </div>
                                     );
                                 } else {
@@ -155,7 +164,7 @@ const Soybean = ({ userInfo }) => {
                                     <div key={item.id} onClick={() => !syncing && toggleOptimistic(item)}
                                         className="flex items-center gap-3 px-4 py-3 cursor-pointer transition">
                                         {icon}
-                                        <span className={`text-sm transition ${done ? "text-gray-400 line-through" : ""}`}>
+                                        <span className={`text-sm transition ${pendingDelete ? "text-gray-400 line-through" : favorite ? "text-rose-600 font-medium" : ""}`}>
                                             {item.title}
                                         </span>
                                     </div>)
