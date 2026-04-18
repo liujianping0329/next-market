@@ -16,6 +16,7 @@ import useLongPress from "@/app/hooks/useLongPress";
 import MoreOpMenu from "@/app/money/garden/_component/list/harvest/MoreOpMenu";
 import HarvestDetail from "@/app/money/garden/_component/detail/HarvestDetail";
 import { AlertCircle } from "lucide-react";
+import * as holiday_jp from "@holiday-jp/holiday_jp";
 
 const Harvest = ({ userInfo, isUserReady }) => {
 
@@ -30,6 +31,7 @@ const Harvest = ({ userInfo, isUserReady }) => {
     const [emptyBlockAddOpen, setEmptyBlockAddOpen] = useState(false);
     const [emptyBlockAddTarget, setEmptyBlockAddTarget] = useState(false);
     const [detailOpen, setDetailOpen] = useState(false);
+    const [holidays, setHolidays] = useState([]);
 
     const timeConst = Array.from({ length: 14 }).map((_, i) => i + 8);     // 1-12 冻结列
     const rest = Array.from({ length: 98 }).map((_, i) => i + 1);           // 13+ 右侧滚动区
@@ -44,11 +46,15 @@ const Harvest = ({ userInfo, isUserReady }) => {
     const bodyScrollRef = useRef(null);
 
     const fetchList = async () => {
+        var startTime0 = pullToZero(startTime);
+        var endTime = changeDay(startTime0, 7);
+        setHolidays(holiday_jp.between(startTime0, endTime));
+        console.log("holidays", holidays);
+
         const response = await ky.post('/api/money/harvest/list/match', {
             json: {
-                startTime__gte: formatDateLocal(pullToZero(startTime), "yyyy-MM-dd HH:mm"),
-                startTime__lt: formatDateLocal(
-                    changeDay(pullToZero(startTime), 7), "yyyy-MM-dd HH:mm"),
+                startTime__gte: formatDateLocal(startTime0, "yyyy-MM-dd HH:mm"),
+                startTime__lt: formatDateLocal(endTime, "yyyy-MM-dd HH:mm"),
                 view: "harvestList",
                 ...(userInfo?.planet ? { planetId: userInfo.planet.id } : { userId: userInfo?.id })
             }
@@ -65,7 +71,7 @@ const Harvest = ({ userInfo, isUserReady }) => {
                     === formatDateLocal(pullToHour(new Date()), "yyyy-MM-dd HH:mm")
             };
         });
-        console.log("dbList", response);
+
         dbList.forEach(element => {
             const index = diffHours(pullToHour(element.startTime), pullToZero(startTime))
             console.log("index", index);
@@ -150,17 +156,34 @@ const Harvest = ({ userInfo, isUserReady }) => {
             <div className="p-4 py-2 sticky top-0 z-30 bg-background border-b">
                 <div ref={headerScrollRef}
                     className="h-[35px] gap-1 flex overflow-x-hidden items-center font-medium">
-                    {header.map((n, i) => (
-                        <div key={n}
-                            className={`
-                                h-full border rounded flex items-center justify-center shrink-0
-                                ${i === 0 ? "w-[36px]" : "w-[166px]"}
-                                ${/土|日/.test(n) ? "bg-red-50 text-red-500 border-red-200" : ""}
+                    {header.map((n, i) => {
+                        const curDt = pullToZero(startTime, i - 1);
+                        const isHoliday =
+                            i !== 0 &&
+                            holidays.some((h) => pullToZero(h.date).getTime() === curDt.getTime());
+
+                        return (
+                            <div
+                                key={n}
+                                className={`
+                                    h-full border rounded flex flex-col items-center justify-center shrink-0
+                                    ${i === 0 ? "w-[36px]" : "w-[166px]"}
+                                    ${/土|日/.test(n) ? "bg-red-50 text-red-500 border-red-200" : ""}
+                                    ${isHoliday ? "bg-rose-100 text-rose-600 border-rose-300" : ""}
                             `}
-                        >
-                            {n}
-                        </div>
-                    ))}
+                            >
+                                {/* 日期 */}
+                                <div className="text-sm font-medium">{n}</div>
+
+                                {/* 祝日名称 */}
+                                {isHoliday && (
+                                    <div className="text-[11px] leading-tight truncate max-w-full px-1">
+                                        {holidays.find((h) => pullToZero(h.date).getTime() === curDt.getTime())?.name}
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
             <div className="p-4 pt-1">
