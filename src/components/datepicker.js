@@ -51,9 +51,13 @@ const Datepicker = ({ dateDf, onChange, dtFormat = "yyyy-MM-dd" }) => {
           <Calendar mode="single" selected={dateDf} captionLayout="dropdown"
             month={month}
             onMonthChange={setMonth}
-            modifiers={{ holiday: holidays.map(h => h.date) }}
+            modifiers={{
+              holiday: holidays.map(h => h.date),
+              weekend: (date) => date.getDay() === 0 || date.getDay() === 6,
+            }}
             modifiersClassNames={{
-              holiday: "bg-red-100 text-red-600"
+              holiday: "bg-red-100 text-red-600",
+              weekend: "text-blue-600"
             }}
             onSelect={calendarSelect}
           />
