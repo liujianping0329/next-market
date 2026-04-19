@@ -9,16 +9,38 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { useState } from "react";
-import { formatDateLocal } from "@/app/utils/date";
+import { useState, useMemo } from "react";
+import * as holiday_jp from "@holiday-jp/holiday_jp";
+import { DayButton as DefaultDayButton } from "react-day-picker";
+import { pullToZero, pushToLast, pullToHour, diffHours, formatDateLocal, changeDay, parseLocalDate, changeHour } from "@/app/utils/date";
 
 const Datepicker = ({ dateDf, onChange, dtFormat = "yyyy-MM-dd" }) => {
   const [open, setOpen] = useState(false);
+  const [month, setMonth] = useState(new Date());
 
   const calendarSelect = (date) => {
     onChange(date);
     setOpen(false);
   }
+
+  const holidays = useMemo(() => {
+    const start = new Date(month.getFullYear(), month.getMonth(), 1);
+    const end = new Date(month.getFullYear(), month.getMonth() + 1, 0);
+    console.log(holiday_jp.between(start, end).map((item) => {
+      return {
+        date: new Date(item.date),
+        name: item.name
+      }
+    }));
+
+    return holiday_jp.between(start, end).map((item) => {
+      return {
+        date: new Date(item.date),
+        name: item.name
+      }
+    });
+  }, [month]);
+
   return (
     <>
       <Popover open={open} onOpenChange={setOpen}>
@@ -27,7 +49,14 @@ const Datepicker = ({ dateDf, onChange, dtFormat = "yyyy-MM-dd" }) => {
         </PopoverTrigger>
         <PopoverContent align="start">
           <Calendar mode="single" selected={dateDf} captionLayout="dropdown"
-            onSelect={calendarSelect} />
+            month={month}
+            onMonthChange={setMonth}
+            modifiers={{ holiday: holidays.map(h => h.date) }}
+            modifiersClassNames={{
+              holiday: "bg-red-100 text-red-600"
+            }}
+            onSelect={calendarSelect}
+          />
         </PopoverContent>
       </Popover>
 
