@@ -9,12 +9,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import * as holiday_jp from "@holiday-jp/holiday_jp";
 import { DayButton as DefaultDayButton } from "react-day-picker";
 import { pullToZero, pushToLast, pullToHour, diffHours, formatDateLocal, changeDay, parseLocalDate, changeHour } from "@/app/utils/date";
 
-const Datepicker = ({ dateDf, onChange, dtFormat = "yyyy-MM-dd" }) => {
+const Datepicker = ({ dateDf, onChange, dtFormat = "yyyy-MM-dd", onMonthChange, redPointDates }) => {
   const [open, setOpen] = useState(false);
   const [month, setMonth] = useState(new Date());
 
@@ -41,6 +41,13 @@ const Datepicker = ({ dateDf, onChange, dtFormat = "yyyy-MM-dd" }) => {
     });
   }, [month]);
 
+  useEffect(() => {
+    const start = new Date(month.getFullYear(), month.getMonth(), 1);
+    const end = new Date(month.getFullYear(), month.getMonth() + 1, 0);
+
+    onMonthChange?.(start, end);
+  }, [month, onMonthChange]);
+
   return (
     <>
       <Popover open={open} onOpenChange={setOpen}>
@@ -54,10 +61,12 @@ const Datepicker = ({ dateDf, onChange, dtFormat = "yyyy-MM-dd" }) => {
             modifiers={{
               holiday: holidays.map(h => h.date),
               weekend: (date) => date.getDay() === 0 || date.getDay() === 6,
+              redPointDates
             }}
             modifiersClassNames={{
               holiday: "bg-red-100 text-red-600",
-              weekend: "text-blue-600"
+              weekend: "text-blue-600",
+              redPointDates: "relative after:absolute after:right-[2px] after:top-[2px] after:h-2 after:w-2 after:rounded-full after:bg-red-500 after:ring-1 after:ring-background after:content-['']",
             }}
             onSelect={calendarSelect}
           />

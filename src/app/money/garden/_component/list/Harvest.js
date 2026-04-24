@@ -32,6 +32,7 @@ const Harvest = ({ userInfo, isUserReady }) => {
     const [emptyBlockAddTarget, setEmptyBlockAddTarget] = useState(false);
     const [detailOpen, setDetailOpen] = useState(false);
     const [holidays, setHolidays] = useState([]);
+    const [redPointDates, setRedPointDates] = useState([]);
 
     const timeConst = Array.from({ length: 14 }).map((_, i) => i + 8);     // 1-12 冻结列
     const rest = Array.from({ length: 98 }).map((_, i) => i + 1);           // 13+ 右侧滚动区
@@ -135,6 +136,14 @@ const Harvest = ({ userInfo, isUserReady }) => {
                         <div className="flex items-center justify-center gap-3">
                             <Datepicker dateDf={startTime} dtFormat="MM/dd" onChange={(date) => {
                                 setStartTime(date);
+                            }} redPointDates={redPointDates} onMonthChange={async (start, end) => {
+                                const sumInfo = await ky.post('/api/money/harvest/summary', {
+                                    json: {
+                                        start: formatDateLocal(start), end: formatDateLocal(changeDay(end, 1)),
+                                        ...(userInfo?.planet ? { planetId: userInfo.planet.id } : { userId: userInfo?.id })
+                                    }
+                                }).json();
+                                setRedPointDates(sumInfo.map(item => new Date(item.startTime)));
                             }} />
                             <Button size="sm" variant="ghost" className="underline px-1" onClick={() => {
                                 setStartTime(pullToZero(startTime, 7));
