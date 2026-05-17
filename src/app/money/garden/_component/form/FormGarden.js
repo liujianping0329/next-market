@@ -47,11 +47,15 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import supabase from "@/app/utils/database";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertTriangle } from "lucide-react";
+import { SiTiktok } from "react-icons/si";
 
 const FormGarden = ({ trigger, onSuccess, categories, defaultValues = null }) => {
     const [openGarden, setOpenGarden] = useState(false);
     const [isLoadGarden, setIsLoadGarden] = useState(false);
     const [picUrls, setPicUrls] = useState([]);
+    const [passCodeInfo, setPassCodeInfo] = useState(null);
 
     const form = useForm({
         defaultValues: {
@@ -89,6 +93,33 @@ const FormGarden = ({ trigger, onSuccess, categories, defaultValues = null }) =>
         form.reset();
     }
 
+    useEffect(() => {
+        if (openGarden) {
+            const loadPassCode = async () => {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    if (text) {
+                        const matchUrl = text.match(/https?:\/\/[^\s]+/);
+                        const url = matchUrl ? matchUrl[0] : null;
+                        if (url.includes("douyin")) {
+                            const matchDetail = text.match(/】(.*?)https?:\/\//);
+                            setPassCodeInfo({
+                                type: "douyin",
+                                typeName: "抖音",
+                                url,
+                                detail: matchDetail ? matchDetail[1] : null
+                            });
+                        }
+
+                    }
+                } catch (e) {
+
+                }
+            }
+            loadPassCode();
+        }
+    }, [openGarden]);
+
     return (
         <>
             <Dialog open={openGarden} onOpenChange={setOpenGarden}>
@@ -99,6 +130,24 @@ const FormGarden = ({ trigger, onSuccess, categories, defaultValues = null }) =>
                     <DialogHeader>
                         <DialogTitle>种草</DialogTitle>
                     </DialogHeader>
+
+                    {passCodeInfo && <Alert className="">
+                        <AlertTitle className="flex items-center gap-2">
+                            <AlertTriangle className="h-4 w-4 text-red-500" />
+                            <SiTiktok className="h-4 w-4 text-black"
+                                style={{
+                                    filter: `
+                                      drop-shadow(1px 0 #25F4EE)
+                                      drop-shadow(-1px 0 #FE2C55)
+                                    `,
+                                }} />
+                            <span>{passCodeInfo.typeName}口令已发现</span>
+                        </AlertTitle>
+                        <AlertDescription>
+                            将绑定【{passCodeInfo.detail}】
+                        </AlertDescription>
+                    </Alert>}
+
                     <div data-scroll className={`flex-1 min-h-0 overflow-y-auto`}>
                         <Form {...form}>
                             <form onSubmit={form.handleSubmit(onSubmit)} id="formGarden" className="">
