@@ -49,7 +49,8 @@ import { Button } from "@/components/ui/button";
 import supabase from "@/app/utils/database";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
-import { SiTiktok } from "react-icons/si";
+import { SiTiktok, SiDazhongdianping, SiXiaohongshu, SiYoutube, SiGooglemaps, } from "react-icons/si";
+import { analyzePassCode } from "@/app/utils/passCode";
 
 const FormGarden = ({ trigger, onSuccess, categories, defaultValues = null }) => {
     const [openGarden, setOpenGarden] = useState(false);
@@ -98,19 +99,15 @@ const FormGarden = ({ trigger, onSuccess, categories, defaultValues = null }) =>
             const loadPassCode = async () => {
                 try {
                     const text = await navigator.clipboard.readText();
-                    if (text) {
-                        const matchUrl = text.match(/https?:\/\/[^\s]+/);
-                        const url = matchUrl ? matchUrl[0] : null;
-                        if (url.includes("douyin")) {
-                            const matchDetail = text.match(/】(.*?)https?:\/\//);
-                            setPassCodeInfo({
-                                type: "douyin",
-                                typeName: "抖音",
-                                url,
-                                detail: matchDetail ? matchDetail[1] : null
-                            });
+                    if (text && !defaultValues) {
+                        const passCodeData = analyzePassCode(text);
+                        if (passCodeData) {
+                            setPassCodeInfo(passCodeData);
+                            form.setValue("location", passCodeData.typeName ?? "");
+                            form.setValue("locationPath", passCodeData.url ?? "");
+                            form.setValue("title", passCodeData.title ?? "");
+                            form.setValue("content", passCodeData.detail ?? "");
                         }
-
                     }
                 } catch (e) {
 
@@ -134,17 +131,33 @@ const FormGarden = ({ trigger, onSuccess, categories, defaultValues = null }) =>
                     {passCodeInfo && <Alert className="">
                         <AlertTitle className="flex items-center gap-2">
                             <AlertTriangle className="h-4 w-4 text-red-500" />
-                            <SiTiktok className="h-4 w-4 text-black"
+                            {passCodeInfo.type === "douyin" && <SiTiktok className="h-4 w-4 text-black"
                                 style={{
                                     filter: `
                                       drop-shadow(1px 0 #25F4EE)
                                       drop-shadow(-1px 0 #FE2C55)
                                     `,
-                                }} />
+                                }} />}
+                            {passCodeInfo.type === "dianping" && <SiDazhongdianping
+                                className="size-[13px] text-[#ffb300]"
+                                style={{
+                                    filter: `
+                                    drop-shadow(0 0 1px #ffe082)
+                                  `,
+                                }}
+                            />}
+                            {passCodeInfo.type === "xhslink" && <SiXiaohongshu
+                                className="size-[14px] text-[#ff2442]"
+                                style={{
+                                    filter: `
+                                    drop-shadow(0 0 1px #ff9db0)
+                                  `,
+                                }}
+                            />}
                             <span>{passCodeInfo.typeName}口令已发现</span>
                         </AlertTitle>
                         <AlertDescription>
-                            将绑定【{passCodeInfo.detail}】
+                            将导入【{passCodeInfo.detail}】
                         </AlertDescription>
                     </Alert>}
 

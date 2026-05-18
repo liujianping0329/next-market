@@ -21,6 +21,7 @@ import { useGardenStore } from "@/store/gardenStore"
 import { usePathname } from "next/navigation";
 import { gardenCategories, gardenCategoriesNoAll } from "@/app/money/garden/constants/gardenCategories";
 import ListBar from "@/app/money/garden/_component/list/bar/ListBar";
+import { SiTiktok, SiDazhongdianping, SiXiaohongshu, SiYoutube, SiGooglemaps, } from "react-icons/si";
 
 const Greengrass = ({ userInfo }) => {
   const [expanded, setExpanded] = useState(false);
@@ -54,6 +55,57 @@ const Greengrass = ({ userInfo }) => {
         <div className="flex flex-col gap-2">
           <span className="text-sm text-muted-foreground">
             采撷生活中的动人瞬间与好物灵感。在这里种下一片青草，记录日常的点滴感悟与美好发现。
+          </span>
+
+          <span className="inline-flex items-center gap-3 text-sm text-muted-foreground">
+            <span>新增时可识别口令:</span>
+
+            <SiTiktok
+              className="size-[14px] text-black relative top-[0.5px]"
+              style={{
+                filter: `
+        drop-shadow(0.8px 0 #25F4EE)
+        drop-shadow(-0.8px 0 #FE2C55)
+      `,
+              }}
+            />
+
+            <SiDazhongdianping
+              className="size-[13px] text-[#ffb300]"
+              style={{
+                filter: `
+        drop-shadow(0 0 1px #ffe082)
+      `,
+              }}
+            />
+
+            <SiXiaohongshu
+              className="size-[14px] text-[#ff2442]"
+              style={{
+                filter: `
+        drop-shadow(0 0 1px #ff9db0)
+      `,
+              }}
+            />
+
+            {/* <SiYoutube
+              className="size-[14px] text-[#ff0000]"
+              style={{
+                filter: `
+        drop-shadow(0 0 1px #ff8080)
+      `,
+              }}
+            /> */}
+
+            {/* <SiGooglemaps
+              className="size-[13px] text-[#34A853] relative top-[-0.5px]"
+              style={{
+                filter: `
+        drop-shadow(0.8px 0 #4285F4)
+        drop-shadow(-0.8px 0 #EA4335)
+      `,
+              }}
+            /> */}
           </span>
 
           <div className="self-start">
