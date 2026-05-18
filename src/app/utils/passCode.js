@@ -14,7 +14,9 @@ export const analyzePassCode = (passCode) => {
         };
     } else if (url.includes("dianping")) {
         const matchTitle = passCode.match(/【(.*?)】/);
-        const matchDetail = passCode.match(/】(.*?)https?:\/\//);
+        const matchDetail = passCode.match(
+            /】([\s\S]*?)https?:\/\//
+        );
         return {
             type: "dianping",
             typeName: "大众",
