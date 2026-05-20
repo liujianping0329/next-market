@@ -4,6 +4,9 @@ export const analyzePassCode = (passCode) => {
     const matchUrl = passCode.match(/https?:\/\/[^\s]+/);
     const url = matchUrl ? matchUrl[0] : null;
 
+    if (!url) {
+        return null;
+    }
     if (url.includes("douyin")) {
         const matchDetail = passCode.match(/】(.*?)https?:\/\//);
         return {
@@ -21,8 +24,8 @@ export const analyzePassCode = (passCode) => {
             type: "dianping",
             typeName: "大众",
             url,
-            title: matchTitle ? matchTitle[1] : null,
-            detail: matchDetail ? matchDetail[1] : null
+            title: matchTitle ? matchTitle[1].trim() : null,
+            detail: matchDetail ? matchDetail[1].trim() : null
         };
     } else if (url.includes("xhslink")) {
         const matchDetail = passCode.match(/^(.*?)https?:\/\//);

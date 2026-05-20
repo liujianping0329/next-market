@@ -50,7 +50,7 @@ const DateTimePicker = ({ dateDf = new Date(), onChange, dtFormat = "yyyy-MM-dd 
                     <Input className="text-left cursor-pointer" id="date" value={formatDateLocal(dateTime, dtFormat)} readOnly />
                 </PopoverTrigger>
                 <PopoverContent align="start" className="pt-0">
-                    <Calendar mode="single" selected={date} captionLayout="dropdown"
+                    <Calendar mode="single" selected={date} defaultMonth={date} captionLayout="dropdown"
                         onSelect={(date) => {
                             if (!date) return;
                             setDate(date);

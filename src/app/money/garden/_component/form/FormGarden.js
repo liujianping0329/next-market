@@ -101,12 +101,17 @@ const FormGarden = ({ trigger, onSuccess, categories, defaultValues = null }) =>
                     const text = await navigator.clipboard.readText();
                     if (text && !defaultValues) {
                         const passCodeData = analyzePassCode(text);
+                        setPassCodeInfo(passCodeData ?? null);
                         if (passCodeData) {
-                            setPassCodeInfo(passCodeData);
                             form.setValue("location", passCodeData.typeName ?? "");
                             form.setValue("locationPath", passCodeData.url ?? "");
                             form.setValue("title", passCodeData.title ?? "");
                             form.setValue("content", passCodeData.detail ?? "");
+                        } else {
+                            form.setValue("location", "");
+                            form.setValue("locationPath", "");
+                            form.setValue("title", "");
+                            form.setValue("content", "");
                         }
                     }
                 } catch (e) {
@@ -154,10 +159,14 @@ const FormGarden = ({ trigger, onSuccess, categories, defaultValues = null }) =>
                                   `,
                                 }}
                             />}
-                            <span>{passCodeInfo.typeName}口令已发现</span>
+                            <span>{passCodeInfo.typeName}
+                                {passCodeInfo.type === "else"
+                                    ? "链接已发现"
+                                    : "口令已发现"}
+                            </span>
                         </AlertTitle>
                         <AlertDescription>
-                            将导入【{passCodeInfo.detail}】
+                            {passCodeInfo.type !== "else" && <span>将导入【{passCodeInfo.detail}】</span>}
                         </AlertDescription>
                     </Alert>}
 
