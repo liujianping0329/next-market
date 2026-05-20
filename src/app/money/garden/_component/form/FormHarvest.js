@@ -82,6 +82,8 @@ const FormHarvest = ({ trigger, openHarvestCtrl, setOpenHarvestCtrl, onSuccess, 
                         let passCodeObj = decode(text);
                         console.log(passCodeObj)
                         setPassCodeGarden(passCodeObj);
+
+                        form.setValue("title", passCodeObj.title ?? "");
                     }
                 } catch (e) {
 
