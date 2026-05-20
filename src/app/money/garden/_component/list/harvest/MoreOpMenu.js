@@ -89,7 +89,7 @@ const MoreOpMenu = ({ open, onOpenChange, target, onSuccess }) => {
     return (
         <>
             <Drawer open={open} onOpenChange={onOpenChange}>
-                <DrawerContent className="h-[35dvh] flex flex-col px-4 pb-0">
+                <DrawerContent className="h-[45dvh] flex flex-col px-4 pb-0">
                     <DrawerHeader>
                         <DrawerTitle className="text-xl">更多操作</DrawerTitle>
                         <p className="text-sm text-muted-foreground">
