@@ -53,7 +53,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import supabase from "@/app/utils/database";
 import { Pencil, Trash2 } from "lucide-react";
 import FormGranary from "@/app/money/garden/_component/form/FormGranary";
-import { useGranaryStore } from "@/app/money/garden/_store/granaryStore"
+import { useGranaryStore } from "@/app/money/garden/_store/granaryStore";
+import { getDiffClassName, formatDiff } from "@/app/utils/numDiff";
 
 const GranaryDetail = ({ open, onOpenChange, target, onSuccess }) => {
   const [userId, setUserId] = useState(false);
@@ -166,6 +167,9 @@ const GranaryDetail = ({ open, onOpenChange, target, onSuccess }) => {
                           <span className="text-2xl font-semibold leading-none text-slate-900">
                             {item.total}
                           </span>
+                          <span className={`mt-1 text-sm font-medium ${getDiffClassName(item.diff)}`}>
+                            {formatDiff(item.diff)}
+                          </span>
                           <span className="text-sm text-slate-500">(wjpy)</span>
                         </div>
                       </div>
@@ -215,8 +219,18 @@ const GranaryDetail = ({ open, onOpenChange, target, onSuccess }) => {
                               {detailItem.granary_user_template?.name}
                             </span>
 
-                            <span className="text-right text-sm font-semibold text-slate-900 tabular-nums">
-                              {Number(detailItem.price).toLocaleString()}
+                            <span className="flex flex-col gap-1 items-end text-right tabular-nums">
+                              <span className="text-xl font-semibold leading-5 text-slate-900">
+                                {Number(detailItem.price).toLocaleString()}
+                              </span>
+
+                              <span
+                                className={`-mt-0.5 font-medium leading-3 ${getDiffClassName(
+                                  detailItem.diff
+                                )}`}
+                              >
+                                {formatDiff(detailItem.diff)}
+                              </span>
                             </span>
 
                             <span className="text-right text-sm text-slate-500 uppercase">
