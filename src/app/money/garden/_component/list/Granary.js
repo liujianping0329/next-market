@@ -4,11 +4,13 @@ import FormSoy from "../form/FormSoy";
 import { Button } from "@/components/ui/button";
 import ky from "ky";
 import { Check } from "lucide-react";
-import { Loader2, ChevronRight } from "lucide-react";
+import { FileSearch, ChevronRight } from "lucide-react";
+import { SearchCheck, BadgeDollarSign, ChartColumn, ReceiptText } from "lucide-react";
 import { pickColor } from "@/app/utils/color";
 import ActionButton from "@/components/ActionButton";
 import FolderOpBar from "./soy/FolderOpBar";
 import FormGranary from "@/app/money/garden/_component/form/FormGranary";
+import FormGranarySpend from "@/app/money/garden/_component/form/FormGranarySpend";
 import GranaryDetail from "@/app/money/garden/_component/detail/GranaryDetail";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useGranaryStore } from "@/app/money/garden/_store/granaryStore"
@@ -16,6 +18,7 @@ import { useGranaryStore } from "@/app/money/garden/_store/granaryStore"
 const Granary = ({ userInfo }) => {
     const [cash, setCash] = useState(null);
     const [userTemplate, setUserTemplate] = useState(null);
+    const [spendCate, setSpendCate] = useState(null);
     const [granaryList, setGranaryList] = useState([]);
     const [targetItemDetail, setTargetItemDetail] = useState(null);
     const [openDetail, setOpenDetail] = useState(false);
@@ -45,6 +48,7 @@ const Granary = ({ userInfo }) => {
         setGranaryList(response.granaryList)
         setPlanetUsers(response.planetUsers ?? [])
         setUserTemplateStore(response.templateList)
+        setSpendCate(response.spendCate ?? [])
     }
 
     useEffect(() => {
@@ -56,6 +60,11 @@ const Granary = ({ userInfo }) => {
         setTargetItemDetail(item);
         setDetailVersion(v => v + 1);
         setOpenDetail(true);
+    }
+    const handleDetailSpend = (item) => {
+        // setTargetItemDetail(item);
+        // setDetailVersion(v => v + 1);
+        // setOpenDetail(true);
     }
 
     const toggleUserSelect = (userId) => {
@@ -76,10 +85,22 @@ const Granary = ({ userInfo }) => {
                     <div className="flex items-center justify-between w-full">
                         <div className="flex items-center gap-2">
                             {userTemplate && <FormGranary trigger={
-                                <Button size="sm" variant="outline">记录余额</Button>
+                                <Button size="sm" variant="outline">
+                                    <BadgeDollarSign className="h-4 w-4" />
+                                    <span>记余额</span>
+                                </Button>
                             } onSuccess={() => {
                                 fetchData();
                             }} cash={cash} userTemplate={userTemplate} />}
+
+                            {spendCate && <FormGranarySpend trigger={
+                                <Button size="sm" variant="outline">
+                                    <ReceiptText className="h-4 w-4" />
+                                    <span>记支出</span>
+                                </Button>
+                            } onSuccess={() => {
+                                fetchData();
+                            }} cash={cash} spendCate={spendCate} />}
 
                             {/* <FormSoy trigger={ */}
                             {/* <Button size="sm" variant="outline">记录关键交易</Button> */}
@@ -164,9 +185,13 @@ const Granary = ({ userInfo }) => {
                                     <span>cny:{item.cnyToJpy} twd:{item.twdToJpy} usd:{item.usdToJpy}</span>
                                 </div>
                                 <div className="flex gap-4 justify-end">
+                                    <Button variant="outline" className="p-3" onClick={() => handleDetailSpend(item)}>
+                                        <ChartColumn className="h-4 w-4" />
+                                        <span>查支出</span>
+                                    </Button>
                                     <Button variant="outline" className="p-3" onClick={() => handleDetail(item)}>
-                                        <span>详情</span>
-                                        <ChevronRight className="h-4 w-4" />
+                                        <SearchCheck className="h-4 w-4" />
+                                        <span>查余额</span>
                                     </Button>
                                 </div>
                             </div>

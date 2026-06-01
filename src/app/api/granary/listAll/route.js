@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import supabase from "@/app/utils/database";
 import { formatDateLocal, parseLocalDate } from "@/app/utils/date";
 import { applyPlanetFilter } from "@/app/utils/query";
+import { getContants } from "@/app/api/constants/_lib/biz";
 
 export async function POST(request, context) {
     const { planetId, userId, ...granaryFilter } = await request.json();
@@ -35,6 +36,7 @@ export async function POST(request, context) {
             : null // 最后一个没有下一个
     }));
 
+    const spendCate = await getContants({ category: "spendCate" });
 
-    return NextResponse.json({ templateList, granaryList, planetUsers });
+    return NextResponse.json({ templateList, granaryList, planetUsers, spendCate });
 }
