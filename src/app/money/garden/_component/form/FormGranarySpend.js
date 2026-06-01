@@ -132,7 +132,7 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
                                                         </SelectTrigger>
                                                         <SelectContent>
                                                             {spendCate.map(cate => (
-                                                                <SelectItem value={cate.value} className="font-medium">
+                                                                <SelectItem value={cate.value} key={cate.value} className="font-medium">
                                                                     {cate.label}
                                                                 </SelectItem>
                                                             ))}
