@@ -69,7 +69,7 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
     const form = useForm({
         defaultValues: {
             date: defaultValues?.date ? parseLocalDate(defaultValues.date) : new Date(),
-            category: defaultValues?.category || "else",
+            category: defaultValues?.category || -1,
             amount: defaultValues?.amount || 0,
         }
     });
@@ -130,11 +130,12 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
                                                             <SelectValue></SelectValue>
                                                         </SelectTrigger>
                                                         <SelectContent>
-                                                            {spendCate.map(cate => (
-                                                                <SelectItem value={cate.value} key={cate.value} className="font-medium">
-                                                                    {cate.label}
-                                                                </SelectItem>
-                                                            ))}
+                                                            {spendCate.filter((cate) => cate.children?.isFixOnly !== "1")
+                                                                .map(cate => (
+                                                                    <SelectItem value={cate.id} key={cate.id} className="font-medium">
+                                                                        {cate.label}
+                                                                    </SelectItem>
+                                                                ))}
                                                         </SelectContent>
                                                     </Select>
                                                 </FormControl>

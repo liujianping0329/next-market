@@ -36,7 +36,24 @@ export async function POST(request, context) {
             : null // 最后一个没有下一个
     }));
 
-    const spendCate = await getContants({ category: "spendCate" });
+    console.log("planetId:", planetId);
+    let spendCate = await getContants({
+        category: "spendCate",
+        ...(planetId ? { planetId } : { userId }),
+    });
+
+    spendCate = [
+        {
+            id: -1,
+            label: "其他费用",
+            value: "else",
+            children: {
+                dfValue: 0,
+                isFixOnly: "0",
+            },
+        },
+        ...(spendCate ?? []),
+    ];
 
     return NextResponse.json({ templateList, granaryList, planetUsers, spendCate });
 }
