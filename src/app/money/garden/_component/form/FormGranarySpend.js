@@ -58,6 +58,19 @@ function normalizeObjectNumbers(obj) {
     );
 }
 
+const cashList = [
+    {
+        label: "万日元",
+        value: "wjpy"
+    }, {
+        label: "台币",
+        value: "twd"
+    }, {
+        label: "人民币",
+        value: "cny"
+    }
+]
+
 const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCtrl, onSuccess, cash, defaultValues = null, spendCate }) => {
 
     const [openGranarySpend, setOpenGranarySpend] = useState(false);
@@ -69,8 +82,9 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
     const form = useForm({
         defaultValues: {
             date: defaultValues?.date ? parseLocalDate(defaultValues.date) : new Date(),
-            category: defaultValues?.category || -1,
+            category: defaultValues?.category || "-1",
             amount: defaultValues?.amount || 0,
+            cashType: defaultValues?.cashType || "wjpy",
         }
     });
 
@@ -125,14 +139,24 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
                                             <FormItem>
                                                 <FormLabel>支出类型</FormLabel>
                                                 <FormControl>
-                                                    <Select onValueChange={field.onChange} value={field.value}>
+                                                    <Select onValueChange={(value) => {
+                                                        field.onChange(value);
+                                                        const selectedCate = spendCate.find(
+                                                            (cate) => String(cate.id) === value
+                                                        );
+
+                                                        form.setValue(
+                                                            "amount",
+                                                            Number(selectedCate?.children?.dfValue ?? 0)
+                                                        );
+                                                    }} value={field.value}>
                                                         <SelectTrigger className="w-full">
                                                             <SelectValue></SelectValue>
                                                         </SelectTrigger>
                                                         <SelectContent>
                                                             {spendCate.filter((cate) => cate.children?.isFixOnly !== "1")
                                                                 .map(cate => (
-                                                                    <SelectItem value={cate.id} key={cate.id} className="font-medium">
+                                                                    <SelectItem value={String(cate.id)} key={cate.id} className="font-medium">
                                                                         {cate.label}
                                                                     </SelectItem>
                                                                 ))}
@@ -142,6 +166,39 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
                                                 <FormMessage />
                                             </FormItem>
                                         )} />
+                                    <div className="grid grid-cols-6 gap-3">
+                                        <FormField name="amount" control={form.control}
+                                            render={({ field }) => (
+                                                <FormItem className="col-span-4">
+                                                    <FormLabel>金额</FormLabel>
+                                                    <FormControl>
+                                                        <Input {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )} />
+                                        <FormField name="cashType" control={form.control}
+                                            render={({ field }) => (
+                                                <FormItem className="col-span-2">
+                                                    <FormLabel>　</FormLabel>
+                                                    <FormControl>
+                                                        <Select onValueChange={field.onChange} value={field.value}>
+                                                            <SelectTrigger className="w-full">
+                                                                <SelectValue></SelectValue>
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {cashList.map((cash) => (
+                                                                    <SelectItem value={cash.value} key={cash.value} className="font-medium">
+                                                                        {cash.label}
+                                                                    </SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )} />
+                                    </div>
                                 </FieldGroup>
                             </form>
                         </Form>
@@ -154,8 +211,8 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
                             {isLoadGranarySpend && <Spinner />}保存
                         </Button>
                     </DialogFooter>
-                </DialogContent>
-            </Dialog>
+                </DialogContent >
+            </Dialog >
         </>
     );
 }
