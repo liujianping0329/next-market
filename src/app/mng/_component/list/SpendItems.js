@@ -87,7 +87,7 @@ const SpendItems = ({ userInfo }) => {
 
                 <div className="mt-2 line-clamp-1 text-gray-500 flex flex-col gap-2">
                   <span>默认值:   {item.children?.dfValue}  </span>
-                  <span>是否只是固定费用:   {item.children?.isFixOnly ? "是" : "否"}  </span>
+                  <span>是否只是固定费用:   {item.children?.isFixOnly === "1" ? "是" : "否"}  </span>
                 </div>
               </div>
             </div>

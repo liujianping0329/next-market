@@ -69,8 +69,7 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
     const form = useForm({
         defaultValues: {
             date: defaultValues?.date ? parseLocalDate(defaultValues.date) : new Date(),
-            category: defaultValues?.category || "food",
-            channel: defaultValues?.channel || "",
+            category: defaultValues?.category || "else",
             amount: defaultValues?.amount || 0,
         }
     });
