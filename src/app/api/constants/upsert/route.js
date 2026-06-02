@@ -6,7 +6,7 @@ import { REDIRECT_ERROR_CODE } from "next/dist/client/components/redirect-error"
 export async function POST(request, context) {
     const requestBody = await request.json();
     if (requestBody.category) {
-        if (requestBody.label) {
+        if (!requestBody.id && requestBody.label) {
             const { data: isExistLabel } = await supabase.from("constants").select()
                 .eq("category", requestBody.category).eq("label", requestBody.label).maybeSingle();
             console.log("isExistLabel", isExistLabel);
