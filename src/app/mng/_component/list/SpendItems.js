@@ -9,11 +9,13 @@ import { pickColor } from "@/app/utils/color";
 import ActionButton from "@/components/ActionButton";
 import FormGranaryItems from "../form/FormGranaryItems"
 import FormSpendItems from "../form/FormSpendItems"
-import { ArrowLeft, MessageSquarePlus, Pencil, Trash2, Orbit, Link as LinkIcon, ChevronRight } from "lucide-react";
+import { ArrowLeft, SquarePen, Pencil, Trash2, Orbit, Link as LinkIcon, ChevronRight } from "lucide-react";
+import FormSpendPersonal from "../form/FormSpendPersonal";
 
 const SpendItems = ({ userInfo }) => {
   const [list, setList] = useState([]);
   const [openUpdate, setOpenUpdate] = useState(false)
+  const [openUpdatePersonal, setOpenUpdatePersonal] = useState(false)
 
   const [formVersion, setFormVersion] = useState(0);
   const [updateTarget, setUpdateTarget] = useState(null)
@@ -37,6 +39,12 @@ const SpendItems = ({ userInfo }) => {
     setUpdateTarget(item);
     setFormVersion((v) => v + 1)
     setOpenUpdate(true);
+  }
+
+  const updatePersonalHandle = async (item) => {
+    setUpdateTarget(item);
+    setFormVersion((v) => v + 1)
+    setOpenUpdatePersonal(true);
   }
 
   const deleteHandle = async (item) => {
@@ -85,10 +93,25 @@ const SpendItems = ({ userInfo }) => {
                   </div>
                 </div>
 
+
+
                 <div className="mt-2 line-clamp-1 text-gray-500 flex flex-col gap-2">
-                  <span>默认值:   {item.children?.dfValue}  </span>
                   <span>是否只是固定费用:   {item.children?.isFixOnly === "1" ? "是" : "否"}  </span>
+                  <div className="flex w-full items-center gap-2 rounded-md bg-sky-100 ">
+                    <span className="ml-2">我的费用:</span>
+                    <span className="text-sm font-medium text-sky-700 ring-1 ring-sky-100">
+                      {item.children?.dfValue}
+                    </span>
+
+                    <div className="ml-auto mr-2">
+                      <ActionButton
+                        icon={SquarePen}
+                        onClick={() => updatePersonalHandle(item)}
+                      />
+                    </div>
+                  </div>
                 </div>
+
               </div>
             </div>
           )
@@ -98,6 +121,9 @@ const SpendItems = ({ userInfo }) => {
       <FormSpendItems openSpendCtrl={openUpdate} setOpenSpendCtrl={setOpenUpdate}
         onSuccess={() => fetchList()} defaultValues={updateTarget}
         key={`${updateTarget?.id ?? "-1"}-${formVersion}`} />
+      <FormSpendPersonal openSpendPersonalCtrl={openUpdatePersonal} setOpenSpendPersonalCtrl={setOpenUpdatePersonal}
+        onSuccess={() => fetchList()} defaultValues={updateTarget}
+        key={`${updateTarget?.id ?? "-1"}-${formVersion}-personal`} />
     </>
   )
 }

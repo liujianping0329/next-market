@@ -61,7 +61,7 @@ const FormSpendItems = ({ trigger, openSpendCtrl, setOpenSpendCtrl, onSuccess, d
     const form = useForm({
         defaultValues: {
             name: defaultValues?.label || "",
-            dfValue: defaultValues?.children?.dfValue || 0,
+            // dfValue: defaultValues?.children?.dfValue || 0,
             isFixOnly: defaultValues?.children?.isFixOnly || 0,
         }
     });
@@ -83,7 +83,7 @@ const FormSpendItems = ({ trigger, openSpendCtrl, setOpenSpendCtrl, onSuccess, d
                 json: {
                     ...(defaultValues?.id && { id: defaultValues.id }),
                     children: {
-                        dfValue: values.dfValue,
+                        // dfValue: values.dfValue,
                         isFixOnly: values.isFixOnly
                     },
                     ...(userInfo?.planet ? { planetId: userInfo.planet.id } : { userId: userInfo?.id }),
@@ -113,6 +113,14 @@ const FormSpendItems = ({ trigger, openSpendCtrl, setOpenSpendCtrl, onSuccess, d
                     <DialogHeader>
                         <DialogTitle>{defaultValues?.id ? "修改" : "新增"}</DialogTitle>
                     </DialogHeader>
+
+                    <Alert className="">
+                        <AlertTriangle className="h-4 w-4" />
+                        <AlertTitle>固定费用项目</AlertTitle>
+                        <AlertDescription>
+                            此条目群组内共享，设置个人值请在列表项目下部处修改
+                        </AlertDescription>
+                    </Alert>
 
                     <div className="w-full max-h-dvh overflow-y-auto overscroll-contain">
                         <Form {...form}>
@@ -156,7 +164,7 @@ const FormSpendItems = ({ trigger, openSpendCtrl, setOpenSpendCtrl, onSuccess, d
                                                 <FormMessage />
                                             </FormItem>
                                         )} />
-                                    <FormField name="dfValue" control={form.control}
+                                    {/* <FormField name="dfValue" control={form.control}
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel>固定费用</FormLabel>
@@ -165,7 +173,7 @@ const FormSpendItems = ({ trigger, openSpendCtrl, setOpenSpendCtrl, onSuccess, d
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
-                                        )} />
+                                        )} /> */}
                                     <FormField control={form.control} name="isFixOnly"
                                         render={({ field }) => (
                                             <FormItem className="flex flex-row items-start items-center space-y-0">

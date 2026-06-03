@@ -44,6 +44,7 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import supabase from "@/app/utils/database";
 import { parseLocalDate } from "@/app/utils/date";
+import { title } from "process";
 
 function normalizeObjectNumbers(obj) {
     return Object.fromEntries(
@@ -83,6 +84,7 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
         defaultValues: {
             date: defaultValues?.date ? parseLocalDate(defaultValues.date) : new Date(),
             category: defaultValues?.category || "-1",
+            title: defaultValues?.title || "",
             amount: defaultValues?.amount || 0,
             cashType: defaultValues?.cashType || "wjpy",
         }
@@ -141,14 +143,6 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
                                                 <FormControl>
                                                     <Select onValueChange={(value) => {
                                                         field.onChange(value);
-                                                        const selectedCate = spendCate.find(
-                                                            (cate) => String(cate.id) === value
-                                                        );
-
-                                                        form.setValue(
-                                                            "amount",
-                                                            Number(selectedCate?.children?.dfValue ?? 0)
-                                                        );
                                                     }} value={field.value}>
                                                         <SelectTrigger className="w-full">
                                                             <SelectValue></SelectValue>
@@ -162,6 +156,16 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
                                                                 ))}
                                                         </SelectContent>
                                                     </Select>
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )} />
+                                    <FormField name="title" control={form.control}
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>标题</FormLabel>
+                                                <FormControl>
+                                                    <Input {...field} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
