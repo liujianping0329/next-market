@@ -29,6 +29,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useUserStore } from "@/app/money/garden/_store/userStore"
 import ky from "ky"
 
 export const revalidate = 0;
@@ -37,6 +38,7 @@ const GardenUI = ({ }) => {
     const [tab, setTab] = useState("Harvest");
     const [user, setUser] = useState(null)
     const [isUserReady, setIsUserReady] = useState(false)
+    const setUserInfoStore = useUserStore(state => state.setUserInfo);
 
     useEffect(() => {
         const syncUser = async (session) => {
@@ -49,6 +51,7 @@ const GardenUI = ({ }) => {
                 const response = await ky.post('/api/f_user/list/match', { json: { id: user.id } }).json();
                 let userInfo = { ...user, ...(response.list[0]) }
                 setUser(userInfo);
+                setUserInfoStore(userInfo);
                 console.log("userInfo", userInfo)
                 setIsUserReady(true)
             } else {

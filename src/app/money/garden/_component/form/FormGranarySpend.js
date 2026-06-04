@@ -45,6 +45,7 @@ import { useEffect, useState } from "react";
 import supabase from "@/app/utils/database";
 import { parseLocalDate } from "@/app/utils/date";
 import { title } from "process";
+import { useUserStore } from "@/app/money/garden/_store/userStore"
 
 function normalizeObjectNumbers(obj) {
     return Object.fromEntries(
@@ -80,12 +81,14 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
 
     const [userId, setUserId] = useState(null);
 
+    const userInfoStore = useUserStore(state => state.userInfo);
+
     const form = useForm({
         defaultValues: {
             date: defaultValues?.date ? parseLocalDate(defaultValues.date) : new Date(),
-            category: defaultValues?.category || "-1",
+            category: defaultValues?.category || "30",
             title: defaultValues?.title || "",
-            amount: defaultValues?.amount || 0,
+            amount: defaultValues?.amount || "",
             cashType: defaultValues?.cashType || "wjpy",
         }
     });
@@ -100,14 +103,18 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
     }, []);
     const onSubmit = async (values) => {
         setIsLoadGranarySpend(true);
-        // await ky.post('/api/granary/upsert/all', {
-        //     json: {
-        //         ...normalizeObjectNumbers(values),
-        //         date: formatDateLocal(values.date),
-        //         cash: normalizeObjectNumbers(cash),
-        //         userId
-        //     }
-        // }).json();
+        await ky.post('/api/spend/upsert', {
+            json: {
+                date: formatDateLocal(values.date),
+                category: values.category,
+                title: values.title,
+                amount: Number(values.amount),
+                cashType: values.cashType,
+                ...cash,
+                userId,
+                planetId: userInfoStore?.planetId,
+            }
+        }).json();
         setOpenGranarySpendCtrl ? setOpenGranarySpendCtrl(false) : setOpenGranarySpend(false);
         form.reset();
         onSuccess();
@@ -148,12 +155,11 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
                                                             <SelectValue></SelectValue>
                                                         </SelectTrigger>
                                                         <SelectContent>
-                                                            {spendCate.filter((cate) => cate.children?.isFixOnly !== "1")
-                                                                .map(cate => (
-                                                                    <SelectItem value={String(cate.id)} key={cate.id} className="font-medium">
-                                                                        {cate.label}
-                                                                    </SelectItem>
-                                                                ))}
+                                                            {spendCate.map(cate => (
+                                                                <SelectItem value={String(cate.id)} key={cate.id} className="font-medium">
+                                                                    {cate.label}
+                                                                </SelectItem>
+                                                            ))}
                                                         </SelectContent>
                                                     </Select>
                                                 </FormControl>
