@@ -12,6 +12,7 @@ import FolderOpBar from "./soy/FolderOpBar";
 import FormGranary from "@/app/money/garden/_component/form/FormGranary";
 import FormGranarySpend from "@/app/money/garden/_component/form/FormGranarySpend";
 import GranaryDetail from "@/app/money/garden/_component/detail/GranaryDetail";
+import SpendDetail from "@/app/money/garden/_component/detail/SpendDetail";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useGranaryStore } from "@/app/money/garden/_store/granaryStore"
 
@@ -22,6 +23,7 @@ const Granary = ({ userInfo }) => {
     const [granaryList, setGranaryList] = useState([]);
     const [targetItemDetail, setTargetItemDetail] = useState(null);
     const [openDetail, setOpenDetail] = useState(false);
+    const [openSpendDetail, setOpenSpendDetail] = useState(false);
     const [detailVersion, setDetailVersion] = useState(0);
     const [planetUsers, setPlanetUsers] = useState([]);
     const [selectedUserIds, setSelectedUserIds] = useState([]);
@@ -62,9 +64,9 @@ const Granary = ({ userInfo }) => {
         setOpenDetail(true);
     }
     const handleDetailSpend = (item) => {
-        // setTargetItemDetail(item);
-        // setDetailVersion(v => v + 1);
-        // setOpenDetail(true);
+        setTargetItemDetail(item);
+        setDetailVersion(v => v + 1);
+        setOpenSpendDetail(true);
     }
 
     const toggleUserSelect = (userId) => {
@@ -201,6 +203,11 @@ const Granary = ({ userInfo }) => {
             </div>
             <GranaryDetail open={openDetail} onOpenChange={setOpenDetail} target={targetItemDetail}
                 key={`${targetItemDetail?.id ?? "empty"}-${detailVersion}`}
+                onSuccess={() => {
+                    fetchData();
+                }} />
+            <SpendDetail open={openSpendDetail} onOpenChange={setOpenSpendDetail} target={targetItemDetail}
+                key={`${targetItemDetail?.id ?? "empty"}-${detailVersion}-spend`}
                 onSuccess={() => {
                     fetchData();
                 }} />

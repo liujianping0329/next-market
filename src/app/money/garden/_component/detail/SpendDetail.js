@@ -55,8 +55,9 @@ import { Pencil, Trash2 } from "lucide-react";
 import FormGranary from "@/app/money/garden/_component/form/FormGranary";
 import { useGranaryStore } from "@/app/money/garden/_store/granaryStore";
 import { getDiffClassName, formatDiff } from "@/app/utils/numDiff";
+import { useUserStore } from "@/app/money/garden/_store/userStore"
 
-const spendDetail = ({ open, onOpenChange, target, onSuccess }) => {
+const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
   const [userId, setUserId] = useState(false);
   const [detail, setDetail] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -65,19 +66,18 @@ const spendDetail = ({ open, onOpenChange, target, onSuccess }) => {
   const [editVersion, setEditVersion] = useState(0);
 
   const cashStore = useGranaryStore(state => state.cash);
+  const userInfoStore = useUserStore(state => state.userInfo);
 
   const fetchDetail = async () => {
     if (!target?.id) return;
 
-    const response = await ky.post("/api/spend/detail", {
+    const response = await ky.post("/api/spend/list/match", {
       json: {
-        spendId: target.id,
-        userId,
+        planetId: userInfoStore?.planetId,
       },
     }).json();
 
-    setDetail(response.detail);
-    console.log(response.detail);
+    setDetail(response.list);
   };
 
   useEffect(() => {
@@ -120,8 +120,6 @@ const spendDetail = ({ open, onOpenChange, target, onSuccess }) => {
     }
   };
 
-  const tabItems = detail.granary_user_sum ?? [];
-  const defaultTabValue = tabItems.find(item => item.f_user?.id === userId) ? userId : (tabItems[0]?.f_user?.id ?? -1);
   return (
     <>
       {detail && (
@@ -136,117 +134,24 @@ const spendDetail = ({ open, onOpenChange, target, onSuccess }) => {
               </div>
             </DrawerHeader>
 
-            <Tabs defaultValue={defaultTabValue} className="flex flex-1 min-h-0 flex-col">
-              <TabsList variant="line">
-                {detail.granary_user_sum.map((item) => (
-                  <TabsTrigger key={item.id} value={item.f_user?.id ?? -1}>
-                    <Avatar>
-                      <AvatarImage src={item.f_user?.raw_user_meta_data?.avatar_url} alt="img" />
-                      <AvatarFallback>guest</AvatarFallback>
-                    </Avatar>
-                    <span>{item.f_user?.raw_user_meta_data?.name}</span>
-                  </TabsTrigger>
+            <div className="flex-1 overflow-y-auto">
+              <div className="flex flex-col gap-4">
+                {detail.map((item, index) => (
+                  <div key={index} className="flex flex-col gap-2 rounded-lg border p-3">
+                    <div className="flex items-center gap-2 text-sm">
+                      <div className="font-medium">名称: {item.title}</div>
+                      <div className={`flex flex-col gap-1 font-mono ${getDiffClassName(item.amount)}`}>
+                        <span>金额: {formatDiff(item.amount)}</span>
+                        <span>日期: {item.date}</span>
+                        <span>币种: {item.cashType}</span>
+                        <span>用户: {item.userId}</span>
+                      </div>
+                    </div>
+                    <div className="text-sm text-muted-foreground">类别: {item.category}</div>
+                  </div>
                 ))}
-              </TabsList>
-
-              {detail.granary_user_sum.map((item) => {
-                const detailList = detail.granary_detail.filter((detailItem) => detailItem.userId === item.userId);
-                const isOwnTab = item.userId === userId;
-
-                return (
-                  <TabsContent
-                    key={item.id}
-                    value={item.f_user?.id ?? -1}
-                    className="flex flex-1 min-h-0 flex-col"
-                  >
-                    <div className="mt-1 rounded-3xl border border-sky-100 bg-sky-50 px-4 py-4 shadow-sm">
-                      <div className="flex items-baseline justify-between gap-3">
-                        <span className="text-sm font-medium tracking-wide text-sky-700">小计</span>
-                        <div className="flex items-baseline gap-1">
-                          <span className="text-2xl font-semibold leading-none text-slate-900">
-                            {item.total}
-                          </span>
-                          <span className={`mt-1 text-sm font-medium ${getDiffClassName(item.diff)}`}>
-                            {formatDiff(item.diff)}
-                          </span>
-                          <span className="text-sm text-slate-500">(wjpy)</span>
-                        </div>
-                      </div>
-
-                      {isOwnTab && (
-                        <div className="mt-4 border-t border-sky-100 pt-3">
-                          <div className="grid grid-cols-2 gap-2">
-                            <Button
-                              variant="outline"
-                              className="h-9 w-full justify-center gap-1.5 rounded-xl border-sky-200 bg-white/90 px-3 text-sm font-medium text-slate-700 shadow-none hover:bg-white"
-                              onClick={() => {
-                                handleEdit(detailList);
-                              }}
-                            >
-                              <Pencil className="h-3.5 w-3.5" />
-                              <span>修改</span>
-                            </Button>
-
-                            <Button
-                              variant="outline"
-                              className="h-9 w-full justify-center gap-1.5 rounded-xl border-red-200 bg-white/90 px-3 text-sm font-medium text-red-600 shadow-none hover:bg-red-50 hover:text-red-700"
-                              onClick={handleDelete}
-                              disabled={deleting}
-                            >
-                              <Trash2 className="h-3.5 w-3.5" />
-                              <span>删除</span>
-                            </Button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white">
-                      <div className="grid grid-cols-[1fr_auto_auto] items-center gap-3 border-b border-slate-100 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-500">
-                        <span>项目</span>
-                        <span className="text-right">金额</span>
-                        <span className="text-right">币种</span>
-                      </div>
-
-                      <div className="divide-y divide-slate-100">
-                        {detailList.map((detailItem) => (
-                          <div
-                            key={detailItem.id}
-                            className="grid grid-cols-[1fr_auto_auto] items-center gap-3 px-4 py-3"
-                          >
-                            <span className="min-w-0 truncate text-sm font-medium text-slate-800">
-                              {detailItem.granary_user_template?.name}
-                            </span>
-
-                            <span className="flex flex-col gap-1 items-end text-right tabular-nums">
-                              <span className="text-xl font-semibold leading-5 text-slate-900">
-                                {Number(detailItem.price).toLocaleString()}
-                              </span>
-
-                              <span
-                                className={`-mt-0.5 font-medium leading-3 ${getDiffClassName(
-                                  detailItem.diff
-                                )}`}
-                              >
-                                {formatDiff(detailItem.diff)}
-                              </span>
-                            </span>
-
-                            <span className="text-right text-sm text-slate-500 uppercase">
-                              {detailItem.granary_user_template?.cashType}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </TabsContent>
-                );
-              })}
-            </Tabs>
-            <FormGranary key={`${detail.id}-${editVersion}`} openGranaryCtrl={editOpen} setOpenGranaryCtrl={setEditOpen} onSuccess={() => {
-              fetchDetail();
-              onSuccess?.(); // ✅ 通知外层的 Granary.js 重新 fetchData()
-            }} cash={cashStore} userTemplate={userTemplateStore} defaultValues={editDfValue} />
+              </div>
+            </div>
           </DrawerContent>
         </Drawer>
       )}
