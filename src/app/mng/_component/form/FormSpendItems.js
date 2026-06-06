@@ -40,19 +40,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 
 import { slugify } from "transliteration";
 
-const cashList = [
-    {
-        label: "万日元",
-        value: "wjpy"
-    }, {
-        label: "台币",
-        value: "twd"
-    }, {
-        label: "人民币",
-        value: "cny"
-    }
-]
-
 const FormSpendItems = ({ trigger, openSpendCtrl, setOpenSpendCtrl, onSuccess, defaultValues = null, userInfo }) => {
 
     const [openSpend, setOpenSpend] = useState(false);
@@ -61,8 +48,6 @@ const FormSpendItems = ({ trigger, openSpendCtrl, setOpenSpendCtrl, onSuccess, d
     const form = useForm({
         defaultValues: {
             name: defaultValues?.label || "",
-            // dfValue: defaultValues?.children?.dfValue || 0,
-            isFixOnly: defaultValues?.children?.isFixOnly || 0,
         }
     });
 
@@ -82,10 +67,6 @@ const FormSpendItems = ({ trigger, openSpendCtrl, setOpenSpendCtrl, onSuccess, d
             const response = await ky.post('/api/constants/upsert', {
                 json: {
                     ...(defaultValues?.id && { id: defaultValues.id }),
-                    children: {
-                        // dfValue: values.dfValue,
-                        isFixOnly: values.isFixOnly
-                    },
                     ...(userInfo?.planet ? { planetId: userInfo.planet.id } : { userId: userInfo?.id }),
                     value: slugify(values.name, {
                         separator: "",
@@ -113,14 +94,6 @@ const FormSpendItems = ({ trigger, openSpendCtrl, setOpenSpendCtrl, onSuccess, d
                     <DialogHeader>
                         <DialogTitle>{defaultValues?.id ? "修改" : "新增"}</DialogTitle>
                     </DialogHeader>
-
-                    <Alert className="">
-                        <AlertTriangle className="h-4 w-4" />
-                        <AlertTitle>固定费用项目</AlertTitle>
-                        <AlertDescription>
-                            此条目群组内共享，设置个人值请在列表项目下部处修改
-                        </AlertDescription>
-                    </Alert>
 
                     <div className="w-full max-h-dvh overflow-y-auto overscroll-contain">
                         <Form {...form}>
@@ -174,7 +147,7 @@ const FormSpendItems = ({ trigger, openSpendCtrl, setOpenSpendCtrl, onSuccess, d
                                                 <FormMessage />
                                             </FormItem>
                                         )} /> */}
-                                    <FormField control={form.control} name="isFixOnly"
+                                    {/* <FormField control={form.control} name="isFixOnly"
                                         render={({ field }) => (
                                             <FormItem className="flex flex-row items-start items-center space-y-0">
                                                 <FormControl>
@@ -186,7 +159,7 @@ const FormSpendItems = ({ trigger, openSpendCtrl, setOpenSpendCtrl, onSuccess, d
                                                 </FormControl>
                                                 <FormLabel className="mr-0 text-muted-foreground">是否只是固定费用</FormLabel>
                                             </FormItem>
-                                        )} />
+                                        )} /> */}
                                 </FieldGroup>
                             </form>
                         </Form>

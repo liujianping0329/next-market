@@ -55,7 +55,8 @@ import { Pencil, Trash2 } from "lucide-react";
 import FormGranary from "@/app/money/garden/_component/form/FormGranary";
 import { useGranaryStore } from "@/app/money/garden/_store/granaryStore";
 import { getDiffClassName, formatDiff } from "@/app/utils/numDiff";
-import { useUserStore } from "@/app/money/garden/_store/userStore"
+import { useUserStore } from "@/app/money/garden/_store/userStore";
+import ActionButton from "@/components/ActionButton";
 
 const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
   const [userId, setUserId] = useState(false);
@@ -98,8 +99,8 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
     setEditOpen(true);
   };
 
-  const handleDelete = async () => {
-    if (!detail?.id || deleting) return;
+  const handleDelete = async (item) => {
+    if (!item?.id || deleting) return;
 
     const ok = window.confirm("确定删除？");
     if (!ok) return;
@@ -107,7 +108,7 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
     setDeleting(true);
     try {
       await ky.post("/api/spend/delete", {
-        json: { id: detail.id, userId },
+        json: { id: item.id },
       }).json();
 
       toast.success("删除成功");
@@ -145,6 +146,7 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
                         <span>日期: {item.date}</span>
                         <span>币种: {item.cashType}</span>
                         <span>用户: {item.userId}</span>
+                        <ActionButton icon={Trash2} onClick={() => handleDelete(item)} />
                       </div>
                     </div>
                     <div className="text-sm text-muted-foreground">类别: {item.category}</div>

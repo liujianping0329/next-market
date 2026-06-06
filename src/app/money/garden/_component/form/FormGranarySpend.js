@@ -62,6 +62,9 @@ function normalizeObjectNumbers(obj) {
 
 const cashList = [
     {
+        label: "日元",
+        value: "jpy"
+    }, {
         label: "万日元",
         value: "wjpy"
     }, {
@@ -89,7 +92,7 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
             category: defaultValues?.category || "30",
             title: defaultValues?.title || "",
             amount: defaultValues?.amount || "",
-            cashType: defaultValues?.cashType || "wjpy",
+            cashType: defaultValues?.cashType || "jpy",
         }
     });
 
