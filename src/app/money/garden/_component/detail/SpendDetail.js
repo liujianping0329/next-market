@@ -150,6 +150,7 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
                       </div>
                     </div>
                     <div className="text-sm text-muted-foreground">类别: {item.category}</div>
+                    <div className="text-sm text-muted-foreground">固定费用: {item.isFix ? '是' : '否'}</div>
                   </div>
                 ))}
               </div>
