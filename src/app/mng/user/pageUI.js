@@ -7,7 +7,7 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import GranaryItems from "../_component/list/GranaryItems";
-import SpendItems from "../_component/list/SpendItems";
+import SpendItemsUser from "../_component/list/SpendItemsUser";
 
 const configs = [{
     name: "冬藏园", value: "granary", isDefault: true, children:
@@ -15,7 +15,7 @@ const configs = [{
             {
                 name: "余额项目", value: "granaryItems"
             }, {
-                name: "支出项目", value: "spendItems"
+                name: "固定支出设置", value: "spendItems"
             }
         ]
 }];
@@ -100,7 +100,7 @@ const MngUserUI = ({ }) => {
                 ))}
             </div>
             {configsChildSel === "granaryItems" && userInfo && <GranaryItems userInfo={userInfo} />}
-            {configsChildSel === "spendItems" && userInfo && <SpendItems userInfo={userInfo} />}
+            {configsChildSel === "spendItems" && userInfo && <SpendItemsUser userInfo={userInfo} />}
         </>
     );
 }

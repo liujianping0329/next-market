@@ -46,10 +46,15 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 
+import { useGranaryStore } from "@/app/money/garden/_store/granaryStore";
 import { slugify } from "transliteration";
+import { title } from "process";
 
 const cashList = [
     {
+        label: "日元",
+        value: "jpy"
+    }, {
         label: "万日元",
         value: "wjpy"
     }, {
@@ -61,13 +66,15 @@ const cashList = [
     }
 ]
 
-const FormSpendPersonal = ({ trigger, openSpendPersonalCtrl, setOpenSpendPersonalCtrl, onSuccess, defaultValues = null, userInfo }) => {
+const FormSpendPersonal = ({ trigger, openSpendPersonalCtrl, setOpenSpendPersonalCtrl, onSuccess, defaultValues = null, userInfo, cash, spendCate }) => {
 
     const [openSpend, setOpenSpend] = useState(false);
     const [isLoadSpend, setIsLoadSpend] = useState(false);
     const [userId, setUserId] = useState(null);
     const form = useForm({
         defaultValues: {
+            spendCate: String(defaultValues?.spendCate) || "30",
+            title: defaultValues?.title || "",
             cost: defaultValues?.cost || "",
             cashType: defaultValues?.cashType || "wjpy",
         }
@@ -86,19 +93,15 @@ const FormSpendPersonal = ({ trigger, openSpendPersonalCtrl, setOpenSpendPersona
         setIsLoadSpend(true);
 
         try {
-            const response = await ky.post('/api/constants/upsert', {
+            const response = await ky.post('/api/spend/fix/upsert', {
                 json: {
                     ...(defaultValues?.id && { id: defaultValues.id }),
-                    children: {
-                        // dfValue: values.dfValue,
-                        isFixOnly: values.isFixOnly
-                    },
-                    ...(userInfo?.planet ? { planetId: userInfo.planet.id } : { userId: userInfo?.id }),
-                    value: slugify(values.name, {
-                        separator: "",
-                    }),
-                    category: "spendCate",
-                    label: values.name,
+                    userId,
+                    spendCate: values.spendCate,
+                    cost: values.cost,
+                    cashType: values.cashType,
+                    ...cash,
+                    title: values.title,
                 }
             }).json();
             onSuccess();
@@ -125,7 +128,39 @@ const FormSpendPersonal = ({ trigger, openSpendPersonalCtrl, setOpenSpendPersona
                         <Form {...form}>
                             <form onSubmit={form.handleSubmit(onSubmit)} id="formSpendPersonal" className="">
                                 <FieldGroup className="gap-4 my-4">
-
+                                    <FormField name="spendCate" control={form.control}
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>支出类型</FormLabel>
+                                                <FormControl>
+                                                    <Select onValueChange={(value) => {
+                                                        field.onChange(value);
+                                                    }} value={field.value}>
+                                                        <SelectTrigger className="w-full">
+                                                            <SelectValue></SelectValue>
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {spendCate.map(cate => (
+                                                                <SelectItem value={String(cate.id)} key={cate.id} className="font-medium">
+                                                                    {cate.label}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )} />
+                                    <FormField name="title" control={form.control}
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>标题</FormLabel>
+                                                <FormControl>
+                                                    <Input {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )} />
                                     <div className="grid grid-cols-6 gap-3">
                                         <FormField name="cost" control={form.control}
                                             render={({ field }) => (
