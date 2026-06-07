@@ -230,12 +230,12 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
                             </div>
                             {item.cashType !== "jpy" && (
                               <div className="grid grid-cols-[80px_44px] items-baseline pt-1 text-lg">
-                                <span className="text-right pl-2 text-left text-xs font-medium text-slate-400">
-                                  ({item.jpyCost}
+                                <span className="text-right pl-2 text-left text-xs font-medium text-gray-300">
+                                  {item.jpyCost}
                                 </span>
 
-                                <span className="pl-2 text-left text-xs font-medium text-slate-400">
-                                  jpy)
+                                <span className="pl-2 text-left text-xs font-medium text-gray-300">
+                                  jpy
                                 </span>
                               </div>
                             )}
