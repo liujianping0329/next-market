@@ -26,7 +26,6 @@ export async function POST(request, context) {
     lastQuery = lastQuery.lt("date", detail.date).order("date", { ascending: false }).limit(1).maybeSingle()
     const { data: lastData, error: lastDataErr } = await lastQuery;
 
-    console.log("lastData", lastData);
     if (lastData) {
         detail.granary_user_sum.forEach((userSum) => {
             let tarLastUserSum = lastData.granary_user_sum.find(item => item.userId === userSum.userId);

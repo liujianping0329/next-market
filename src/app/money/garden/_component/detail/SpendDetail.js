@@ -72,13 +72,14 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
   const fetchDetail = async () => {
     if (!target?.id) return;
 
-    const response = await ky.post("/api/spend/list/match", {
+    const response = await ky.post("/api/spend/detail", {
       json: {
+        userId: userInfoStore?.id,
         planetId: userInfoStore?.planetId,
       },
     }).json();
 
-    setDetail(response.list);
+    setDetail(response.detail);
   };
 
   useEffect(() => {
@@ -135,24 +136,109 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
               </div>
             </DrawerHeader>
 
-            <div className="flex-1 overflow-y-auto">
-              <div className="flex flex-col gap-4">
-                {detail.map((item, index) => (
-                  <div key={index} className="flex flex-col gap-2 rounded-lg border p-3">
-                    <div className="flex items-center gap-2 text-sm">
-                      <div className="font-medium">名称: {item.title}</div>
-                      <div className={`flex flex-col gap-1 font-mono ${getDiffClassName(item.amount)}`}>
-                        <span>金额: {formatDiff(item.amount)}</span>
-                        <span>日期: {item.date}</span>
-                        <span>币种: {item.cashType}</span>
-                        <span>用户: {item.userId}</span>
-                        <ActionButton icon={Trash2} onClick={() => handleDelete(item)} />
+            <div className="pb-5 flex flex-col bg-white overflow-y-auto">
+              {detail.map((spendCate) => {
+                return (
+                  <div key={spendCate.id} className="border-b border-slate-200">
+                    {/* 分类标题行 */}
+                    <div className="flex items-center justify-between border-b border-slate-100 px-3 py-4">
+                      <div className="flex items-center gap-3">
+                        <span
+                          className="h-3 w-3 rounded-full"
+                          style={{
+                            backgroundColor: spendCate.children?.bgColor || "#94A3B8",
+                          }}
+                        />
+                        <span className="text-xl font-bold text-slate-900">
+                          {spendCate.label}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-[44px_80px_44px] items-center text-base">
+                        <span className="text-right text-slate-500">
+                          共{spendCate.spends.length}笔
+                        </span>
+
+                        <span className="text-right font-medium text-red-500 tabular-nums">
+                          {spendCate.total}
+                        </span>
+                        <span className="pl-2 text-left text-xs font-medium text-slate-400">
+                          jpy
+                        </span>
                       </div>
                     </div>
-                    <div className="text-sm text-muted-foreground">类别: {item.category}</div>
-                    <div className="text-sm text-muted-foreground">固定费用: {item.isFix ? '是' : '否'}</div>
+
+                    {/* 分类下的每一条明细 */}
+                    <div className="divide-y divide-slate-100">
+                      {spendCate.spends.map((item) => (
+                        <div
+                          key={item.id}
+                          className="grid grid-cols-[72px_1fr_auto] items-start gap-4 px-3 py-4"
+                        >
+                          {/* 用户头像 + 用户名 */}
+                          <div className="flex flex-col items-center pt-1">
+                            <img
+                              src={item.f_user?.raw_user_meta_data?.avatar_url || "/default-avatar.png"}
+                              alt=""
+                              className="h-14 w-14 rounded-full object-cover"
+                            />
+
+                            <div
+                              className={`mt-1 max-w-[72px] truncate text-center text-xs font-medium`}
+                            >
+                              {item.f_user?.raw_user_meta_data?.name}
+                            </div>
+                          </div>
+
+                          {/* 中间内容 */}
+                          <div className="min-w-0">
+                            <div className="flex flex-col gap-0 text-lg font-semibold text-slate-900">
+                              <div>{item.title}</div>
+                              <div className=" grid grid-cols-1 gap-x-6 gap-y-1 text-sm text-green-700">
+                                {item.isFix ? "(固定费用)" : "　"}
+                              </div>
+                            </div>
+
+                            <div className="mt-2.5 text-base text-slate-500">
+                              {item.date?.slice(5)}
+                            </div>
+
+
+                          </div>
+
+                          {/* 右侧金额 */}
+                          <div className="grid grid-cols-[80px_44px] items-baseline pt-1 text-lg">
+                            <span className="text-right font-medium text-red-500 tabular-nums">
+                              {item.amount}
+                            </span>
+
+                            <span className="pl-2 text-left text-xs font-medium text-slate-400">
+                              {item.cashType}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                ))}
+                );
+              })}
+
+              {/* 总计行 */}
+              <div className="flex items-center justify-between px-3 py-4">
+                <span className="text-xl text-slate-700">总计</span>
+
+                <div className="grid grid-cols-[44px_80px_44px] items-center text-base">
+                  <span className="text-right text-slate-500">
+                    共{detail.length}笔
+                  </span>
+
+                  <span className="text-right font-medium text-red-500 tabular-nums">
+                    {detail.reduce((sum, item) => sum + Number(item.total || 0), 0)}
+                  </span>
+                  <span className="pl-2 text-left text-xs font-medium text-slate-400">
+                    jpy
+                  </span>
+                </div>
               </div>
             </div>
           </DrawerContent>

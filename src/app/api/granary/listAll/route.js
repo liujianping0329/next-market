@@ -36,7 +36,6 @@ export async function POST(request, context) {
             : null // 最后一个没有下一个
     }));
 
-    console.log("planetId:", planetId);
     let spendCate = await getContants({
         category: "spendCate",
         ...(planetId ? { planetId } : { userId }),
