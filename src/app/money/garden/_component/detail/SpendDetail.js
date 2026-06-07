@@ -142,7 +142,7 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
                 return (
                   <div key={spendCate.id} className="border-b border-slate-200">
                     {/* 分类标题行 */}
-                    <div className="flex items-center justify-between border-b border-slate-100 py-4">
+                    <div className="flex items-center justify-between border-b border-slate-100 py-3">
                       <div className="flex items-center gap-3">
                         <span
                           className="h-3 w-3 rounded-full"
@@ -150,7 +150,7 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
                             backgroundColor: spendCate.children?.bgColor || "#94A3B8",
                           }}
                         />
-                        <span className="grid grid-cols-[30px_60px] items-center text-base text-xl font-bold text-slate-900">
+                        <span className="grid grid-cols-[50px_40px] items-center text-base text-xl font-bold text-slate-900">
                           <span>{spendCate.label}</span>
                           <span className="text-right text-slate-500 text-sm">
                             共{spendCate.spends.length}笔
@@ -163,7 +163,7 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
 
                         </span>
 
-                        <span className="text-[20px] text-right font-medium text-red-500 tabular-nums">
+                        <span className="text-[24px] text-right font-medium text-red-500 tabular-nums">
                           {spendCate.total}
                         </span>
                         <span className="pl-2 text-left text-xs font-medium text-slate-400">
@@ -177,7 +177,7 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
                       {spendCate.spends.map((item) => (
                         <div
                           key={item.id}
-                          className="grid grid-cols-[72px_1fr_auto] items-start gap-2 py-4"
+                          className="grid grid-cols-[72px_1fr_auto] items-start gap-2 py-1.5"
                         >
                           {/* 用户头像 + 用户名 */}
                           <div className="flex flex-col items-center pt-1">
@@ -218,14 +218,27 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
                           </div>
 
                           {/* 右侧金额 */}
-                          <div className="grid grid-cols-[80px_44px] items-baseline pt-1 text-lg">
-                            <span className="text-right font-medium text-orange-300 tabular-nums">
-                              {item.amount}
-                            </span>
+                          <div className="flex flex-col">
+                            <div className="grid grid-cols-[80px_44px] items-baseline text-lg">
+                              <span className="text-right font-medium text-orange-300 tabular-nums">
+                                {item.amount}
+                              </span>
 
-                            <span className="pl-2 text-left text-xs font-medium text-slate-400">
-                              {item.cashType}
-                            </span>
+                              <span className="pl-2 text-left text-xs font-medium text-slate-400">
+                                {item.cashType}
+                              </span>
+                            </div>
+                            {item.cashType !== "jpy" && (
+                              <div className="grid grid-cols-[80px_44px] items-baseline pt-1 text-lg">
+                                <span className="text-right pl-2 text-left text-xs font-medium text-slate-400">
+                                  ({item.jpyCost}
+                                </span>
+
+                                <span className="pl-2 text-left text-xs font-medium text-slate-400">
+                                  jpy)
+                                </span>
+                              </div>
+                            )}
                           </div>
                         </div>
                       ))}
