@@ -145,7 +145,7 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
                     <div className="flex items-center justify-between border-b border-slate-100 py-3">
                       <div className="flex items-center gap-3">
                         <span
-                          className="h-3 w-3 rounded-full"
+                          className="h-6 w-3 rounded-full"
                           style={{
                             backgroundColor: spendCate.children?.bgColor || "#94A3B8",
                           }}
