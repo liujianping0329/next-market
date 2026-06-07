@@ -57,6 +57,7 @@ import { useGranaryStore } from "@/app/money/garden/_store/granaryStore";
 import { getDiffClassName, formatDiff } from "@/app/utils/numDiff";
 import { useUserStore } from "@/app/money/garden/_store/userStore";
 import ActionButton from "@/components/ActionButton";
+import { Tags } from "lucide-react";
 
 const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
   const [userId, setUserId] = useState(false);
@@ -141,7 +142,7 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
                 return (
                   <div key={spendCate.id} className="border-b border-slate-200">
                     {/* 分类标题行 */}
-                    <div className="flex items-center justify-between border-b border-slate-100 px-3 py-4">
+                    <div className="flex items-center justify-between border-b border-slate-100 py-4">
                       <div className="flex items-center gap-3">
                         <span
                           className="h-3 w-3 rounded-full"
@@ -149,17 +150,20 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
                             backgroundColor: spendCate.children?.bgColor || "#94A3B8",
                           }}
                         />
-                        <span className="text-xl font-bold text-slate-900">
-                          {spendCate.label}
+                        <span className="grid grid-cols-[30px_60px] items-center text-base text-xl font-bold text-slate-900">
+                          <span>{spendCate.label}</span>
+                          <span className="text-right text-slate-500 text-sm">
+                            共{spendCate.spends.length}笔
+                          </span>
                         </span>
                       </div>
 
                       <div className="grid grid-cols-[44px_80px_44px] items-center text-base">
                         <span className="text-right text-slate-500">
-                          共{spendCate.spends.length}笔
+
                         </span>
 
-                        <span className="text-right font-medium text-red-500 tabular-nums">
+                        <span className="text-[20px] text-right font-medium text-red-500 tabular-nums">
                           {spendCate.total}
                         </span>
                         <span className="pl-2 text-left text-xs font-medium text-slate-400">
@@ -173,14 +177,14 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
                       {spendCate.spends.map((item) => (
                         <div
                           key={item.id}
-                          className="grid grid-cols-[72px_1fr_auto] items-start gap-4 px-3 py-4"
+                          className="grid grid-cols-[72px_1fr_auto] items-start gap-2 py-4"
                         >
                           {/* 用户头像 + 用户名 */}
                           <div className="flex flex-col items-center pt-1">
                             <img
                               src={item.f_user?.raw_user_meta_data?.avatar_url || "/default-avatar.png"}
                               alt=""
-                              className="h-14 w-14 rounded-full object-cover"
+                              className="h-8 w-8 rounded-full object-cover"
                             />
 
                             <div
@@ -192,14 +196,21 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
 
                           {/* 中间内容 */}
                           <div className="min-w-0">
-                            <div className="flex flex-col gap-0 text-lg font-semibold text-slate-900">
-                              <div>{item.title}</div>
-                              <div className=" grid grid-cols-1 gap-x-6 gap-y-1 text-sm text-green-700">
-                                {item.isFix ? "(固定费用)" : "　"}
-                              </div>
+                            <div className="flex min-w-0 items-center gap-2 text-lg font-semibold text-slate-900">
+
+                              <span className="truncate text-[18px]">
+                                {item.title}
+                              </span>
+
+                              {item.isFix && (
+                                <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700 ring-1 ring-green-200">
+                                  <Tags className="h-3 w-3" />
+                                  固定
+                                </span>
+                              )}
                             </div>
 
-                            <div className="mt-2.5 text-base text-slate-500">
+                            <div className="mt-1 text-base text-slate-500">
                               {item.date?.slice(5)}
                             </div>
 
@@ -208,7 +219,7 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
 
                           {/* 右侧金额 */}
                           <div className="grid grid-cols-[80px_44px] items-baseline pt-1 text-lg">
-                            <span className="text-right font-medium text-red-500 tabular-nums">
+                            <span className="text-right font-medium text-orange-300 tabular-nums">
                               {item.amount}
                             </span>
 
@@ -222,24 +233,6 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
                   </div>
                 );
               })}
-
-              {/* 总计行 */}
-              <div className="flex items-center justify-between px-3 py-4">
-                <span className="text-xl text-slate-700">总计</span>
-
-                <div className="grid grid-cols-[44px_80px_44px] items-center text-base">
-                  <span className="text-right text-slate-500">
-                    共{detail.length}笔
-                  </span>
-
-                  <span className="text-right font-medium text-red-500 tabular-nums">
-                    {detail.reduce((sum, item) => sum + Number(item.total || 0), 0)}
-                  </span>
-                  <span className="pl-2 text-left text-xs font-medium text-slate-400">
-                    jpy
-                  </span>
-                </div>
-              </div>
             </div>
           </DrawerContent>
         </Drawer>
