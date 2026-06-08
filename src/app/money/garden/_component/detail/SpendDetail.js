@@ -58,6 +58,12 @@ import { getDiffClassName, formatDiff } from "@/app/utils/numDiff";
 import { useUserStore } from "@/app/money/garden/_store/userStore";
 import ActionButton from "@/components/ActionButton";
 import { Tags } from "lucide-react";
+import {
+  PieChart,
+  Pie,
+  Sector,
+  ResponsiveContainer,
+} from "recharts";
 
 const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
   const [userId, setUserId] = useState(false);
@@ -122,6 +128,49 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
       setDeleting(false);
     }
   };
+  const chartData = Array.isArray(detail)
+    ? detail.filter((cate) => cate.total && Number(cate.total) > 0).map((cate) => ({
+      name: cate.label,
+      value: Number(cate.total || 0),
+      color: cate.children?.bgColor || "#94A3B8",
+    }))
+    : [];
+  const PieSector = (props) => {
+    return <Sector {...props} fill={props.payload.color} />;
+  };
+  const renderPieLabel = ({
+    cx,
+    cy,
+    midAngle,
+    innerRadius,
+    outerRadius,
+    name,
+    value,
+    percent,
+  }) => {
+    if (!percent || percent < 0.08) return null;
+
+    const RADIAN = Math.PI / 180;
+    const radius = innerRadius + (outerRadius - innerRadius) * 0.58;
+    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+    return (
+      <text
+        x={x}
+        y={y}
+        textAnchor="middle"
+        dominantBaseline="central"
+        fill="#111827"
+        fontSize={12}
+        fontWeight={600}
+      >
+        <tspan x={x} dy="-1.1em">{name}</tspan>
+        <tspan x={x} dy="1.1em">{value}</tspan>
+        <tspan x={x} dy="1.1em">{Math.round(percent * 100)}%</tspan>
+      </text>
+    );
+  };
 
   return (
     <>
@@ -138,6 +187,27 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
             </DrawerHeader>
 
             <div className="pb-5 flex flex-col bg-white overflow-y-auto">
+              <div className="mx-auto flex h-[180px] w-full max-w-[390px] shrink-0 items-center">
+                <div className="h-full flex-1 min-w-0">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={chartData}
+                        dataKey="value"
+                        nameKey="name"
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={0}
+                        outerRadius={90}
+                        paddingAngle={1}
+                        labelLine={false}
+                        label={renderPieLabel}
+                        shape={<PieSector />}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
               {detail.map((spendCate) => {
                 return (
                   <div key={spendCate.id} className="border-b border-slate-200">
@@ -150,7 +220,7 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
                             backgroundColor: spendCate.children?.bgColor || "#94A3B8",
                           }}
                         />
-                        <span className="grid grid-cols-[50px_40px] items-center text-base text-xl font-bold text-slate-900">
+                        <span className="grid grid-cols-[50px_50px] items-center text-base text-xl font-bold text-slate-900">
                           <span>{spendCate.label}</span>
                           <span className="text-right text-slate-500 text-sm">
                             共{spendCate.spends.length}笔
