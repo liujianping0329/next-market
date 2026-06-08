@@ -186,7 +186,7 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
               </div>
             </DrawerHeader>
 
-            <div className="pb-5 flex flex-col bg-white overflow-y-auto">
+            <div className="pb-5 flex flex-col bg-white overflow-y-auto overflow-x-hidden">
               <div className="mx-auto flex h-[180px] w-full max-w-[390px] shrink-0 items-center">
                 <div className="h-full flex-1 min-w-0">
                   <ResponsiveContainer width="100%" height="100%">
