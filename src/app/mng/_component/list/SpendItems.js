@@ -75,8 +75,17 @@ const SpendItems = ({ userInfo }) => {
 
               <div className="min-w-0 flex-1">
                 <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0 line-clamp-1 text-base font-semibold text-gray-900">
-                    {item.label}
+                  <div className="flex min-w-0 items-center gap-2">
+                    <span
+                      className="h-5 w-1.5 shrink-0 rounded-full"
+                      style={{
+                        backgroundColor: item.children?.bgColor || "#94A3B8",
+                      }}
+                    />
+
+                    <span className="min-w-0 truncate text-base font-semibold text-gray-900">
+                      {item.label}
+                    </span>
                   </div>
 
                   <div className="flex shrink-0 items-center gap-1">

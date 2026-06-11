@@ -48,6 +48,7 @@ const FormSpendItems = ({ trigger, openSpendCtrl, setOpenSpendCtrl, onSuccess, d
     const form = useForm({
         defaultValues: {
             name: defaultValues?.label || "",
+            color: defaultValues?.children?.bgColor || "#94A3B8",
         }
     });
 
@@ -73,6 +74,10 @@ const FormSpendItems = ({ trigger, openSpendCtrl, setOpenSpendCtrl, onSuccess, d
                     }),
                     category: "spendCate",
                     label: values.name,
+                    children: {
+                        ...defaultValues?.children,
+                        bgColor: values.color
+                    }
                 }
             }).json();
             onSuccess();
@@ -127,16 +132,28 @@ const FormSpendItems = ({ trigger, openSpendCtrl, setOpenSpendCtrl, onSuccess, d
                                         </FormItem>
                                     )}
                                 /> */}
-                                    <FormField name="name" control={form.control}
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>条目名称</FormLabel>
-                                                <FormControl>
-                                                    <Input {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )} />
+                                    <div className="grid grid-cols-4 gap-3">
+                                        <FormField name="color" control={form.control}
+                                            render={({ field }) => (
+                                                <FormItem className="col-span-1">
+                                                    <FormLabel>颜色</FormLabel>
+                                                    <FormControl>
+                                                        <Input type="color" {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )} />
+                                        <FormField name="name" control={form.control}
+                                            render={({ field }) => (
+                                                <FormItem className="col-span-3">
+                                                    <FormLabel>条目名称</FormLabel>
+                                                    <FormControl>
+                                                        <Input {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )} />
+                                    </div>
                                     {/* <FormField name="dfValue" control={form.control}
                                         render={({ field }) => (
                                             <FormItem>
