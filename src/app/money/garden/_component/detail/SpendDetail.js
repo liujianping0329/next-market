@@ -171,6 +171,9 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
       </text>
     );
   };
+  const chartTotal = chartData.reduce((sum, item) => sum + item.value, 0);
+
+  const rankData = [...chartData].sort((a, b) => b.value - a.value);
 
   return (
     <>
@@ -206,6 +209,52 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
                       />
                     </PieChart>
                   </ResponsiveContainer>
+                </div>
+                <div className="h-full flex-1 min-w-0">
+                  <div className="flex h-full w-full shrink-0 flex-col rounded-xl bg-slate-50 pt-2">
+                    {/* 总额 */}
+                    <div className="mb-1.5 rounded-lg bg-white px-2 py-1.5 shadow-sm">
+                      <div className="flex items-baseline justify-between">
+                        <span className="text-[16px] font-medium">
+                          总额
+                        </span>
+
+                        <span className="text-lg font-bold text-red-500 tabular-nums">
+                          {(chartTotal / 10000).toFixed(1)}万円
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* 排行榜 */}
+                    <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+                      {rankData.map((item, index) => (
+                        <div
+                          key={item.name}
+                          className="mb-0.5 flex items-center gap-1.5 rounded-lg bg-white px-2 py-1.5 shadow-sm"
+                        >
+                          <span className="w-4 shrink-0 text-xs font-bold text-slate-400">
+                            {index + 1}
+                          </span>
+                          <span
+                            className="h-3 w-2 shrink-0 rounded-full"
+                            style={{ backgroundColor: item.color }}
+                          />
+
+                          <span className="w-[52px] shrink-0 truncate text-xs font-medium text-slate-700">
+                            {item.name}
+                          </span>
+                          <span className="w-11 shrink-0 text-left text-[11px] font-bold text-slate-500 tabular-nums">
+                            {chartTotal > 0 ? `${Math.round((item.value / chartTotal) * 100)}%` : "0%"}
+                          </span>
+
+                          <span className="flex-1 shrink-0 text-xs text-right font-semibold text-slate-900 tabular-nums">
+                            {(item.value / 10000).toFixed(1)}
+                          </span>
+
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
               {detail.map((spendCate) => {
