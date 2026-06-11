@@ -75,6 +75,7 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
 
   const cashStore = useGranaryStore(state => state.cash);
   const userInfoStore = useUserStore(state => state.userInfo);
+  const cateRefs = useRef({});
 
   const fetchDetail = async () => {
     if (!target?.id) return;
@@ -231,7 +232,12 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
                         <div
                           key={item.name}
                           className="mb-0.5 flex items-center gap-1.5 rounded-lg bg-white px-2 py-1.5 shadow-sm"
-                        >
+                          onClick={() => {
+                            cateRefs.current[item.name]?.scrollIntoView({
+                              behavior: "smooth",
+                              block: "start",
+                            });
+                          }}>
                           <span className="w-4 shrink-0 text-xs font-bold text-slate-400">
                             {index + 1}
                           </span>
@@ -259,7 +265,9 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
               </div>
               {detail.map((spendCate) => {
                 return (
-                  <div key={spendCate.id} className="border-b border-slate-200">
+                  <div key={spendCate.id} ref={(el) => {
+                    cateRefs.current[spendCate.label] = el;
+                  }} className="border-b border-slate-200">
                     {/* 分类标题行 */}
                     <div className="flex items-center justify-between border-b border-slate-100 py-3">
                       <div className="flex items-center gap-3">
