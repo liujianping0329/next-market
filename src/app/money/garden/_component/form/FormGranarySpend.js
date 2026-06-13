@@ -185,7 +185,7 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
                                                 <FormItem className="col-span-4">
                                                     <FormLabel>金额</FormLabel>
                                                     <FormControl>
-                                                        <Input {...field} />
+                                                        <Input type="number" {...field} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
