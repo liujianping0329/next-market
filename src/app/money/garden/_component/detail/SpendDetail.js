@@ -57,13 +57,18 @@ import { useGranaryStore } from "@/app/money/garden/_store/granaryStore";
 import { getDiffClassName, formatDiff } from "@/app/utils/numDiff";
 import { useUserStore } from "@/app/money/garden/_store/userStore";
 import ActionButton from "@/components/ActionButton";
-import { Tags } from "lucide-react";
+import { Tags, ChevronRight, ChevronLeft } from "lucide-react";
 import {
   PieChart,
   Pie,
   Sector,
   ResponsiveContainer,
 } from "recharts";
+import { Checkbox } from "@/components/ui/checkbox";
+import OpenCC from "opencc-js";
+
+const toCn = OpenCC.Converter({ from: "tw", to: "cn" });
+const toTw = OpenCC.Converter({ from: "cn", to: "tw" });
 
 const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
   const [userId, setUserId] = useState(false);
@@ -72,6 +77,8 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
   const [editOpen, setEditOpen] = useState(false);
   const [editDfValue, setEditDfValue] = useState([]);
   const [editVersion, setEditVersion] = useState(0);
+  const [mode, setMode] = useState("detail");
+  const [checkedIds, setCheckedIds] = useState([]);
 
   const cashStore = useGranaryStore(state => state.cash);
   const userInfoStore = useUserStore(state => state.userInfo);
@@ -87,7 +94,16 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
       },
     }).json();
 
-    setDetail(response.detail);
+    setDetail(
+      response.detail.map((cate) => ({
+        ...cate,
+        spends: cate.spends.map((spend) => ({
+          ...spend,
+          titleCn: toCn(spend.title || ""),
+          titleTw: toTw(spend.title || ""),
+        })),
+      }))
+    );
   };
 
   useEffect(() => {
@@ -176,13 +192,50 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
 
   const rankData = [...chartData].sort((a, b) => b.value - a.value);
 
+  const checkedTotal = Array.isArray(detail)
+    ? detail
+      .flatMap((cate) => cate.spends || [])
+      .filter((spend) => checkedIds.includes(spend.id))
+      .reduce((sum, spend) => sum + Number(spend.jpyCost), 0)
+    : 0;
+
+  const checkedPercent =
+    chartTotal > 0 ? (checkedTotal / chartTotal) * 100 : 0;
+
   return (
     <>
       {detail && (
         <Drawer open={open} onOpenChange={onOpenChange}>
           <DrawerContent className="h-[100dvh] flex flex-col px-4 pb-0">
-            <DrawerHeader className="pb-2">
-              <DrawerTitle className="text-xl font-semibold">详情</DrawerTitle>
+            <DrawerHeader className="pb-2 px-0">
+              <DrawerTitle className="text-xl font-semibold flex">
+                <div className="w-20 flex justify-start">
+                  {mode !== "detail" && <Button variant="ghost" size="sm" className={`h-auto px-1 py-1.5`}
+                    onClick={() => setMode("detail")}>
+                    <span className="flex items-center gap-1">
+                      <ChevronLeft className="h-7 w-7" />
+                      <span className="text-[13px] leading-none text-muted-foreground">
+                        总览
+                      </span>
+                    </span>
+                  </Button>}
+                </div>
+                <div className="flex-1 text-center">
+                  {mode === "play" && <span>演算纸</span>}
+                  {mode === "detail" && <span>总览</span>}
+                </div>
+                <div className="w-20 flex justify-end">
+                  {mode !== "play" && <Button variant="ghost" size="sm" className={`h-auto px-1 py-1.5`}
+                    onClick={() => setMode("play")}>
+                    <span className="flex items-center gap-1">
+                      <span className="text-[13px] leading-none text-muted-foreground">
+                        演算纸
+                      </span>
+                      <ChevronRight className="h-7 w-7" />
+                    </span>
+                  </Button>}
+                </div>
+              </DrawerTitle>
               <div className="space-y-2 text-sm text-muted-foreground">
                 <div className="flex flex-wrap justify-center gap-3">
                   <div>结算日:{detail.date}</div>
@@ -191,7 +244,7 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
             </DrawerHeader>
 
             <div className="pb-5 flex flex-col bg-white overflow-y-auto overflow-x-hidden">
-              <div className="mx-auto flex h-[180px] w-full max-w-[390px] shrink-0 items-center">
+              {mode === "detail" && <div className="mx-auto flex h-[180px] w-full max-w-[390px] shrink-0 items-center">
                 <div className="h-full flex-1 min-w-0">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
@@ -262,7 +315,28 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
                     </div>
                   </div>
                 </div>
-              </div>
+              </div>}
+
+              {mode === "play" && (
+                <div className="sticky top-0 z-10 mb-2 grid grid-cols-[1fr_auto_auto] items-center rounded-xl border border-slate-200 bg-white/95 px-4 py-3 shadow-sm backdrop-blur">
+                  <div className="text-sm font-semibold text-slate-600">
+                    已选合计
+                  </div>
+
+                  <div className="pr-5 text-base font-bold text-orange-500 tabular-nums">
+                    {checkedPercent.toFixed(1)}%
+                  </div>
+
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-2xl font-bold text-red-500 tabular-nums">
+                      {checkedTotal.toLocaleString()}
+                    </span>
+                    <span className="text-xs font-medium text-slate-400">
+                      jpy
+                    </span>
+                  </div>
+                </div>
+              )}
               {detail.map((spendCate) => {
                 return (
                   <div key={spendCate.id} ref={(el) => {
@@ -304,10 +378,31 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
                       {spendCate.spends.map((item) => (
                         <div
                           key={item.id}
-                          className="grid grid-cols-[72px_1fr_auto] items-start gap-2 py-1.5"
+                          className={`grid ${mode === "play"
+                            ? "grid-cols-[28px_72px_1fr_auto]"
+                            : "grid-cols-[72px_1fr_auto]"
+                            } items-start gap-2 py-1.5`}
+                          onClick={() => {
+                            if (mode === "play") {
+                              setCheckedIds((prev) =>
+                                prev.includes(item.id)
+                                  ? prev.filter((id) => id !== item.id)
+                                  : [...prev, ...detail.flatMap(item => item.spends || [])
+                                    .filter(spend => spend.title?.includes(item.title) ||
+                                      spend.titleCn?.includes(item.titleCn) ||
+                                      spend.titleTw?.includes(item.titleTw))
+                                    .map(spend => spend.id)]
+                              );
+                            }
+                          }}
                         >
+                          {mode === "play" && <div className="flex h-full items-center justify-center">
+                            <Checkbox className="border-2 border-slate-400"
+                              checked={checkedIds.includes(item.id)}
+                            />
+                          </div>}
                           {/* 用户头像 + 用户名 */}
-                          <div className="flex flex-col items-center pt-1">
+                          < div className="flex flex-col items-center pt-1" >
                             <img
                               src={item.f_user?.raw_user_meta_data?.avatar_url || "/default-avatar.png"}
                               alt=""
@@ -374,8 +469,8 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
                 );
               })}
             </div>
-          </DrawerContent>
-        </Drawer>
+          </DrawerContent >
+        </Drawer >
       )}
     </>
   );
