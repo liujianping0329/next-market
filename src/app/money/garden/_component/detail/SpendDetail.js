@@ -79,6 +79,7 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
   const [editVersion, setEditVersion] = useState(0);
   const [mode, setMode] = useState("detail");
   const [checkedIds, setCheckedIds] = useState([]);
+  const [checkMode, setCheckMode] = useState("single");
 
   const cashStore = useGranaryStore(state => state.cash);
   const userInfoStore = useUserStore(state => state.userInfo);
@@ -236,16 +237,21 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
                   </Button>}
                   {mode === "play" && <div className="flex gap-1">
                     <Button variant="outline" size="sm" className={`h-auto px-1 py-1.5 h-7 w-7`}
-                      onClick={() => { }}>
+                      onClick={() => setCheckedIds([])}>
                       <span className="flex items-center">
                         <RotateCcw className="h-12 w-12" />
                       </span>
                     </Button>
-                    <Button variant="outline" size="sm" className={`h-auto px-1 py-1.5 h-7 w-7`}
-                      onClick={() => { }}>
-                      <span className="flex items-center">
-                        <CopyCheck className="h-12 w-12" />
-                      </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className={`h-7 w-7 px-1 py-1.5 transition active:scale-95 ${checkMode === "multi"
+                        ? "bg-slate-900 text-white hover:bg-slate-800"
+                        : "active:bg-slate-200"
+                        }`}
+                      onClick={() => setCheckMode(prev => prev === "single" ? "multi" : "single")}
+                    >
+                      <CopyCheck className="h-4 w-4" />
                     </Button>
                   </div>}
                 </div>
@@ -401,11 +407,11 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
                               setCheckedIds((prev) =>
                                 prev.includes(item.id)
                                   ? prev.filter((id) => id !== item.id)
-                                  : [...prev, ...detail.flatMap(item => item.spends || [])
+                                  : (checkMode === "single" ? [...prev, item.id] : [...prev, ...detail.flatMap(item => item.spends || [])
                                     .filter(spend => spend.title?.includes(item.title) ||
                                       spend.titleCn?.includes(item.titleCn) ||
                                       spend.titleTw?.includes(item.titleTw))
-                                    .map(spend => spend.id)]
+                                    .map(spend => spend.id)])
                               );
                             }
                           }}
