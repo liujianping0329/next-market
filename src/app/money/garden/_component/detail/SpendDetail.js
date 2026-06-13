@@ -57,7 +57,7 @@ import { useGranaryStore } from "@/app/money/garden/_store/granaryStore";
 import { getDiffClassName, formatDiff } from "@/app/utils/numDiff";
 import { useUserStore } from "@/app/money/garden/_store/userStore";
 import ActionButton from "@/components/ActionButton";
-import { Tags, ChevronRight, ChevronLeft } from "lucide-react";
+import { Tags, ChevronRight, ChevronLeft, RotateCcw, CopyCheck } from "lucide-react";
 import {
   PieChart,
   Pie,
@@ -234,6 +234,20 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
                       <ChevronRight className="h-7 w-7" />
                     </span>
                   </Button>}
+                  {mode === "play" && <div className="flex gap-1">
+                    <Button variant="outline" size="sm" className={`h-auto px-1 py-1.5 h-7 w-7`}
+                      onClick={() => { }}>
+                      <span className="flex items-center">
+                        <RotateCcw className="h-12 w-12" />
+                      </span>
+                    </Button>
+                    <Button variant="outline" size="sm" className={`h-auto px-1 py-1.5 h-7 w-7`}
+                      onClick={() => { }}>
+                      <span className="flex items-center">
+                        <CopyCheck className="h-12 w-12" />
+                      </span>
+                    </Button>
+                  </div>}
                 </div>
               </DrawerTitle>
               <div className="space-y-2 text-sm text-muted-foreground">
