@@ -33,6 +33,7 @@ const Granary = ({ userInfo }) => {
     const [spendCate, setSpendCate] = useState(null);
     const [granaryList, setGranaryList] = useState([]);
     const [targetItemDetail, setTargetItemDetail] = useState(null);
+    const [targetPrevItemDetail, setTargetPrevItemDetail] = useState(null);
     const [openDetail, setOpenDetail] = useState(false);
     const [openSpendDetail, setOpenSpendDetail] = useState(false);
     const [detailVersion, setDetailVersion] = useState(0);
@@ -76,8 +77,9 @@ const Granary = ({ userInfo }) => {
         setDetailVersion(v => v + 1);
         setOpenDetail(true);
     }
-    const handleDetailSpend = (item) => {
+    const handleDetailSpend = (item, prevItem) => {
         setTargetItemDetail(item);
+        setTargetPrevItemDetail(prevItem);
         setDetailVersion(v => v + 1);
         setOpenSpendDetail(true);
     }
@@ -165,7 +167,8 @@ const Granary = ({ userInfo }) => {
                 </div>
             </div>
             <div id="cardContainer" className="flex flex-col p-4 gap-3">
-                {granaryList.map(item => {
+                {granaryList.map((item, index) => {
+                    const prevItem = index > 0 ? granaryList[index - 1] : null;
                     return (
                         <div key={item.id} className="flex gap-3 rounded-2xl border border-gray-200 bg-white p-3 transition hover:shadow-md">
                             <div className="flex flex-col h-32 w-24 shrink-0 overflow-hidden rounded-xl bg-gray-100">
@@ -200,7 +203,7 @@ const Granary = ({ userInfo }) => {
                                     <span>cny:{item.cnyToJpy} twd:{item.twdToJpy} usd:{item.usdToJpy}</span>
                                 </div>
                                 <div className="flex gap-4 justify-end">
-                                    <Button variant="outline" className="p-3" onClick={() => handleDetailSpend(item)}>
+                                    <Button variant="outline" className="p-3" onClick={() => handleDetailSpend(item, prevItem)}>
                                         <ChartColumn className="h-4 w-4" />
                                         <span>查支出</span>
                                     </Button>
@@ -223,7 +226,7 @@ const Granary = ({ userInfo }) => {
                 key={`${targetItemDetail?.id ?? "empty"}-${detailVersion}-spend`}
                 onSuccess={() => {
                     fetchData();
-                }} />
+                }} prevTar={targetPrevItemDetail} />
         </>
     );
 }

@@ -4,7 +4,7 @@ import supabase from "@/app/utils/database";
 import { getContants } from "@/app/api/constants/_lib/biz";
 
 export async function POST(request, context) {
-    const { planetId, userId, ...requestBody } = await request.json();
+    const { planetId, userId, gteDate, ltDateMaybe, ...requestBody } = await request.json();
 
     let query = supabase.from("spend").select("*,f_user(*)").match(requestBody).order("isFix", { ascending: false })
         .order("date", { ascending: false });
@@ -12,6 +12,12 @@ export async function POST(request, context) {
         query = query.eq("planetId", planetId);
     } else {
         query = query.eq("userId", userId);
+    }
+    if (gteDate) {
+        query = query.gte("date", gteDate);
+    }
+    if (ltDateMaybe) {
+        query = query.lt("date", ltDateMaybe);
     }
 
     let { data: spends, error } = await query;

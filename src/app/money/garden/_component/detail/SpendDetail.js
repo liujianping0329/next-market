@@ -37,7 +37,7 @@ import SpendMoreOpMenu from "@/app/money/garden/_component/detail/SpendMoreOpMen
 const toCn = OpenCC.Converter({ from: "tw", to: "cn" });
 const toTw = OpenCC.Converter({ from: "cn", to: "tw" });
 
-const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
+const SpendDetail = ({ open, onOpenChange, target, onSuccess, prevTar }) => {
   const [userId, setUserId] = useState(false);
   const [detail, setDetail] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
@@ -60,6 +60,8 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
       json: {
         userId: userInfoStore?.id,
         planetId: userInfoStore?.planetId,
+        gteDate: target.date,
+        ltDateMaybe: prevTar?.date,
       },
     }).json();
 
@@ -209,7 +211,7 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
               </DrawerTitle>
               <div className="space-y-2 text-sm text-muted-foreground">
                 <div className="flex flex-wrap justify-center gap-3">
-                  <div>结算日:{detail.date}</div>
+                  <div>结算周期:{target.date.slice(5)}~{prevTar?.date?.slice(5)}</div>
                 </div>
               </div>
             </DrawerHeader>
