@@ -1,12 +1,19 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  useEffect,
+  useState,
+} from "react";
 import { cn } from "@/lib/utils";
-import { ca, fi, id } from "date-fns/locale";
+
 import ky from "ky";
 import { Spinner } from "@/components/ui/spinner";
 import { Input } from "@/components/ui/input";
-import { Plus, X, Check } from "lucide-react";
+import {
+  Plus,
+  X,
+  Check,
+} from "lucide-react";
 import { slugify } from "transliteration";
 import { toast } from "sonner";
 

@@ -2,7 +2,10 @@ import { NextResponse } from "next/server";
 import supabase from "@/app/utils/database";
 
 import { applyPlanetFilter } from "@/app/utils/query";
-import { calGranaryTotal, outputOldSys } from "@/app/api/granary/_lib/biz";
+import {
+  calGranaryTotal,
+  outputOldSys,
+} from "@/app/api/granary/_lib/biz";
 
 export async function POST(request, context) {
     const { id, userId, date, cash, ...detail } = await request.json();

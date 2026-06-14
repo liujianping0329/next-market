@@ -1,6 +1,14 @@
-import { Filter, ArrowUpDown, ChevronDown, X } from "lucide-react";
+import {
+  Filter,
+  ArrowUpDown,
+  ChevronDown,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { cn } from "@/lib/utils";
 import FilterContent from "@/app/money/garden/_component/list/bar/FilterContent";
 

@@ -1,4 +1,4 @@
-import { Badge } from "@/components/ui/badge";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -6,7 +6,7 @@ import {
   CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle
+  CardTitle,
 } from "@/components/ui/card";
 
 import { formatDistanceToNow } from "date-fns";
@@ -14,14 +14,20 @@ import { zhCN } from "date-fns/locale";
 import ky from "ky";
 import { MapPin } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useState,
+} from "react";
 import FormGarden from "../form/FormGarden";
-import { useRouter } from "next/navigation"
-import { useGardenStore } from "@/store/gardenStore"
+import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
-import { gardenCategories, gardenCategoriesNoAll } from "@/app/money/garden/constants/gardenCategories";
+
 import ListBar from "@/app/money/garden/_component/list/bar/ListBar";
-import { SiTiktok, SiDazhongdianping, SiXiaohongshu, SiYoutube, SiGooglemaps, } from "react-icons/si";
+import {
+  SiTiktok,
+  SiDazhongdianping,
+  SiXiaohongshu,
+} from "react-icons/si";
 
 const Greengrass = ({ userInfo }) => {
   const [expanded, setExpanded] = useState(false);

@@ -1,14 +1,29 @@
 "use client";
 import supabase from "@/app/utils/database";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import ky from "ky";
-import { ArrowLeft, MessageSquarePlus, Pencil, Trash2, Orbit, Link as LinkIcon, ChevronRight } from "lucide-react";
+import {
+  ArrowLeft,
+  MessageSquarePlus,
+  Pencil,
+  Trash2,
+  Orbit,
+  Link as LinkIcon,
+} from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState, useCallback } from "react";
+import {
+  useEffect,
+  useState,
+  useCallback,
+} from "react";
 import FormNews from "./_component/form/FormNews";
 import ActionButton from "@/components/ActionButton";
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 import { Spinner } from "@/components/ui/spinner";
 
 export const revalidate = 0;

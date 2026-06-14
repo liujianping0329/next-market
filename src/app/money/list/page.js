@@ -1,6 +1,6 @@
-import ky from 'ky';
+
 import MoneyListUI from './pageUI';
-import supabase from '../../utils/database';
+
 export const revalidate = 0;
 export async function MoneyList () {
     const paraExchange = {

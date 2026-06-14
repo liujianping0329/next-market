@@ -1,55 +1,59 @@
 "use client";
-import { useEffect, useState } from "react";
-import { useRef } from "react";
+import {
+  useEffect,
+  useState,
+} from "react";
+
 import { useForm } from "react-hook-form";
 import {
-    Form,
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@/components/ui/form"
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { FieldGroup } from "@/components/ui/field";
 import {
-    Field,
-    FieldDescription,
-    FieldGroup,
-    FieldLabel,
-    FieldSet,
-    FieldSeparator
-} from "@/components/ui/field"
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
-import { Input } from "@/components/ui/input"
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import ky from "ky";
-import { Textarea } from "@/components/ui/textarea"
-
+import { Textarea } from "@/components/ui/textarea";
 import Datepicker from "@/components/datepicker";
-import PicUploader from "@/components/PicUploader";
+
 import PicUploaderAdvance from "@/components/PicUploaderAdvance";
-import { formatDateLocal, parseLocalDate } from "@/app/utils/date";
 import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger
+  formatDateLocal,
+  parseLocalDate,
+} from "@/app/utils/date";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import supabase from "@/app/utils/database";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
-import { SiTiktok, SiDazhongdianping, SiXiaohongshu, SiYoutube, SiGooglemaps, } from "react-icons/si";
+import {
+  SiTiktok,
+  SiDazhongdianping,
+  SiXiaohongshu,
+} from "react-icons/si";
 import { analyzePassCode } from "@/app/utils/passCode";
 
 const FormGarden = ({ trigger, onSuccess, categories, defaultValues = null }) => {

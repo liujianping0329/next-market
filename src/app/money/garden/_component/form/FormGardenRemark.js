@@ -1,47 +1,27 @@
 "use client";
-import { useEffect, useState } from "react";
-import { useRef } from "react";
+import { useState } from "react";
+
 import { useForm } from "react-hook-form";
 import {
-    Form,
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@/components/ui/form"
-import {
-    Field,
-    FieldDescription,
-    FieldGroup,
-    FieldLabel,
-    FieldSet,
-    FieldSeparator
-} from "@/components/ui/field"
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
-import { Input } from "@/components/ui/input"
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+import { FieldGroup } from "@/components/ui/field";
 import ky from "ky";
 import { Textarea } from "@/components/ui/textarea"
-
-import Datepicker from "@/components/datepicker";
 import StarBar from "@/components/StarBar";
-import { formatDateLocal, parseLocalDate } from "@/app/utils/date";
+
 import {
-    Drawer,
-    DrawerClose,
-    DrawerContent,
-    DrawerFooter,
-    DrawerHeader,
-    DrawerTitle,
-    DrawerTrigger
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";

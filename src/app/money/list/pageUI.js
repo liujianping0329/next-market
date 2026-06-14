@@ -1,41 +1,32 @@
 "use client";
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import {
-    Field,
-    FieldDescription,
-    FieldGroup,
-    FieldLabel,
-    FieldSet,
-    FieldSeparator
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog"
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
-    Table,
-    TableBody,
-    TableCaption,
-    TableCell,
-    TableFooter,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table"
-import { useEffect, useMemo, useState } from "react";
+  useEffect,
+  useState,
+} from "react";
 import ky from "ky";
 import FormX from "./_component/form/formX";
-import Bar, { toBarChartData } from "./_component/chart/bar";
+
 import FormL from "./_component/form/formL";
-import { Spinner } from "@/components/ui/spinner"
+import { Spinner } from "@/components/ui/spinner";
 import FormMemo from "./_component/form/formMemo";
 import { formatDateLocal } from "@/app/utils/date";
 

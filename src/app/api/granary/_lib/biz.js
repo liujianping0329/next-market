@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server";
-import { generateText, generateImage } from "ai";
-import { openai } from "@ai-sdk/openai";
+
+
+
 
 import supabase from "@/app/utils/database";
 

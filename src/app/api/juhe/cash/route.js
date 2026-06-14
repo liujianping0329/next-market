@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import supabase from "@/app/utils/database";
+
 
 export async function GET() {
     const paraExchange = {

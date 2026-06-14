@@ -1,52 +1,45 @@
 "use client";
+import { FieldGroup } from "@/components/ui/field";
 import {
-    Field,
-    FieldDescription,
-    FieldGroup,
-    FieldLabel,
-    FieldSet,
-    FieldSeparator
-} from "@/components/ui/field"
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import {
-    Form,
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@/components/ui/form"
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { useForm } from "react-hook-form";
-import { formatDateLocal } from "@/app/utils/date";
 import ky from "ky";
 import Datepicker from "@/components/datepicker";
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useState,
+} from "react";
 import supabase from "@/app/utils/database";
-import { parseLocalDate } from "@/app/utils/date";
-import { title } from "process";
-import { useUserStore } from "@/app/money/garden/_store/userStore"
-
+import {
+  formatDateLocal,
+  parseLocalDate,
+} from "@/app/utils/date";
+import { useUserStore } from "@/app/money/garden/_store/userStore";
 function normalizeObjectNumbers(obj) {
     return Object.fromEntries(
         Object.entries(obj).map(([key, value]) => {

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import supabase from "@/app/utils/database";
-import { error } from "console";
-import { REDIRECT_ERROR_CODE } from "next/dist/client/components/redirect-error";
+
+
 
 export async function POST(request, context) {
     const requestBody = await request.json();

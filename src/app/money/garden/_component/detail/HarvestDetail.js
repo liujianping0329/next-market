@@ -1,53 +1,18 @@
 "use client";
-import { useEffect, useState } from "react";
-import { useRef } from "react";
-import { useForm } from "react-hook-form";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-  FieldSet,
-  FieldSeparator
-} from "@/components/ui/field"
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Input } from "@/components/ui/input"
-import ky from "ky";
-import { Textarea } from "@/components/ui/textarea"
-
-import Datepicker from "@/components/datepicker";
-import StarBar from "@/components/StarBar";
-import { formatDateLocal, parseLocalDate } from "@/app/utils/date";
+import { useEffect } from "react";
 import {
   Drawer,
-  DrawerClose,
   DrawerContent,
-  DrawerFooter,
   DrawerHeader,
   DrawerTitle,
-  DrawerTrigger
 } from "@/components/ui/drawer";
-import { Spinner } from "@/components/ui/spinner";
-import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import FormHarvest from "@/app/money/garden/_component/form/FormHarvest";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from "@/components/ui/tabs";
 import GreengrassDetail from "@/app/money/garden/greengrass/_component/detail/GreengrassDetail"
 
 const HarvestDetail = ({ open, onOpenChange, target, onSuccess }) => {

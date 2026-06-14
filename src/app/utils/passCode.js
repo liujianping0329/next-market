@@ -1,4 +1,4 @@
-import { title } from "process";
+
 
 export const analyzePassCode = (passCode) => {
     const matchUrl = passCode.match(/https?:\/\/[^\s]+/);

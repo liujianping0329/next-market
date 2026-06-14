@@ -1,7 +1,9 @@
 "use client";
-import { Rating, RoundedStar } from '@smastrom/react-rating'
+import {
+  Rating,
+  RoundedStar,
+} from '@smastrom/react-rating';
 import '@smastrom/react-rating/style.css'
-import { useState } from 'react'
 
 const StarBar = ({ value, onChange }) => {
 

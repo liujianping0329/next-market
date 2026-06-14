@@ -1,12 +1,19 @@
 "use client";
 import supabase from "@/app/utils/database";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import ky from "ky";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import GranaryItems from "../_component/list/GranaryItems";
+import {
+  useEffect,
+  useState,
+} from "react";
+
 import SpendItems from "../_component/list/SpendItems";
 
 const configs = [{

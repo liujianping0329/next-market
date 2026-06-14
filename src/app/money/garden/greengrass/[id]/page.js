@@ -1,5 +1,4 @@
 import GreengrassDetail from "../_component/detail/GreengrassDetail";
-import ky from "ky"
 import supabase from "@/app/utils/database";
 
 export const dynamic = "force-dynamic";

@@ -1,21 +1,32 @@
-import { Spinner } from "@/components/ui/spinner";
-import { useEffect, useState } from "react";
-import FormSoy from "../form/FormSoy";
+
+import {
+  useEffect,
+  useState,
+} from "react";
+
 import { Button } from "@/components/ui/button";
 import ky from "ky";
 import { Check } from "lucide-react";
-import { FileSearch, ChevronRight } from "lucide-react";
-import { SearchCheck, BadgeDollarSign, ChartColumn, ReceiptText } from "lucide-react";
-import { pickColor } from "@/app/utils/color";
-import ActionButton from "@/components/ActionButton";
-import FolderOpBar from "./soy/FolderOpBar";
+import { ChevronRight } from "lucide-react";
+import {
+  SearchCheck,
+  BadgeDollarSign,
+  ChartColumn,
+  ReceiptText,
+} from "lucide-react";
+
+
+
 import FormGranary from "@/app/money/garden/_component/form/FormGranary";
 import FormGranarySpend from "@/app/money/garden/_component/form/FormGranarySpend";
 import GranaryDetail from "@/app/money/garden/_component/detail/GranaryDetail";
 import SpendDetail from "@/app/money/garden/_component/detail/SpendDetail";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useGranaryStore } from "@/app/money/garden/_store/granaryStore"
-
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar";
+import { useGranaryStore } from "@/app/money/garden/_store/granaryStore";
 const Granary = ({ userInfo }) => {
     const [cash, setCash] = useState(null);
     const [userTemplate, setUserTemplate] = useState(null);

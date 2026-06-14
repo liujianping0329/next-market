@@ -1,24 +1,36 @@
 "use client";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Info, Pencil, Trash2, Share2, ArrowLeft, BookOpenCheck, Landmark } from "lucide-react"
-import { useRouter } from "next/navigation"
-import { useEffect, useMemo, useState } from "react"
-import { useGardenStore } from "@/store/gardenStore"
-import { de } from "date-fns/locale";
+
+import {
+  Pencil,
+  Trash2,
+  ArrowLeft,
+  BookOpenCheck,
+  Landmark,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import {
+  useEffect,
+  useState,
+} from "react"
 import ky from "ky"
-import { Spinner } from "@/components/ui/spinner";
-import { toast } from "sonner"
+
+import { toast } from "sonner";
 import FormGarden from "@/app/money/garden/_component/form/FormGarden";
 import FormSoy from "@/app/money/garden/_component/form/FormSoy";
 import FormGardenRemark from "@/app/money/garden/_component/form/FormGardenRemark";
-import { gardenCategories, gardenCategoriesNoAll } from "@/app/money/garden/constants/gardenCategories";
-import { MapPin, MessageSquare, Sparkles, Loader2, KeyRound } from "lucide-react";
+
+import {
+  MapPin,
+  MessageSquare,
+  Sparkles,
+  KeyRound,
+} from "lucide-react";
 import ActionButton from "@/components/ActionButton";
 import ImageCarousel from "@/components/ImageCarousel";
 import FormHarvest from "@/app/money/garden/_component/form/FormHarvest";
 import { convertCateName } from "@/app/utils/data";
-import StarBar from "@/components/StarBar";
+
 
 const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips }) => {
   const router = useRouter()
