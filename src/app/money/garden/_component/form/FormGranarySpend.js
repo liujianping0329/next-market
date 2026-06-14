@@ -81,7 +81,6 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
 
     const form = useForm({
         defaultValues: {
-            ...(defaultValues?.id && { id: defaultValues.id }),
             date: defaultValues?.date ? parseLocalDate(defaultValues.date) : new Date(),
             category: String(defaultValues?.category) || "30",
             title: defaultValues?.title || "",
@@ -102,6 +101,7 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
         setIsLoadGranarySpend(true);
         await ky.post('/api/spend/upsert', {
             json: {
+                ...(defaultValues?.id && { id: defaultValues.id }),
                 date: formatDateLocal(values.date),
                 category: values.category,
                 title: values.title,
