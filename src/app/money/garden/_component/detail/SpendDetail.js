@@ -40,7 +40,6 @@ const toTw = OpenCC.Converter({ from: "cn", to: "tw" });
 const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
   const [userId, setUserId] = useState(false);
   const [detail, setDetail] = useState(false);
-  const [deleting, setDeleting] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [editDfValue, setEditDfValue] = useState([]);
   const [editVersion, setEditVersion] = useState(0);
@@ -88,33 +87,6 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
     fetchDetail();
   }, [target]);
 
-  const handleEdit = (detailList) => {
-    setEditDfValue({ date: detail.date, detailList });
-    setEditVersion(v => v + 1);
-    setEditOpen(true);
-  };
-
-  const handleDelete = async (item) => {
-    if (!item?.id || deleting) return;
-
-    const ok = window.confirm("确定删除？");
-    if (!ok) return;
-
-    setDeleting(true);
-    try {
-      await ky.post("/api/spend/delete", {
-        json: { id: item.id },
-      }).json();
-
-      toast.success("删除成功");
-      onOpenChange(false);
-      onSuccess?.();
-    } catch (error) {
-      toast.error("删除失败");
-    } finally {
-      setDeleting(false);
-    }
-  };
   const chartData = Array.isArray(detail)
     ? detail.filter((cate) => cate.total && Number(cate.total) > 0).map((cate) => ({
       name: cate.label,
@@ -177,6 +149,7 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
       return detail?.flatMap(item => item.spends || []).find(spend => spend.id === Number(e.currentTarget.dataset.no))
     },
     onLongPress: (item) => {
+      if (mode === "play") return;
       setMoreOpMenuOpen(true);
       setMoreOpMenuTarget(item);
     },

@@ -1,7 +1,7 @@
 
 import {
-  useEffect,
-  useState,
+    useEffect,
+    useState,
 } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -9,10 +9,10 @@ import ky from "ky";
 import { Check } from "lucide-react";
 import { ChevronRight } from "lucide-react";
 import {
-  SearchCheck,
-  BadgeDollarSign,
-  ChartColumn,
-  ReceiptText,
+    SearchCheck,
+    BadgeDollarSign,
+    ChartColumn,
+    ReceiptText,
 } from "lucide-react";
 
 
@@ -22,9 +22,9 @@ import FormGranarySpend from "@/app/money/garden/_component/form/FormGranarySpen
 import GranaryDetail from "@/app/money/garden/_component/detail/GranaryDetail";
 import SpendDetail from "@/app/money/garden/_component/detail/SpendDetail";
 import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
+    Avatar,
+    AvatarFallback,
+    AvatarImage,
 } from "@/components/ui/avatar";
 import { useGranaryStore } from "@/app/money/garden/_store/granaryStore";
 const Granary = ({ userInfo }) => {
@@ -41,6 +41,7 @@ const Granary = ({ userInfo }) => {
 
     const setCashStore = useGranaryStore(state => state.setCash);
     const setUserTemplateStore = useGranaryStore(state => state.setUserTemplate);
+    const setSpendCateStore = useGranaryStore(state => state.setSpendCate);
 
     const fetchCash = async () => {
         const response = await ky.get('/api/juhe/cash').json();
@@ -62,6 +63,7 @@ const Granary = ({ userInfo }) => {
         setPlanetUsers(response.planetUsers ?? [])
         setUserTemplateStore(response.templateList)
         setSpendCate(response.spendCate ?? [])
+        setSpendCateStore(response.spendCate ?? [])
     }
 
     useEffect(() => {

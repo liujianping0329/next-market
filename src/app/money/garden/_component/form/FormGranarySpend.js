@@ -1,29 +1,29 @@
 "use client";
 import { FieldGroup } from "@/components/ui/field";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from "@/components/ui/select";
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import ky from "ky";
@@ -31,13 +31,13 @@ import Datepicker from "@/components/datepicker";
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import {
-  useEffect,
-  useState,
+    useEffect,
+    useState,
 } from "react";
 import supabase from "@/app/utils/database";
 import {
-  formatDateLocal,
-  parseLocalDate,
+    formatDateLocal,
+    parseLocalDate,
 } from "@/app/utils/date";
 import { useUserStore } from "@/app/money/garden/_store/userStore";
 function normalizeObjectNumbers(obj) {
@@ -82,7 +82,7 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
     const form = useForm({
         defaultValues: {
             date: defaultValues?.date ? parseLocalDate(defaultValues.date) : new Date(),
-            category: defaultValues?.category || "30",
+            category: String(defaultValues?.category) || "30",
             title: defaultValues?.title || "",
             amount: defaultValues?.amount || "",
             cashType: defaultValues?.cashType || "jpy",
