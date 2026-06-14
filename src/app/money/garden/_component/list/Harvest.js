@@ -26,6 +26,7 @@ import {
 import FormHarvest from "../form/FormHarvest";
 
 import MoreOpMenu from "@/app/money/garden/_component/list/harvest/MoreOpMenu";
+import useLongPress from "@/hooks/useLongPress";
 import HarvestDetail from "@/app/money/garden/_component/detail/HarvestDetail";
 
 import * as holiday_jp from "@holiday-jp/holiday_jp";
@@ -107,22 +108,16 @@ const Harvest = ({ userInfo, isUserReady }) => {
         { title: "哈尔滨游2", startDate: "2026-06-19" }
     ]
 
-    const timerRef = useRef(null);
-    const longPressHandle = {
-        startPress: (e) => {
-            clearTimeout(timerRef.current);
+    const longPressHandle = useLongPress({
+        getPayload: (e) => {
             const no = e.currentTarget.dataset.no;
-            const item = timelist[no];
-
-            timerRef.current = setTimeout(() => {
-                setMoreOpMenuOpen(true);
-                setMoreOpMenuTarget(item);
-            }, 500);
+            return timelist[no];
         },
-        endPress: () => {
-            clearTimeout(timerRef.current);
-        }
-    }
+        onLongPress: (item) => {
+            setMoreOpMenuOpen(true);
+            setMoreOpMenuTarget(item);
+        },
+    });
     const detailHandle = (e) => {
         const no = e.currentTarget.dataset.no;
         const item = timelist[no];
@@ -244,11 +239,7 @@ const Harvest = ({ userInfo, isUserReady }) => {
                                     className={`relative h-[50px] border rounded flex items-center justify-center select-none ${n.hidden ? "hidden" : ""
                                         } transition-all duration-150 active:bg-blue-100 active:scale-95`}
                                     onClick={detailHandle}
-                                    onPointerDown={longPressHandle.startPress}
-                                    onPointerUp={longPressHandle.endPress}
-                                    onPointerLeave={longPressHandle.endPress}
-                                    onPointerCancel={longPressHandle.endPress}
-                                    onContextMenu={(e) => e.preventDefault()}>
+                                    {...longPressHandle}>
                                     {/* 左侧正方形 */}
                                     {n.harvest?.[0]?.garden && (<div className="h-full aspect-square flex-shrink-0">
                                         <img
