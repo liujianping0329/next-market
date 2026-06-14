@@ -7,14 +7,11 @@ import {
   ToggleGroupItem,
 } from "@/components/ui/toggle-group";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import {
   useEffect,
   useState,
 } from "react";
-import Greengrass from "./_component/list/Greengrass";
-import Soybean from "./_component/list/Soybean";
-import Harvest from "./_component/list/Harvest";
-import Granary from "./_component/list/Granary";
 import supabase from "@/app/utils/database";
 import {
   CircleUser,
@@ -41,6 +38,19 @@ import { useUserStore } from "@/app/money/garden/_store/userStore";
 import ky from "ky"
 
 export const revalidate = 0;
+
+const Soybean = dynamic(() => import("./_component/list/Soybean"), {
+  ssr: false,
+});
+const Greengrass = dynamic(() => import("./_component/list/Greengrass"), {
+  ssr: false,
+});
+const Harvest = dynamic(() => import("./_component/list/Harvest"), {
+  ssr: false,
+});
+const Granary = dynamic(() => import("./_component/list/Granary"), {
+  ssr: false,
+});
 
 const GardenUI = ({ }) => {
     const [tab, setTab] = useState("Harvest");
