@@ -81,6 +81,7 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
 
     const form = useForm({
         defaultValues: {
+            ...(defaultValues?.id && { id: defaultValues.id }),
             date: defaultValues?.date ? parseLocalDate(defaultValues.date) : new Date(),
             category: String(defaultValues?.category) || "30",
             title: defaultValues?.title || "",
