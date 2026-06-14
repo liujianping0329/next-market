@@ -31,6 +31,8 @@ import {
 } from "recharts";
 import { Checkbox } from "@/components/ui/checkbox";
 import OpenCC from "opencc-js";
+import useLongPress from "@/hooks/useLongPress";
+import SpendMoreOpMenu from "@/app/money/garden/_component/detail/SpendMoreOpMenu";
 
 const toCn = OpenCC.Converter({ from: "tw", to: "cn" });
 const toTw = OpenCC.Converter({ from: "cn", to: "tw" });
@@ -45,6 +47,8 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
   const [mode, setMode] = useState("detail");
   const [checkedIds, setCheckedIds] = useState([]);
   const [checkMode, setCheckMode] = useState("single");
+  const [moreOpMenuOpen, setMoreOpMenuOpen] = useState(false);
+  const [moreOpMenuTarget, setMoreOpMenuTarget] = useState(null);
 
   const cashStore = useGranaryStore(state => state.cash);
   const userInfoStore = useUserStore(state => state.userInfo);
@@ -168,6 +172,15 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
   const checkedPercent =
     chartTotal > 0 ? (checkedTotal / chartTotal) * 100 : 0;
 
+  const longPressHandle = useLongPress({
+    getPayload: (e) => {
+      return detail?.flatMap(item => item.spends || []).find(spend => spend.id === Number(e.currentTarget.dataset.no))
+    },
+    onLongPress: (item) => {
+      setMoreOpMenuOpen(true);
+      setMoreOpMenuTarget(item);
+    },
+  });
   return (
     <>
       {detail && (
@@ -380,6 +393,7 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
                               );
                             }
                           }}
+                          {...longPressHandle} data-no={item.id}
                         >
                           {mode === "play" && <div className="flex h-full items-center justify-center">
                             <Checkbox className="border-2 border-slate-400"
@@ -457,6 +471,11 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess }) => {
           </DrawerContent >
         </Drawer >
       )}
+      <SpendMoreOpMenu open={moreOpMenuOpen} onOpenChange={setMoreOpMenuOpen} target={moreOpMenuTarget} onSuccess={
+        () => {
+          fetchDetail();
+        }
+      } />
     </>
   );
 };
