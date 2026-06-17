@@ -30,6 +30,11 @@ import ActionButton from "@/components/ActionButton";
 import ImageCarousel from "@/components/ImageCarousel";
 import FormHarvest from "@/app/money/garden/_component/form/FormHarvest";
 import { convertCateName } from "@/app/utils/data";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar";
 
 
 const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips }) => {
@@ -89,6 +94,41 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips }) => {
     navigator.clipboard.writeText(detail.passCode);
     toast.info("口令已复制到剪贴板")
   }
+
+  const normalizePics = (pics) => {
+    if (!pics) return [];
+
+    if (Array.isArray(pics)) {
+      return pics.flatMap(normalizePics);
+    }
+
+    if (typeof pics === "string") {
+      const text = pics.trim();
+
+      if (!text || text === "[]") return [];
+
+      if (text.startsWith("[") && text.endsWith("]")) {
+        try {
+          return normalizePics(JSON.parse(text));
+        } catch {
+          return [];
+        }
+      }
+
+      if (text.startsWith("http")) {
+        return [text];
+      }
+    }
+
+    return [];
+  };
+
+  const carouselImages = [
+    ...normalizePics(detail?.pics),
+    ...normalizePics(detail?.garden_remark?.map((remark) => remark.pics)),
+  ];
+  console.log(carouselImages);
+
   return (
     <>
       {showToolbar && detail && categories && <div id="toolBar" className="flex p-2.5 justify-between overflow-x-auto items-center border-b">
@@ -138,8 +178,7 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips }) => {
           } onSuccess={() => fetchDetail()} defaultValues={detail} />
       </div>}
 
-
-      <ImageCarousel images={detail?.pics} ratio={cssTips?.ImageCarousel?.ratio || 3 / 4} />
+      <ImageCarousel images={carouselImages} ratio={cssTips?.ImageCarousel?.ratio || 3 / 4} />
       {/* <img
           src={detail?.pics?.[0]}
           className="w-full aspect-[3/4] object-contain bg-white"
@@ -148,7 +187,7 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips }) => {
         {detail?.title}<br />
         {detail && `评分:${detail?.point}`}<br />
         {/* {detail && <StarBar value={detail?.point} />} */}
-        {detail && `点评:${detail?.remark}`}<br />
+        <br />
         {detail?.location?.name &&
           <Link href={detail?.location?.path} className="flex items-center gap-1 truncate">
             <MapPin className="h-3.5 w-3.5 shrink-0" />
@@ -169,6 +208,24 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips }) => {
               <div className="rounded-xl bg-sky-50 px-4 py-4">
                 <p className="whitespace-pre-wrap text-sm leading-7 text-gray-700">
                   {data?.ansJSON.desp || "暂无内容"}
+                </p>
+              </div>
+            </div>
+          ))}
+        </>
+      )}
+      {detail?.garden_remark?.length > 0 && (
+        <>
+          {detail.garden_remark.map((data, i) => (
+            <div key={data.id} className="rounded-2xl border bg-white p-5 shadow-sm pb-20">
+              <Avatar>
+                <AvatarImage src={data?.f_user.raw_user_meta_data.avatar_url} alt="img" />
+                <AvatarFallback>CN</AvatarFallback>
+              </Avatar>
+
+              <div className="rounded-xl bg-sky-50 px-4 py-4">
+                <p className="whitespace-pre-wrap text-sm leading-7 text-gray-700">
+                  {data?.remark}
                 </p>
               </div>
             </div>
