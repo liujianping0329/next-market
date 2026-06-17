@@ -102,24 +102,30 @@ export async function POST(request, context) {
             console.log(err);
             pushInfo.err = err;
         }
-        try {
-            pushInfoRemark = await ky.post(
-                "https://api.onesignal.com/notifications?c=push",
-                {
-                    headers: {
-                        Authorization: `Key ${process.env.ONESIGNAL_API_KEY}`,
-                    },
-                    json: oneSignalParaRemark,
-                }
-            ).json();
-        } catch (error) {
-            const err = await error.response.json();
-            console.log(err);
-            pushInfoRemark.err = err;
+        if (requestBody.gardenId) {
+            try {
+                pushInfoRemark = await ky.post(
+                    "https://api.onesignal.com/notifications?c=push",
+                    {
+                        headers: {
+                            Authorization: `Key ${process.env.ONESIGNAL_API_KEY}`,
+                        },
+                        json: oneSignalParaRemark,
+                    }
+                ).json();
+            } catch (error) {
+                const err = await error.response.json();
+                console.log(err);
+                pushInfoRemark.err = err;
+            }
+
+            await supabase.from('harvest').update({
+                remarkPushId: pushInfoRemark.id
+            }).eq("id", data.id);
         }
+
         await supabase.from('harvest').update({
-            pushId: pushInfo.id,
-            remarkPushId: pushInfoRemark.id
+            pushId: pushInfo.id
         }).eq("id", data.id);
     }
 
