@@ -1,8 +1,8 @@
 
 import {
-  useEffect,
-  useState,
-  useRef,
+    useEffect,
+    useState,
+    useRef,
 } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -14,13 +14,13 @@ import ky from "ky";
 
 import Datepicker from "@/components/datepicker";
 import {
-  pullToZero,
-  pullToHour,
-  diffHours,
-  formatDateLocal,
-  changeDay,
-  parseLocalDate,
-  changeHour,
+    pullToZero,
+    pullToHour,
+    diffHours,
+    formatDateLocal,
+    changeDay,
+    parseLocalDate,
+    changeHour,
 } from "@/app/utils/date";
 
 import FormHarvest from "../form/FormHarvest";
@@ -70,7 +70,6 @@ const Harvest = ({ userInfo, isUserReady }) => {
             json: {
                 startTime__gte: formatDateLocal(startTime0, "yyyy-MM-dd HH:mm"),
                 startTime__lt: formatDateLocal(endTime, "yyyy-MM-dd HH:mm"),
-                view: "harvestList",
                 ...(userInfo?.planet ? { planetId: userInfo.planet.id } : { userId: userInfo?.id })
             }
         }).json();
