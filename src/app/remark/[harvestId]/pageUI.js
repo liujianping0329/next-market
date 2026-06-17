@@ -19,18 +19,23 @@ import {
     FormControl,
     FormField,
     FormItem,
+    FormLabel,
     FormMessage,
 } from "@/components/ui/form";
 import { FieldGroup } from "@/components/ui/field";
 import ky from "ky";
 import { Textarea } from "@/components/ui/textarea"
 import StarBar from "@/components/StarBar";
+import PicUploaderAdvance from "@/components/PicUploaderAdvance";
+import { Spinner } from "@/components/ui/spinner";
 export const revalidate = 0;
 
 const RemarkUI = ({ harvest, defaultValues }) => {
     const [userInfo, setUserInfo] = useState(null);
     const [openGardenRemark, setOpenGardenRemark] = useState(false);
     const [isLoadGardenRemark, setIsLoadGardenRemark] = useState(false);
+
+    const [picUrls, setPicUrls] = useState([]);
 
     const form = useForm({
         defaultValues: {
@@ -115,17 +120,24 @@ const RemarkUI = ({ harvest, defaultValues }) => {
                             <FormField name="point" control={form.control}
                                 render={({ field }) => (
                                     <FormItem>
-                                        {/* <FormLabel>分数</FormLabel> */}
+                                        <FormLabel>分数</FormLabel>
                                         <FormControl>
                                             <StarBar {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
                                 )} />
+                            <FormItem>
+                                <FormLabel>图片上传</FormLabel>
+                                <FormControl>
+                                    <PicUploaderAdvance defaultPics={defaultValues?.pics} onChange={setPicUrls} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
                             <FormField name="remark" control={form.control}
                                 render={({ field }) => (
                                     <FormItem>
-                                        {/* <FormLabel>内容</FormLabel> */}
+                                        <FormLabel>内容</FormLabel>
                                         <FormControl>
                                             <Textarea {...field} className="min-h-[120px] resize-none"
                                                 onFocus={(e) => {
@@ -142,6 +154,11 @@ const RemarkUI = ({ harvest, defaultValues }) => {
                         </FieldGroup>
                     </form>
                 </Form>
+            </div>
+            <div className="flex gap-2 px-4">
+                <Button className="w-full" type="submit" form="formRemark" disabled={isLoadGardenRemark}>
+                    {isLoadGardenRemark && <Spinner />}保存
+                </Button>
             </div>
         </>
     );

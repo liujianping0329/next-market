@@ -1,25 +1,25 @@
 "use client";
 import {
-  useEffect,
-  useState,
+    useEffect,
+    useState,
 } from "react";
 
 import { useForm } from "react-hook-form";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
 } from "@/components/ui/form";
 import { FieldGroup } from "@/components/ui/field";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import ky from "ky";
@@ -28,31 +28,31 @@ import Datepicker from "@/components/datepicker";
 
 import PicUploaderAdvance from "@/components/PicUploaderAdvance";
 import {
-  formatDateLocal,
-  parseLocalDate,
+    formatDateLocal,
+    parseLocalDate,
 } from "@/app/utils/date";
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
 } from "@/components/ui/dialog";
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import supabase from "@/app/utils/database";
 import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
+    Alert,
+    AlertDescription,
+    AlertTitle,
 } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
 import {
-  SiTiktok,
-  SiDazhongdianping,
-  SiXiaohongshu,
+    SiTiktok,
+    SiDazhongdianping,
+    SiXiaohongshu,
 } from "react-icons/si";
 import { analyzePassCode } from "@/app/utils/passCode";
 
@@ -231,7 +231,7 @@ const FormGarden = ({ trigger, onSuccess, categories, defaultValues = null }) =>
                                         <FormMessage />
                                     </FormItem> */}
                                     <FormItem>
-                                        <FormLabel>图片测试上传</FormLabel>
+                                        <FormLabel>图片上传</FormLabel>
                                         <FormControl>
                                             <PicUploaderAdvance defaultPics={defaultValues?.pics} onChange={setPicUrls} />
                                         </FormControl>
