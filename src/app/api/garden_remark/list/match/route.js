@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server";
 import supabase from "@/app/utils/database";
 
+
 export async function POST(request, context) {
     const requestBody = await request.json();
-    const { data, error } = await supabase.from('f_user').upsert(requestBody).select();
-    return NextResponse.json({ id: data[0].id });
+
+    let query = supabase.from("garden_remark").select().match(requestBody);
+
+    const { data: matchList, error } = await query;
+    return NextResponse.json({ list: matchList });
 }

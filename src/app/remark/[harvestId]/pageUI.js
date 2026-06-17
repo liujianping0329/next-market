@@ -28,6 +28,7 @@ import { Textarea } from "@/components/ui/textarea"
 import StarBar from "@/components/StarBar";
 import PicUploaderAdvance from "@/components/PicUploaderAdvance";
 import { Spinner } from "@/components/ui/spinner";
+import { useRouter } from "next/navigation";
 export const revalidate = 0;
 
 const RemarkUI = ({ harvest, defaultValues }) => {
@@ -36,7 +37,7 @@ const RemarkUI = ({ harvest, defaultValues }) => {
     const [isLoadGardenRemark, setIsLoadGardenRemark] = useState(false);
 
     const [picUrls, setPicUrls] = useState([]);
-
+    const router = useRouter();
     const form = useForm({
         defaultValues: {
             point: defaultValues?.point || 3,
@@ -45,14 +46,18 @@ const RemarkUI = ({ harvest, defaultValues }) => {
     });
 
     const onSubmit = async (values) => {
-        // setIsLoadGardenRemark(true);
-        // await ky.post('/api/money/garden/upsert', {
-        //     json: { id: defaultValues?.id, ...values }
-        // }).json();
-        // onSuccess();
-        // setOpenGardenRemark(false);
-        // setIsLoadGardenRemark(false);
-        // form.reset();
+        setIsLoadGardenRemark(true);
+        await ky.post('/api/garden_remark/upsert', {
+            json: {
+                id: defaultValues?.id,
+                ...values,
+                pics: picUrls,
+                userId: userInfo.id,
+                gardenId: harvest.gardenId
+            }
+        }).json();
+        setIsLoadGardenRemark(false);
+        router.push(`/money/garden/greengrass/${harvest.gardenId}`)
     }
 
     useEffect(() => {
