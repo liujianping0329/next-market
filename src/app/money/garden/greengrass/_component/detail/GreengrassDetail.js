@@ -222,7 +222,7 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips }) => {
                 <AvatarImage src={data?.f_user.raw_user_meta_data.avatar_url} alt="img" />
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>
-
+              {data?.point}
               <div className="rounded-xl bg-sky-50 px-4 py-4">
                 <p className="whitespace-pre-wrap text-sm leading-7 text-gray-700">
                   {data?.remark}
