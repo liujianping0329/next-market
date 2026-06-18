@@ -14,6 +14,8 @@ import {
     DrawerHeader,
     DrawerTitle,
 } from "@/components/ui/drawer"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Label } from "@/components/ui/label"
 
 const PicUploaderAdvance = ({ defaultPics = [], onChange }) => {
     const fileInputRef = useRef(null)
@@ -21,6 +23,45 @@ const PicUploaderAdvance = ({ defaultPics = [], onChange }) => {
     const [pics, setPics] = useState(defaultPics)
     const [uploading, setUploading] = useState(false)
     const [deletingUrl, setDeletingUrl] = useState("")
+    const [cropType, setCropType] = useState("none")
+
+    const cropOptions = [
+        {
+            label: "不裁剪",
+            value: "none",
+            crop: null,
+        },
+        {
+            label: "正方形",
+            value: "square",
+            crop: {
+                x: 0,
+                y: 0,
+                width: 800,
+                height: 800,
+            },
+        },
+        {
+            label: "竖图 3:4",
+            value: "portrait",
+            crop: {
+                x: 0,
+                y: 0,
+                width: 900,
+                height: 1200,
+            },
+        },
+        {
+            label: "横图 4:3",
+            value: "landscape",
+            crop: {
+                x: 0,
+                y: 0,
+                width: 1200,
+                height: 900,
+            },
+        },
+    ]
 
     const updatePics = (updater) => {
         setPics((prev) => (typeof updater === "function" ? updater(prev) : updater))
@@ -31,6 +72,7 @@ const PicUploaderAdvance = ({ defaultPics = [], onChange }) => {
     }, [pics, onChange])
 
     const handleSelectFiles = async (event) => {
+        const selectedCrop = cropOptions.find((item) => item.value === cropType)?.crop
         const selectedFiles = Array.from(event.target.files || [])
         event.currentTarget.value = ""
 
@@ -46,7 +88,10 @@ const PicUploaderAdvance = ({ defaultPics = [], onChange }) => {
             const fd = new FormData()
 
             for (const file of selectedFiles) {
-                const compressed = await imageCompression(file, imgOptions)
+                const cropped = selectedCrop
+                    ? await cropImage(file, selectedCrop)
+                    : file
+                const compressed = await imageCompression(cropped, imgOptions)
                 fd.append("files", compressed)
             }
 
@@ -81,6 +126,55 @@ const PicUploaderAdvance = ({ defaultPics = [], onChange }) => {
 
     const isBusy = uploading || Boolean(deletingUrl)
 
+    const cropImage = (file, crop) => {
+        return new Promise((resolve, reject) => {
+            const img = new window.Image()
+            const url = URL.createObjectURL(file)
+
+            img.onload = () => {
+                const { x, y, width, height } = crop
+
+                const canvas = document.createElement("canvas")
+                canvas.width = width
+                canvas.height = height
+
+                const ctx = canvas.getContext("2d")
+
+                ctx.drawImage(
+                    img,
+                    x,
+                    y,
+                    width,
+                    height,
+                    0,
+                    0,
+                    width,
+                    height
+                )
+
+                canvas.toBlob((blob) => {
+                    URL.revokeObjectURL(url)
+
+                    if (!blob) {
+                        reject(new Error("图片裁剪失败"))
+                        return
+                    }
+
+                    resolve(new File([blob], file.name, {
+                        type: file.type || "image/jpeg",
+                    }))
+                }, file.type || "image/jpeg", 0.9)
+            }
+
+            img.onerror = () => {
+                URL.revokeObjectURL(url)
+                reject(new Error("图片读取失败"))
+            }
+
+            img.src = url
+        })
+    }
+
     return (
         <>
             <div className="flex items-center gap-3 rounded-md border border-gray-200 bg-gray-100 px-3 py-2">
@@ -99,13 +193,35 @@ const PicUploaderAdvance = ({ defaultPics = [], onChange }) => {
                     </DrawerHeader>
 
                     <div className="flex-1 min-h-0 overflow-y-auto px-4 pb-2">
-                        <div className="mb-4 flex items-center justify-between rounded-md border border-dashed border-gray-300 bg-gray-50 px-3 py-3">
-                            <div className="text-sm text-gray-600">
-                                已上传 {pics.length} 张图片
+                        <div className="mb-4 flex flex-col rounded-md border border-dashed border-gray-300 bg-gray-50 px-3 py-3">
+                            <div className="flex items-center justify-between">
+                                <div className="text-sm text-gray-600">
+                                    已上传 {pics.length} 张图片
+                                </div>
+                                <Button type="button" size="sm" onClick={() => fileInputRef.current?.click()} disabled={isBusy}>
+                                    {uploading ? "上传中..." : "选择图片"}
+                                </Button>
                             </div>
-                            <Button type="button" size="sm" onClick={() => fileInputRef.current?.click()} disabled={isBusy}>
-                                {uploading ? "上传中..." : "选择图片"}
-                            </Button>
+                            <div className="flex gap-2 mt-3 items-center justify-start">
+                                <div className="flex-1">
+                                    <RadioGroup
+                                        value={cropType}
+                                        onValueChange={setCropType}
+                                        className="flex flex-wrap gap-2"
+                                        disabled={isBusy}
+                                    >
+                                        {cropOptions.map((item) => (
+                                            <Label
+                                                key={item.value}
+                                                className="flex cursor-pointer items-center rounded-md border border-gray-200 bg-white px-2 py-1 text-sm text-gray-700 has-[[data-state=checked]]:border-slate-900 has-[[data-state=checked]]:bg-sky-100"
+                                            >
+                                                <RadioGroupItem className="sr-only" value={item.value} disabled={isBusy} />
+                                                <span>{item.label}</span>
+                                            </Label>
+                                        ))}
+                                    </RadioGroup>
+                                </div>
+                            </div>
                         </div>
 
                         <Input
