@@ -28,6 +28,8 @@ import {
   SiDazhongdianping,
   SiXiaohongshu,
 } from "react-icons/si";
+import { Search } from "lucide-react"
+import { Input } from "@/components/ui/input"
 
 const Greengrass = ({ userInfo }) => {
   const [expanded, setExpanded] = useState(false);
@@ -35,6 +37,7 @@ const Greengrass = ({ userInfo }) => {
   const [list, setList] = useState([]);
   const [categories, setCategories] = useState([]);
   const pathname = usePathname();
+  const [keyword, setKeyword] = useState("");
 
   const router = useRouter()
 
@@ -52,9 +55,22 @@ const Greengrass = ({ userInfo }) => {
     fetchData();
   }, [pathname]);
 
-  const filteredList = subCategory ? list.filter((item) => subCategory.includes("-") ?
-    item.category === subCategory : item.category.startsWith(subCategory)) : list;
-  console.log(filteredList)
+  const filteredList = list
+    .filter((item) => {
+      if (!subCategory) return true;
+
+      return subCategory.includes("-")
+        ? item.category === subCategory
+        : item.category.startsWith(subCategory);
+    })
+    .filter((item) => {
+      const text = keyword.trim().toLowerCase();
+
+      if (!text) return true;
+
+      return item.title?.toLowerCase().includes(text);
+    });
+
   return (
     <>
       <div id="toolBar" className="mx-2.5 mt-2 flex items-center justify-between rounded-md border bg-muted/40 px-2.5 py-2">
@@ -114,14 +130,26 @@ const Greengrass = ({ userInfo }) => {
             /> */}
           </span>
 
-          <div className="self-start">
+          <div className="sticky top-0 z-50 flex justify-between">
+            <div className="flex items-center gap-2 rounded-md border border-input bg-background px-3">
+              <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
+
+              <Input
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+                className="border-0 px-0 shadow-none focus-visible:ring-0"
+                placeholder="搜索..."
+              />
+            </div>
+
+
             <FormGarden trigger={
               <Button size="sm" variant="outline">新增记录</Button>
             } onSuccess={() => fetchData()} categories={categories} />
 
-            <Button size="sm" variant="outline" onClick={() => setExpanded(!expanded)}>
+            {/* <Button size="sm" variant="outline" onClick={() => setExpanded(!expanded)}>
               {expanded ? "全收起" : "全展开"}
-            </Button>
+            </Button> */}
           </div>
         </div>
       </div>

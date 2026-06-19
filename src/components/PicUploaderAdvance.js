@@ -27,7 +27,7 @@ const PicUploaderAdvance = ({ defaultPics = [], onChange }) => {
 
     const cropOptions = [
         {
-            label: "不裁剪",
+            label: "原图",
             value: "none",
             crop: null,
         },
