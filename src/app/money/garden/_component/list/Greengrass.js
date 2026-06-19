@@ -130,14 +130,14 @@ const Greengrass = ({ userInfo }) => {
             /> */}
           </span>
 
-          <div className="sticky top-0 z-50 flex justify-between">
+          <div className="flex justify-between items-center">
             <div className="flex items-center gap-2 rounded-md border border-input bg-background px-3">
               <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
 
               <Input
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
-                className="border-0 px-0 shadow-none focus-visible:ring-0"
+                className="h-[30px] border-0 px-0 shadow-none focus-visible:ring-0"
                 placeholder="搜索..."
               />
             </div>
