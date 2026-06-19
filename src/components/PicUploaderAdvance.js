@@ -17,6 +17,7 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label";
 import { normalizeObjectNumbers } from "@/app/utils/data";
+import MobileDebugPanel, { useMobileDebug } from "@/components/MobileDebugPanel"
 
 const PicUploaderAdvance = ({ defaultPics = [], onChange }) => {
     const fileInputRef = useRef(null)
@@ -26,6 +27,7 @@ const PicUploaderAdvance = ({ defaultPics = [], onChange }) => {
     const [deletingUrl, setDeletingUrl] = useState("")
     const [cropType, setCropType] = useState("none")
     const [cropOptions, setCropOptions] = useState([]);
+    const { logs, debugLog, clearLogs } = useMobileDebug()
 
     const updatePics = (updater) => {
         setPics((prev) => (typeof updater === "function" ? updater(prev) : updater))
@@ -95,29 +97,85 @@ const PicUploaderAdvance = ({ defaultPics = [], onChange }) => {
             const img = new window.Image()
             const url = URL.createObjectURL(file)
 
+            debugLog("[crop] file:", {
+                name: file.name,
+                type: file.type,
+                size: file.size,
+            })
+
+            debugLog("[crop] crop input:", crop)
+
             img.onload = () => {
-                const { x, y, width, height } = crop
+                debugLog("[crop] image loaded:", {
+                    imgWidth: img.width,
+                    imgHeight: img.height,
+                    naturalWidth: img.naturalWidth,
+                    naturalHeight: img.naturalHeight,
+                    complete: img.complete,
+                })
+
+                const { startX, startY, width, height } = crop
+
+                debugLog("[crop] crop values:", {
+                    x: startX,
+                    y: startY,
+                    width,
+                    height,
+                    xPlusWidth: startX + width,
+                    yPlusHeight: startY + height,
+                })
 
                 const canvas = document.createElement("canvas")
                 canvas.width = width
                 canvas.height = height
 
+                debugLog("[crop] canvas size:", {
+                    canvasWidth: canvas.width,
+                    canvasHeight: canvas.height,
+                })
+
                 const ctx = canvas.getContext("2d")
 
-                ctx.drawImage(
-                    img,
-                    x,
-                    y,
-                    width,
-                    height,
-                    0,
-                    0,
-                    width,
-                    height
-                )
+                debugLog("[crop] before drawImage:", {
+                    sx: startX,
+                    sy: startY,
+                    sw: width,
+                    sh: height,
+                    dx: 0,
+                    dy: 0,
+                    dw: width,
+                    dh: height,
+                })
+
+                try {
+                    ctx.drawImage(
+                        img,
+                        startX,
+                        startY,
+                        width,
+                        height,
+                        0,
+                        0,
+                        width,
+                        height
+                    )
+
+                    debugLog("[crop] drawImage success")
+                } catch (error) {
+                    debugLog("[crop] drawImage error:", error)
+                    URL.revokeObjectURL(url)
+                    reject(error)
+                    return
+                }
 
                 canvas.toBlob((blob) => {
                     URL.revokeObjectURL(url)
+
+                    debugLog("[crop] toBlob result:", {
+                        exists: !!blob,
+                        size: blob?.size,
+                        type: blob?.type,
+                    })
 
                     if (!blob) {
                         reject(new Error("图片裁剪失败"))
@@ -131,6 +189,7 @@ const PicUploaderAdvance = ({ defaultPics = [], onChange }) => {
             }
 
             img.onerror = () => {
+                debugLog("[crop] image load error")
                 URL.revokeObjectURL(url)
                 reject(new Error("图片读取失败"))
             }
@@ -252,6 +311,7 @@ const PicUploaderAdvance = ({ defaultPics = [], onChange }) => {
                             ))}
                         </div>
                     </div>
+                    <MobileDebugPanel logs={logs} onClear={clearLogs} />
 
                     <DrawerFooter className="pt-4">
                         <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={isBusy}>
