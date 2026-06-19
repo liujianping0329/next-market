@@ -1,40 +1,41 @@
 "use client";
 import Link from "next/link";
 
+import ky from "ky";
 import {
-  Pencil,
-  Trash2,
   ArrowLeft,
   BookOpenCheck,
   Landmark,
+  Pencil,
+  Trash2,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
   useEffect,
   useState,
-} from "react"
-import ky from "ky"
+} from "react";
 
-import { toast } from "sonner";
 import FormGarden from "@/app/money/garden/_component/form/FormGarden";
-import FormSoy from "@/app/money/garden/_component/form/FormSoy";
 import FormGardenRemark from "@/app/money/garden/_component/form/FormGardenRemark";
+import FormSoy from "@/app/money/garden/_component/form/FormSoy";
+import { toast } from "sonner";
 
-import {
-  MapPin,
-  MessageSquare,
-  Sparkles,
-  KeyRound,
-} from "lucide-react";
-import ActionButton from "@/components/ActionButton";
-import ImageCarousel from "@/components/ImageCarousel";
 import FormHarvest from "@/app/money/garden/_component/form/FormHarvest";
 import { convertCateName } from "@/app/utils/data";
+import ActionButton from "@/components/ActionButton";
+import ImageCarousel from "@/components/ImageCarousel";
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/avatar";
+import {
+  ExternalLink,
+  KeyRound,
+  LinkIcon,
+  MessageSquare,
+  Sparkles
+} from "lucide-react";
 
 
 const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips }) => {
@@ -179,58 +180,134 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips }) => {
       </div>}
 
       <ImageCarousel images={carouselImages} ratio={cssTips?.ImageCarousel?.ratio || 3 / 4} />
-      {/* <img
-          src={detail?.pics?.[0]}
-          className="w-full aspect-[3/4] object-contain bg-white"
-        /> */}
-      <p className="whitespace-pre-line pb-20">
-        {detail?.title}<br />
-        {detail && `评分:${detail?.point}`}<br />
-        {/* {detail && <StarBar value={detail?.point} />} */}
-        <br />
-        {detail?.location?.name &&
-          <Link href={detail?.location?.path} className="flex items-center gap-1 truncate">
-            <MapPin className="h-3.5 w-3.5 shrink-0" />
-            <span className="truncate">{detail?.location?.name}</span>
-          </Link>
-        }<br />
-        {detail?.content}
-      </p>
-      {detail?.garden_ai?.length > 0 && (
-        <>
-          {detail.garden_ai.map((data, i) => (
-            <div key={data.id} className="rounded-2xl border bg-white p-5 shadow-sm pb-20">
+      {detail && (
+        <main className="relative z-10 -mt-6 rounded-t-[28px] bg-background px-5 pt-7 pb-28">
+          {/* 标题 + 评分 */}
+          <section className="flex items-start justify-between gap-4">
+            <div className="min-w-0 flex-1">
+              <h1 className="text-3xl font-bold tracking-tight text-foreground">
+                {detail.title}
+              </h1>
+
+              <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                <span>{convertCateName(detail.category, categories) || "未分类"}</span>
+
+                {detail.price && (
+                  <>
+                    <span>・</span>
+                    <span>¥{detail.price} / 人</span>
+                  </>
+                )}
+              </div>
+            </div>
+
+            <div className="flex h-20 w-24 shrink-0 flex-col items-center justify-center rounded-xl bg-muted">
+              <div className="text-3xl font-bold">
+                {detail.point ? Number(detail.point).toFixed(1) : "0.0"}
+              </div>
+              <div className="mt-1 text-xs text-muted-foreground">评分</div>
+            </div>
+          </section>
+
+          {/* 地点 */}
+          {detail.location?.path && (
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Link
+                href={detail.location.path}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="
+        group inline-flex max-w-full items-center gap-1.5
+        rounded-full border border-sky-100 bg-sky-50/80
+        px-3 py-1.5 text-sm text-sky-700
+        shadow-sm transition
+        hover:border-sky-200 hover:bg-sky-100 hover:text-sky-800
+        active:scale-[0.98]
+      "
+              >
+                <LinkIcon className="h-3.5 w-3.5 shrink-0" />
+
+                <span className="truncate underline-offset-4 group-hover:underline">
+                  {detail.location.name || "查看原始链接"}
+                </span>
+
+                <ExternalLink className="h-3 w-3 shrink-0 opacity-70 transition group-hover:translate-x-0.5" />
+              </Link>
+            </div>
+          )}
+
+          {/* 内容 */}
+          {detail.content && (
+            <section className="mt-2">
+              <div className="rounded-2xl bg-muted/50 px-5 py-4">
+                <p className="whitespace-pre-wrap text-sm leading-8 text-muted-foreground">
+                  {detail.content}
+                </p>
+              </div>
+            </section>
+          )}
+
+          {/* AI 补充介绍 */}
+          {detail?.garden_ai?.length > 0 && (
+            <section className="mt-4 rounded-2xl bg-sky-50 px-5 py-5">
               <div className="mb-4 flex items-center gap-2 text-sky-700">
                 <Sparkles className="h-5 w-5" />
-                <h3 className="text-base font-semibold">AI 补充介绍</h3>
+                <h3 className="font-semibold">AI 补充介绍</h3>
               </div>
 
-              <div className="rounded-xl bg-sky-50 px-4 py-4">
-                <p className="whitespace-pre-wrap text-sm leading-7 text-gray-700">
-                  {data?.ansJSON.desp || "暂无内容"}
-                </p>
+              <p className="whitespace-pre-wrap text-sm leading-8 text-gray-700">
+                {detail.garden_ai[0]?.ansJSON?.desp || "暂无内容"}
+              </p>
+            </section>
+          )}
+
+          {/* 评论 */}
+          {detail?.garden_remark?.length > 0 && (
+            <section className="mt-8">
+              <div className="space-y-4">
+                {detail?.garden_remark?.length > 0 && (
+                  <section className="mt-8">
+                    <h3 className="mb-2 text-base font-semibold">
+                      用户评论（{detail.garden_remark.length}）
+                    </h3>
+
+                    <div className="divide-y">
+                      {detail.garden_remark.map((data) => (
+                        <div key={data.id} className="flex gap-3 py-5">
+                          <Avatar className="h-10 w-10 shrink-0">
+                            <AvatarImage
+                              src={data?.f_user?.raw_user_meta_data?.avatar_url}
+                              alt="img"
+                            />
+                            <AvatarFallback>CN</AvatarFallback>
+                          </Avatar>
+
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center justify-between gap-3">
+                              <span className="truncate text-sm font-medium">
+                                {data?.f_user?.raw_user_meta_data?.name || "用户"}
+                              </span>
+
+                              {data?.point && (
+                                <span className="shrink-0 text-xs text-yellow-500">
+                                  {"★".repeat(Number(data.point))}
+                                </span>
+                              )}
+                            </div>
+
+                            <p className="mt-2 whitespace-pre-wrap text-sm leading-7 text-muted-foreground">
+                              {data?.remark}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                )}
               </div>
-            </div>
-          ))}
-        </>
-      )}
-      {detail?.garden_remark?.length > 0 && (
-        <>
-          {detail.garden_remark.map((data, i) => (
-            <div key={data.id} className="rounded-2xl border bg-white p-5 shadow-sm pb-20">
-              <Avatar>
-                <AvatarImage src={data?.f_user.raw_user_meta_data.avatar_url} alt="img" />
-                <AvatarFallback>CN</AvatarFallback>
-              </Avatar>
-              {data?.point}
-              <div className="rounded-xl bg-sky-50 px-4 py-4">
-                <p className="whitespace-pre-wrap text-sm leading-7 text-gray-700">
-                  {data?.remark}
-                </p>
-              </div>
-            </div>
-          ))}
-        </>
+            </section>
+          )}
+        </main>
       )}
     </>
   );
