@@ -9,3 +9,17 @@ export const convertCateName = (gardenCate, cates) => {
     }
     return cates.find((c => c.value === gardenCate))?.label
 };
+
+export const normalizeObjectNumbers = (obj) => {
+    if (!obj) return obj;
+    return Object.fromEntries(
+        Object.entries(obj).map(([key, value]) => {
+            if (value === "") return [key, 0];
+            if (value instanceof Date) return [key, value];
+            if (typeof value === "string" && !Number.isNaN(Number(value))) {
+                return [key, Number(value)];
+            }
+            return [key, value];
+        })
+    );
+}

@@ -1,21 +1,21 @@
 "use client";
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { formatDateLocal } from "@/app/utils/date";
@@ -24,24 +24,12 @@ import Datepicker from "@/components/datepicker";
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
 import {
-  useEffect,
-  useState,
+    useEffect,
+    useState,
 } from "react";
 import supabase from "@/app/utils/database";
 import { parseLocalDate } from "@/app/utils/date";
-
-function normalizeObjectNumbers(obj) {
-    return Object.fromEntries(
-        Object.entries(obj).map(([key, value]) => {
-            if (value === "") return [key, 0];
-            if (value instanceof Date) return [key, value];
-            if (typeof value === "string" && !Number.isNaN(Number(value))) {
-                return [key, Number(value)];
-            }
-            return [key, value];
-        })
-    );
-}
+import { normalizeObjectNumbers } from "@/app/utils/data";
 
 const FormGranary = ({ trigger, openGranaryCtrl, setOpenGranaryCtrl, onSuccess, cash, defaultValues = null, userTemplate }) => {
 

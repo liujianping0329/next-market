@@ -15,7 +15,8 @@ import {
     DrawerTitle,
 } from "@/components/ui/drawer"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Label } from "@/components/ui/label"
+import { Label } from "@/components/ui/label";
+import { normalizeObjectNumbers } from "@/app/utils/data";
 
 const PicUploaderAdvance = ({ defaultPics = [], onChange }) => {
     const fileInputRef = useRef(null)
@@ -24,44 +25,7 @@ const PicUploaderAdvance = ({ defaultPics = [], onChange }) => {
     const [uploading, setUploading] = useState(false)
     const [deletingUrl, setDeletingUrl] = useState("")
     const [cropType, setCropType] = useState("none")
-
-    const cropOptions = [
-        {
-            label: "原图",
-            value: "none",
-            crop: null,
-        },
-        {
-            label: "正方形",
-            value: "square",
-            crop: {
-                x: 0,
-                y: 0,
-                width: 800,
-                height: 800,
-            },
-        },
-        {
-            label: "竖图 3:4",
-            value: "portrait",
-            crop: {
-                x: 0,
-                y: 0,
-                width: 900,
-                height: 1200,
-            },
-        },
-        {
-            label: "横图 4:3",
-            value: "landscape",
-            crop: {
-                x: 0,
-                y: 0,
-                width: 1200,
-                height: 900,
-            },
-        },
-    ]
+    const [cropOptions, setCropOptions] = useState([]);
 
     const updatePics = (updater) => {
         setPics((prev) => (typeof updater === "function" ? updater(prev) : updater))
@@ -72,7 +36,7 @@ const PicUploaderAdvance = ({ defaultPics = [], onChange }) => {
     }, [pics, onChange])
 
     const handleSelectFiles = async (event) => {
-        const selectedCrop = cropOptions.find((item) => item.value === cropType)?.crop
+        const selectedCrop = normalizeObjectNumbers(cropOptions.find((item) => item.value === cropType)?.children)
         const selectedFiles = Array.from(event.target.files || [])
         event.currentTarget.value = ""
 
@@ -174,6 +138,23 @@ const PicUploaderAdvance = ({ defaultPics = [], onChange }) => {
             img.src = url
         })
     }
+
+    const fetchData = async () => {
+        const response = await ky.post('/api/constants/list/match', {
+            json: {
+                category: "CameraCate"
+            }
+        }).json();
+        setCropOptions([{
+            label: "原图",
+            value: "none",
+            crop: null,
+        }, ...response.list]);
+    }
+
+    useEffect(() => {
+        fetchData();
+    }, []);
 
     return (
         <>

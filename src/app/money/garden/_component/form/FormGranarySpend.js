@@ -40,18 +40,6 @@ import {
     parseLocalDate,
 } from "@/app/utils/date";
 import { useUserStore } from "@/app/money/garden/_store/userStore";
-function normalizeObjectNumbers(obj) {
-    return Object.fromEntries(
-        Object.entries(obj).map(([key, value]) => {
-            if (value === "") return [key, 0];
-            if (value instanceof Date) return [key, value];
-            if (typeof value === "string" && !Number.isNaN(Number(value))) {
-                return [key, Number(value)];
-            }
-            return [key, value];
-        })
-    );
-}
 
 const cashList = [
     {
