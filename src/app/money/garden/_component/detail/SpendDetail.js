@@ -22,6 +22,7 @@ import {
   ChevronLeft,
   RotateCcw,
   CopyCheck,
+  CalendarPlus
 } from "lucide-react";
 import {
   PieChart,
@@ -188,25 +189,6 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess, prevTar }) => {
                       <ChevronRight className="h-7 w-7" />
                     </span>
                   </Button>}
-                  {mode === "play" && <div className="flex gap-1">
-                    <Button variant="outline" size="sm" className={`h-auto px-1 py-1.5 h-7 w-7`}
-                      onClick={() => setCheckedIds([])}>
-                      <span className="flex items-center">
-                        <RotateCcw className="h-12 w-12" />
-                      </span>
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className={`h-7 w-7 px-1 py-1.5 transition active:scale-95 ${checkMode === "multi"
-                        ? "bg-slate-900 text-white hover:bg-slate-800"
-                        : "active:bg-slate-200"
-                        }`}
-                      onClick={() => setCheckMode(prev => prev === "single" ? "multi" : "single")}
-                    >
-                      <CopyCheck className="h-4 w-4" />
-                    </Button>
-                  </div>}
                 </div>
               </DrawerTitle>
               <div className="space-y-2 text-sm text-muted-foreground">
@@ -291,22 +273,65 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess, prevTar }) => {
               </div>}
 
               {mode === "play" && (
-                <div className="sticky top-0 z-10 mb-2 grid grid-cols-[1fr_auto_auto] items-center rounded-xl border border-slate-200 bg-white/95 px-4 py-3 shadow-sm backdrop-blur">
-                  <div className="text-sm font-semibold text-slate-600">
-                    已选合计
+                <div className="sticky top-0 z-10 mb-2 rounded-xl border border-slate-200 bg-white/95 px-4 py-2 shadow-sm backdrop-blur">
+                  {/* 第一行：已选合计 */}
+                  <div className="grid grid-cols-[1fr_auto_auto] items-center">
+                    <div className="text-sm font-semibold text-slate-600">
+                      已选合计
+                    </div>
+
+                    <div className="pr-5 text-base font-bold text-orange-500 tabular-nums">
+                      {checkedPercent.toFixed(1)}%
+                    </div>
+
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-2xl font-bold text-red-500 tabular-nums">
+                        {checkedTotal.toLocaleString()}
+                      </span>
+                      <span className="text-xs font-medium text-slate-400">
+                        jpy
+                      </span>
+                    </div>
                   </div>
 
-                  <div className="pr-5 text-base font-bold text-orange-500 tabular-nums">
-                    {checkedPercent.toFixed(1)}%
-                  </div>
+                  {/* 第二行：操作按钮 */}
+                  <div className="flex items-center justify-between gap-2 border-t border-slate-100 pt-2">
+                    <Button variant="outline" size="sm" className={`h-auto px-1 py-1.5 h-7 w-7`}
+                      onClick={() => setCheckedIds([])}>
+                      <span className="flex items-center">
+                        <RotateCcw className="h-12 w-12" />
+                      </span>
+                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className={`px-1 py-1.5 transition active:scale-95 ${checkMode === "multi"
+                          ? "bg-slate-900 text-white hover:bg-slate-800"
+                          : "active:bg-slate-200"
+                          }`}
+                        onClick={() =>
+                          setCheckMode((prev) => (prev === "multi" ? "single" : "multi"))
+                        }
+                      >
+                        <CopyCheck className="h-4 w-4" />同名快选
+                      </Button>
 
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-2xl font-bold text-red-500 tabular-nums">
-                      {checkedTotal.toLocaleString()}
-                    </span>
-                    <span className="text-xs font-medium text-slate-400">
-                      jpy
-                    </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className={`px-1 py-1.5 transition active:scale-95 ${checkMode === "sameDate"
+                          ? "bg-slate-900 text-white hover:bg-slate-800"
+                          : "active:bg-slate-200"
+                          }`}
+                        onClick={() =>
+                          setCheckMode((prev) => (prev === "sameDate" ? "single" : "sameDate"))
+                        }
+                      >
+                        <CalendarPlus className="h-4 w-4" />同日快选
+                      </Button>
+                    </div>
+
                   </div>
                 </div>
               )}
@@ -360,11 +385,17 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess, prevTar }) => {
                               setCheckedIds((prev) =>
                                 prev.includes(item.id)
                                   ? prev.filter((id) => id !== item.id)
-                                  : (checkMode === "single" ? [...prev, item.id] : [...prev, ...detail.flatMap(item => item.spends || [])
+                                  : checkMode === "multi" ? [...prev, ...detail.flatMap(item => item.spends || [])
                                     .filter(spend => spend.title?.includes(item.title) ||
                                       spend.titleCn?.includes(item.titleCn) ||
                                       spend.titleTw?.includes(item.titleTw))
-                                    .map(spend => spend.id)])
+                                    .map(spend => spend.id)]
+
+                                    : checkMode === "sameDate" ? [...prev, ...detail.flatMap(item => item.spends || [])
+                                      .filter(spend => spend.date === item.date)
+                                      .map(spend => spend.id)]
+
+                                      : [...prev, item.id]
                               );
                             }
                           }}
