@@ -33,6 +33,7 @@ import { Button } from "@/components/ui/button";
 import {
     useEffect,
     useState,
+    useRef
 } from "react";
 import supabase from "@/app/utils/database";
 import {
@@ -66,11 +67,12 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
     const [userId, setUserId] = useState(null);
 
     const userInfoStore = useUserStore(state => state.userInfo);
+    const amountInputRef = useRef(null);
 
     const form = useForm({
         defaultValues: {
             date: defaultValues?.date ? parseLocalDate(defaultValues.date) : new Date(),
-            category: String(defaultValues?.category) || "30",
+            category: String(defaultValues?.category ?? "34"),
             title: defaultValues?.title || "",
             amount: defaultValues?.amount || "",
             cashType: defaultValues?.cashType || "jpy",
@@ -167,7 +169,17 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
                                                 <FormItem className="col-span-4">
                                                     <FormLabel>金额</FormLabel>
                                                     <FormControl>
-                                                        <Input type="number" {...field} />
+                                                        <Input
+                                                            type="number"
+                                                            value={field.value}
+                                                            onChange={field.onChange}
+                                                            onBlur={field.onBlur}
+                                                            name={field.name}
+                                                            ref={(el) => {
+                                                                field.ref(el);
+                                                                amountInputRef.current = el;
+                                                            }}
+                                                        />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -178,7 +190,10 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
                                                     <FormLabel>　</FormLabel>
                                                     <FormControl>
                                                         <Select onValueChange={field.onChange} value={field.value}>
-                                                            <SelectTrigger className="w-full">
+                                                            <SelectTrigger className="w-full"
+                                                                onPointerDownCapture={() => {
+                                                                    amountInputRef.current?.blur();
+                                                                }}>
                                                                 <SelectValue></SelectValue>
                                                             </SelectTrigger>
                                                             <SelectContent>
