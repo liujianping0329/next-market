@@ -72,7 +72,7 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
     const form = useForm({
         defaultValues: {
             date: defaultValues?.date ? parseLocalDate(defaultValues.date) : new Date(),
-            category: String(defaultValues?.category) || "30",
+            category: String(defaultValues?.category ?? "34"),
             title: defaultValues?.title || "",
             amount: defaultValues?.amount || "",
             cashType: defaultValues?.cashType || "jpy",
