@@ -34,6 +34,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import OpenCC from "opencc-js";
 import useLongPress from "@/hooks/useLongPress";
 import SpendMoreOpMenu from "@/app/money/garden/_component/detail/SpendMoreOpMenu";
+import MonthInfo from "@/components/MonthInfo";
 
 const toCn = OpenCC.Converter({ from: "tw", to: "cn" });
 const toTw = OpenCC.Converter({ from: "cn", to: "tw" });
@@ -165,30 +166,47 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess, prevTar }) => {
             <DrawerHeader className="pb-2 px-0">
               <DrawerTitle className="text-xl font-semibold flex">
                 <div className="w-20 flex justify-start">
-                  {mode !== "detail" && <Button variant="ghost" size="sm" className={`h-auto px-1 py-1.5`}
-                    onClick={() => setMode("detail")}>
+                  <Button variant="ghost" size="sm" className={`h-auto px-1 py-1.5`}
+                    onClick={() => {
+                      if (mode === "play") {
+                        setMode("detail")
+                      }
+                      if (mode === "detail") {
+                        setMode("month")
+                      }
+                    }}>
                     <span className="flex items-center gap-1">
-                      <ChevronLeft className="h-7 w-7" />
+                      {(mode === "play" || mode === "detail") && <ChevronLeft className="h-7 w-7" />}
                       <span className="text-[13px] leading-none text-muted-foreground">
-                        总览
+                        {mode === "play" && <>总览</>}
+                        {mode === "detail" && <>月报</>}
                       </span>
                     </span>
-                  </Button>}
+                  </Button>
                 </div>
                 <div className="flex-1 text-center">
                   {mode === "play" && <span>演算纸</span>}
                   {mode === "detail" && <span>总览</span>}
+                  {mode === "month" && <span>月报</span>}
                 </div>
                 <div className="w-20 flex justify-end">
-                  {mode !== "play" && <Button variant="ghost" size="sm" className={`h-auto px-1 py-1.5`}
-                    onClick={() => setMode("play")}>
+                  <Button variant="ghost" size="sm" className={`h-auto px-1 py-1.5`}
+                    onClick={() => {
+                      if (mode === "detail") {
+                        setMode("play")
+                      }
+                      if (mode === "month") {
+                        setMode("detail")
+                      }
+                    }}>
                     <span className="flex items-center gap-1">
                       <span className="text-[13px] leading-none text-muted-foreground">
-                        演算纸
+                        {mode === "detail" && <>演算纸</>}
+                        {mode === "month" && <>总览</>}
                       </span>
-                      <ChevronRight className="h-7 w-7" />
+                      {(mode === "detail" || mode === "month") && <ChevronRight className="h-7 w-7" />}
                     </span>
-                  </Button>}
+                  </Button>
                 </div>
               </DrawerTitle>
               <div className="space-y-2 text-sm text-muted-foreground">
@@ -199,6 +217,10 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess, prevTar }) => {
             </DrawerHeader>
 
             <div className="pb-5 flex flex-col bg-white overflow-y-auto overflow-x-hidden">
+              {mode === "month" && <div className="mx-auto flex h-[180px] w-full max-w-[390px] shrink-0 items-center">
+                <MonthInfo startDateStr={target.date}
+                  {...(prevTar?.date ? { endDateStr: prevTar.date } : {})} />
+              </div>}
               {mode === "detail" && <div className="mx-auto flex h-[180px] w-full max-w-[390px] shrink-0 items-center">
                 <div className="h-full flex-1 min-w-0">
                   <ResponsiveContainer width="100%" height="100%">
