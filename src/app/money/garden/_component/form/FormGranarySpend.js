@@ -178,7 +178,12 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
                                                     <FormLabel>　</FormLabel>
                                                     <FormControl>
                                                         <Select onValueChange={field.onChange} value={field.value}>
-                                                            <SelectTrigger className="w-full">
+                                                            <SelectTrigger className="w-full"
+                                                                onPointerDownCapture={() => {
+                                                                    if (document.activeElement instanceof HTMLInputElement) {
+                                                                        document.activeElement.blur();
+                                                                    }
+                                                                }}>
                                                                 <SelectValue></SelectValue>
                                                             </SelectTrigger>
                                                             <SelectContent>
