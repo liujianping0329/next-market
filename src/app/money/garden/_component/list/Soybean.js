@@ -1,17 +1,17 @@
 import { Spinner } from "@/components/ui/spinner";
 import {
-  useEffect,
-  useState,
+    useEffect,
+    useState,
 } from "react";
 import FormSoy from "../form/FormSoy";
 import { Button } from "@/components/ui/button";
 import ky from "ky";
 import {
-  Check,
-  Heart,
-  Loader2,
-  Plus,
-  Trash2,
+    Check,
+    Heart,
+    Loader2,
+    Plus,
+    Trash2,
 } from "lucide-react";
 import { pickColor } from "@/app/utils/color";
 
@@ -61,9 +61,9 @@ const Soybean = ({ userInfo }) => {
         setStatusFilter(prev => (prev === 2 ? 1 : 2));
     };
 
-    const toggleOptimistic = async (item) => {
+    const toggleOptimistic = async (item, folder) => {
         const id = item.id;
-        const nextStatus = item.status === "0" ? "1" : "0";
+        const nextStatus = item.status === "0" ? folder.status : "0";
 
         // 1) 立刻更新 UI（乐观更新）
         setList(prev =>
@@ -165,7 +165,7 @@ const Soybean = ({ userInfo }) => {
                                     );
                                 }
                                 return (
-                                    <div key={item.id} onClick={() => !syncing && toggleOptimistic(item)}
+                                    <div key={item.id} onClick={() => !syncing && toggleOptimistic(item, folder)}
                                         className="flex items-center gap-3 px-4 py-3 cursor-pointer transition">
                                         {icon}
                                         <span className={`text-sm transition ${pendingDelete ? "text-gray-400 line-through" : favorite ? "" : ""}`}>
