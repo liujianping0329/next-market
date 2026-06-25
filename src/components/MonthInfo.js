@@ -11,20 +11,37 @@ export default function MonthInfo({ startDateStr, endDateStr = formatDateLocal(n
   const getDateRangeArray = () => {
     const result = [];
 
-    let startDate = parseLocalDate(startDateStr);
+    const monthStartDate = parseLocalDate(startDateStr);
+    monthStartDate.setDate(1);
+
+    const monthEndDate = parseLocalDate(startDateStr);
+    monthEndDate.setMonth(monthEndDate.getMonth() + 1);
+    monthEndDate.setDate(0);
+
+    const startDate = parseLocalDate(startDateStr);
     const endDate = parseLocalDate(endDateStr);
 
-    while (startDate <= endDate) {
-      result.push({
-        dateDis: formatDateLocal(startDate).slice(8),
-        dateStr: formatDateLocal(startDate),
-      });
+    let currentDate = new Date(monthStartDate);
 
-      startDate = new Date(startDate);
-      startDate.setDate(startDate.getDate() + 1);
+    while (currentDate <= monthEndDate) {
+      const dateStr = formatDateLocal(currentDate);
+
+      const dateObj = {
+        dateDis: dateStr.slice(8),
+        dateStr,
+      };
+
+      if (currentDate < startDate || currentDate > endDate) {
+        dateObj.greyOut = 1;
+      }
+
+      result.push(dateObj);
+
+      currentDate = new Date(currentDate);
+      currentDate.setDate(currentDate.getDate() + 1);
     }
 
-    const firstDay = parseLocalDate(startDateStr).getDay();
+    const firstDay = monthStartDate.getDay();
 
     return [
       ...Array.from({ length: firstDay }, () => null),
@@ -41,10 +58,11 @@ export default function MonthInfo({ startDateStr, endDateStr = formatDateLocal(n
           </div>
         ))}
       </div>
-      <div className="mt-2 grid grid-cols-7 gap-2 text-center py-1 rounded-lg border border-slate-200 p-2">
+      <div className="my-2 grid grid-cols-7 gap-2 text-center py-1 rounded-lg border border-slate-200 p-2">
         {getDateRangeArray().map((item, i) => (
           <div key={i} className={`rounded-sm 
             ${i % 7 === 0 ? "text-red-500" : i % 7 === 6 ? "text-sky-500" : ""}
+            ${item?.greyOut === 1 ? "text-slate-300" : ""}
           ${selDate === item?.dateStr ? "bg-sky-200" : ""}
           `} >
             {item?.dateDis}

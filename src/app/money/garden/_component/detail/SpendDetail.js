@@ -217,7 +217,7 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess, prevTar }) => {
             </DrawerHeader>
 
             <div className="pb-5 flex flex-col bg-white overflow-y-auto overflow-x-hidden">
-              {mode === "month" && <div className="mx-auto flex h-[180px] w-full max-w-[390px] shrink-0 items-center">
+              {mode === "month" && <div className="mx-auto flex w-full max-w-[390px] shrink-0 items-center">
                 <MonthInfo startDateStr={target.date}
                   {...(prevTar?.date ? { endDateStr: prevTar.date } : {})} />
               </div>}
