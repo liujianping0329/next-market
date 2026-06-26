@@ -1,13 +1,10 @@
 import {
   formatDateLocal, parseLocalDate
 } from "@/app/utils/date";
-import {
-  useState,
-} from "react";
 
 const weekMap = ["日", "月", "火", "水", "木", "金", "土"]
-export default function MonthInfo({ startDateStr, endDateStr = formatDateLocal(new Date()) }) {
-  const [selDate, setSelDate] = useState(endDateStr);
+export default function MonthInfo({ startDateStr, endDateStr = formatDateLocal(new Date()), monthData, selDate, setSelDate }) {
+
   const getDateRangeArray = () => {
     const result = [];
 
@@ -63,7 +60,7 @@ export default function MonthInfo({ startDateStr, endDateStr = formatDateLocal(n
           <div key={i} className={`rounded-sm 
             ${i % 7 === 0 ? "text-red-500" : i % 7 === 6 ? "text-sky-500" : ""}
             ${item?.greyOut === 1 ? "text-slate-300" : ""}
-          ${selDate === item?.dateStr ? "bg-sky-200" : ""}
+          ${selDate === item?.dateStr ? "shadow-[inset_0_0_0_2px_rgb(14_165_233)]" : ""}
           `} >
             {item?.dateDis}
           </div>

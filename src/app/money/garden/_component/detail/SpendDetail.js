@@ -3,6 +3,7 @@ import {
   useEffect,
   useRef,
   useState,
+  useMemo
 } from "react";
 import ky from "ky";
 import {
@@ -12,7 +13,6 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
 import supabase from "@/app/utils/database";
 import { useGranaryStore } from "@/app/money/garden/_store/granaryStore";
 import { useUserStore } from "@/app/money/garden/_store/userStore";
@@ -35,6 +35,9 @@ import OpenCC from "opencc-js";
 import useLongPress from "@/hooks/useLongPress";
 import SpendMoreOpMenu from "@/app/money/garden/_component/detail/SpendMoreOpMenu";
 import MonthInfo from "@/components/MonthInfo";
+import {
+  formatDateLocal, changeDateStrDay
+} from "@/app/utils/date";
 
 const toCn = OpenCC.Converter({ from: "tw", to: "cn" });
 const toTw = OpenCC.Converter({ from: "cn", to: "tw" });
@@ -134,6 +137,53 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess, prevTar }) => {
       </text>
     );
   };
+  const monthData = useMemo(() => {
+    if (!Array.isArray(detail)) return [];
+
+    const dateMap = {};
+
+    detail.forEach((detailItem) => {
+      detailItem.spends?.forEach((spend) => {
+        if (spend.isFix) return false;
+        const date = spend.date;
+
+        if (!dateMap[date]) {
+          dateMap[date] = {
+            date,
+            total: 0,
+            detail: [],
+          };
+        }
+
+        dateMap[date].total += Number(spend.amount || 0);
+
+        let targetDetail = dateMap[date].detail.find(
+          (item) => item.id === detailItem.id
+        );
+
+        if (!targetDetail) {
+          targetDetail = {
+            ...detailItem,
+            total: 0,
+            spends: [],
+          };
+
+          dateMap[date].detail.push(targetDetail);
+        }
+
+        targetDetail.total += Number(spend.jpyCost || 0);
+        targetDetail.spends.push(spend);
+      });
+    });
+
+    return Object.values(dateMap)
+      .map((item) => ({
+        ...item,
+        total: Number(item.total.toFixed(0)),
+      }))
+      .sort((a, b) => a.date.localeCompare(b.date));
+  }, [detail]);
+
   const chartTotal = chartData.reduce((sum, item) => sum + item.value, 0);
 
   const rankData = [...chartData].sort((a, b) => b.value - a.value);
@@ -158,6 +208,15 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess, prevTar }) => {
       setMoreOpMenuTarget(item);
     },
   });
+
+  const [selDate, setSelDate] = useState(() => formatDateLocal(new Date()));
+
+  useEffect(() => {
+    if (!prevTar?.date) return;
+
+    setSelDate(changeDateStrDay(prevTar.date, -1));
+  }, [prevTar?.date]);
+
   return (
     <>
       {detail && (
@@ -211,7 +270,7 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess, prevTar }) => {
               </DrawerTitle>
               <div className="space-y-2 text-sm text-muted-foreground">
                 <div className="flex flex-wrap justify-center gap-3">
-                  <div>结算周期:{target.date.slice(5)}~{prevTar?.date?.slice(5)}</div>
+                  <div>结算周期:{target.date.slice(5)}~{prevTar ? changeDateStrDay(prevTar?.date, -1).slice(5) : ""}</div>
                 </div>
               </div>
             </DrawerHeader>
@@ -219,7 +278,8 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess, prevTar }) => {
             <div className="pb-5 flex flex-col bg-white overflow-y-auto overflow-x-hidden">
               {mode === "month" && <div className="mx-auto flex w-full max-w-[390px] shrink-0 items-center">
                 <MonthInfo startDateStr={target.date}
-                  {...(prevTar?.date ? { endDateStr: prevTar.date } : {})} />
+                  {...(prevTar?.date ? { endDateStr: changeDateStrDay(prevTar?.date, -1) } : {})}
+                  monthData={monthData} selDate={selDate} setSelDate={setSelDate} />
               </div>}
               {mode === "detail" && <div className="mx-auto flex h-[180px] w-full max-w-[390px] shrink-0 items-center">
                 <div className="h-full flex-1 min-w-0">
@@ -358,6 +418,12 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess, prevTar }) => {
                 </div>
               )}
               {detail.map((spendCate) => {
+                if (mode === "month") {
+                  var selDateData = monthData.find(t => t.date === selDate)
+                  if (!selDateData) return null;
+                  var selDateCate = selDateData?.detail.find(t => t.id === spendCate.id)
+                  if (!selDateCate) return null;
+                }
                 return (
                   <div key={spendCate.id} ref={(el) => {
                     cateRefs.current[spendCate.label] = el;
@@ -395,102 +461,104 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess, prevTar }) => {
 
                     {/* 分类下的每一条明细 */}
                     <div className="divide-y divide-slate-100">
-                      {spendCate.spends.map((item) => (
-                        <div
-                          key={item.id}
-                          className={`grid ${mode === "play"
-                            ? "grid-cols-[28px_72px_1fr_auto]"
-                            : "grid-cols-[72px_1fr_auto]"
-                            } items-start gap-2 py-1.5`}
-                          onClick={() => {
-                            if (mode === "play") {
-                              setCheckedIds((prev) =>
-                                prev.includes(item.id)
-                                  ? prev.filter((id) => id !== item.id)
-                                  : checkMode === "multi" ? [...prev, ...detail.flatMap(item => item.spends || [])
-                                    .filter(spend => spend.title?.includes(item.title) ||
-                                      spend.titleCn?.includes(item.titleCn) ||
-                                      spend.titleTw?.includes(item.titleTw))
-                                    .map(spend => spend.id)]
+                      {spendCate.spends.map((item) => {
 
-                                    : checkMode === "sameDate" ? [...prev, ...detail.flatMap(item => item.spends || [])
-                                      .filter(spend => spend.date === item.date)
+                        return (
+                          <div
+                            key={item.id}
+                            className={`grid ${mode === "play"
+                              ? "grid-cols-[28px_72px_1fr_auto]"
+                              : "grid-cols-[72px_1fr_auto]"
+                              } items-start gap-2 py-1.5`}
+                            onClick={() => {
+                              if (mode === "play") {
+                                setCheckedIds((prev) =>
+                                  prev.includes(item.id)
+                                    ? prev.filter((id) => id !== item.id)
+                                    : checkMode === "multi" ? [...prev, ...detail.flatMap(item => item.spends || [])
+                                      .filter(spend => spend.title?.includes(item.title) ||
+                                        spend.titleCn?.includes(item.titleCn) ||
+                                        spend.titleTw?.includes(item.titleTw))
                                       .map(spend => spend.id)]
 
-                                      : [...prev, item.id]
-                              );
-                            }
-                          }}
-                          {...longPressHandle} data-no={item.id}
-                        >
-                          {mode === "play" && <div className="flex h-full items-center justify-center">
-                            <Checkbox className="border-2 border-slate-400"
-                              checked={checkedIds.includes(item.id)}
-                            />
-                          </div>}
-                          {/* 用户头像 + 用户名 */}
-                          < div className="flex flex-col items-center pt-1" >
-                            <img
-                              src={item.f_user?.raw_user_meta_data?.avatar_url || "/default-avatar.png"}
-                              alt=""
-                              className="h-8 w-8 rounded-full object-cover"
-                            />
+                                      : checkMode === "sameDate" ? [...prev, ...detail.flatMap(item => item.spends || [])
+                                        .filter(spend => spend.date === item.date)
+                                        .map(spend => spend.id)]
 
-                            <div
-                              className={`mt-1 max-w-[72px] truncate text-center text-xs font-medium`}
-                            >
-                              {item.f_user?.raw_user_meta_data?.name}
-                            </div>
-                          </div>
+                                        : [...prev, item.id]
+                                );
+                              }
+                            }}
+                            {...longPressHandle} data-no={item.id}
+                          >
+                            {mode === "play" && <div className="flex h-full items-center justify-center">
+                              <Checkbox className="border-2 border-slate-400"
+                                checked={checkedIds.includes(item.id)}
+                              />
+                            </div>}
+                            {/* 用户头像 + 用户名 */}
+                            < div className="flex flex-col items-center pt-1" >
+                              <img
+                                src={item.f_user?.raw_user_meta_data?.avatar_url || "/default-avatar.png"}
+                                alt=""
+                                className="h-8 w-8 rounded-full object-cover"
+                              />
 
-                          {/* 中间内容 */}
-                          <div className="min-w-0">
-                            <div className="flex min-w-0 items-center gap-2 text-lg font-semibold text-slate-900">
-
-                              <span className="truncate text-[18px]">
-                                {item.title}
-                              </span>
-
-                              {item.isFix && (
-                                <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700 ring-1 ring-green-200">
-                                  <Tags className="h-3 w-3" />
-                                  固定
-                                </span>
-                              )}
+                              <div
+                                className={`mt-1 max-w-[72px] truncate text-center text-xs font-medium`}
+                              >
+                                {item.f_user?.raw_user_meta_data?.name}
+                              </div>
                             </div>
 
-                            <div className="mt-1 text-base text-slate-500">
-                              {item.date?.slice(5)}
-                            </div>
+                            {/* 中间内容 */}
+                            <div className="min-w-0">
+                              <div className="flex min-w-0 items-center gap-2 text-lg font-semibold text-slate-900">
 
-
-                          </div>
-
-                          {/* 右侧金额 */}
-                          <div className="flex flex-col">
-                            <div className="grid grid-cols-[80px_44px] items-baseline text-lg">
-                              <span className="text-right font-medium text-orange-300 tabular-nums">
-                                {item.amount}
-                              </span>
-
-                              <span className="pl-2 text-left text-xs font-medium text-slate-400">
-                                {item.cashType}
-                              </span>
-                            </div>
-                            {item.cashType !== "jpy" && (
-                              <div className="grid grid-cols-[80px_44px] items-baseline pt-1 text-lg">
-                                <span className="text-right pl-2 text-left text-xs font-medium text-gray-300">
-                                  {item.jpyCost}
+                                <span className="truncate text-[18px]">
+                                  {item.title}
                                 </span>
 
-                                <span className="pl-2 text-left text-xs font-medium text-gray-300">
-                                  jpy
+                                {item.isFix && (
+                                  <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700 ring-1 ring-green-200">
+                                    <Tags className="h-3 w-3" />
+                                    固定
+                                  </span>
+                                )}
+                              </div>
+
+                              <div className="mt-1 text-base text-slate-500">
+                                {item.date?.slice(5)}
+                              </div>
+
+
+                            </div>
+
+                            {/* 右侧金额 */}
+                            <div className="flex flex-col">
+                              <div className="grid grid-cols-[80px_44px] items-baseline text-lg">
+                                <span className="text-right font-medium text-orange-300 tabular-nums">
+                                  {item.amount}
+                                </span>
+
+                                <span className="pl-2 text-left text-xs font-medium text-slate-400">
+                                  {item.cashType}
                                 </span>
                               </div>
-                            )}
-                          </div>
-                        </div>
-                      ))}
+                              {item.cashType !== "jpy" && (
+                                <div className="grid grid-cols-[80px_44px] items-baseline pt-1 text-lg">
+                                  <span className="text-right pl-2 text-left text-xs font-medium text-gray-300">
+                                    {item.jpyCost}
+                                  </span>
+
+                                  <span className="pl-2 text-left text-xs font-medium text-gray-300">
+                                    jpy
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          </div>)
+                      })}
                     </div>
                   </div>
                 );

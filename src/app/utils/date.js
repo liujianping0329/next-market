@@ -82,3 +82,8 @@ export const calcRemindTime = (startTime, remindBeforeMin) => {
       d.setMinutes(d.getMinutes() - remindBeforeMin);
       return d.toISOString();
 }
+
+// string -> string
+export const changeDateStrDay = (dateStr, days = 0) => {
+      return formatDateLocal(changeDay(parseLocalDate(dateStr), days));
+};
