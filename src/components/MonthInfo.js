@@ -76,9 +76,12 @@ export default function MonthInfo({ startDateStr, endDateStr = formatDateLocal(n
             ${item?.greyOut === 1 ? "text-slate-300" : ""}
             ${holidayName ? "text-red-500" : ""}
           ${selDate === item?.dateStr ? "shadow-[inset_0_0_0_2px_rgb(14_165_233)]" : ""}
+          ${!dayData || Number(dayData.total) <= 0 ? "text-slate-400" : ""}
           `}
               onClick={() => {
-                if (item?.greyOut === 1) return;
+                if (!item) return;
+                if (item.greyOut === 1) return;
+                if (!dayData || Number(dayData.total) <= 0) return;
                 setSelDate(item?.dateStr);
               }}>
               <div className="leading-5">
