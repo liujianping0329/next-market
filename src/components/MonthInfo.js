@@ -61,7 +61,11 @@ export default function MonthInfo({ startDateStr, endDateStr = formatDateLocal(n
             ${i % 7 === 0 ? "text-red-500" : i % 7 === 6 ? "text-sky-500" : ""}
             ${item?.greyOut === 1 ? "text-slate-300" : ""}
           ${selDate === item?.dateStr ? "shadow-[inset_0_0_0_2px_rgb(14_165_233)]" : ""}
-          `} >
+          `}
+            onClick={() => {
+              if (item?.greyOut === 1) return;
+              setSelDate(item?.dateStr);
+            }}>
             {item?.dateDis}
           </div>
         ))}

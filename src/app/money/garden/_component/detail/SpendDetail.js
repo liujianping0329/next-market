@@ -440,7 +440,8 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess, prevTar }) => {
                         <span className="grid grid-cols-[50px_50px] items-center text-base text-xl font-bold text-slate-900">
                           <span>{spendCate.label}</span>
                           <span className="text-right text-slate-500 text-sm">
-                            共{spendCate.spends.length}笔
+                            {mode !== "month" && <>共{spendCate.spends.length}笔</>}
+                            {mode === "month" && <>共{selDateCate.spends.length}笔</>}
                           </span>
                         </span>
                       </div>
@@ -451,7 +452,8 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess, prevTar }) => {
                         </span>
 
                         <span className="text-[24px] text-right font-medium text-red-500 tabular-nums">
-                          {spendCate.total}
+                          {mode !== "month" && <>{spendCate.total}</>}
+                          {mode === "month" && <>{selDateCate.total}</>}
                         </span>
                         <span className="pl-2 text-left text-xs font-medium text-slate-400">
                           jpy
@@ -462,7 +464,9 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess, prevTar }) => {
                     {/* 分类下的每一条明细 */}
                     <div className="divide-y divide-slate-100">
                       {spendCate.spends.map((item) => {
-
+                        if (mode === "month") {
+                          if (item.isFix || item.date !== selDate) return null;
+                        }
                         return (
                           <div
                             key={item.id}
