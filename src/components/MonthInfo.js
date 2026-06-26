@@ -56,19 +56,29 @@ export default function MonthInfo({ startDateStr, endDateStr = formatDateLocal(n
         ))}
       </div>
       <div className="my-2 grid grid-cols-7 gap-2 text-center py-1 rounded-lg border border-slate-200 p-2">
-        {getDateRangeArray().map((item, i) => (
-          <div key={i} className={`rounded-sm 
+        {getDateRangeArray().map((item, i) => {
+          const dayData = monthData?.find((d) => d.date === item?.dateStr);
+          return (
+            <div key={i} className={`rounded-sm py-0.5
             ${i % 7 === 0 ? "text-red-500" : i % 7 === 6 ? "text-sky-500" : ""}
             ${item?.greyOut === 1 ? "text-slate-300" : ""}
           ${selDate === item?.dateStr ? "shadow-[inset_0_0_0_2px_rgb(14_165_233)]" : ""}
           `}
-            onClick={() => {
-              if (item?.greyOut === 1) return;
-              setSelDate(item?.dateStr);
-            }}>
-            {item?.dateDis}
-          </div>
-        ))}
+              onClick={() => {
+                if (item?.greyOut === 1) return;
+                setSelDate(item?.dateStr);
+              }}>
+              <div className="leading-5">
+                {item?.dateDis}
+              </div>
+
+              {dayData?.total > 0 && (
+                <div className="mt-0.5 text-[10px] leading-3 text-orange-400 tabular-nums">
+                  {dayData.total}
+                </div>
+              )}
+            </div>)
+        })}
       </div>
     </div>
   );

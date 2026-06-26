@@ -155,7 +155,7 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess, prevTar }) => {
           };
         }
 
-        dateMap[date].total += Number(spend.amount || 0);
+        dateMap[date].total += Number(spend.jpyCost || 0);
 
         let targetDetail = dateMap[date].detail.find(
           (item) => item.id === detailItem.id
