@@ -150,9 +150,9 @@ const GardenUI = ({ }) => {
                     开启提醒
                 </button> */}
 
-                <Button variant="outline" size="sm" onClick={() => setIsVoiceOpen(true)}>
+                {/* <Button variant="outline" size="sm" onClick={() => setIsVoiceOpen(true)}>
                     <Mic className="h-4 w-4" />语音
-                </Button>
+                </Button> */}
                 {user ? (<DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon" className="rounded-full w-6 h-6">
