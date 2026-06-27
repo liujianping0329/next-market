@@ -55,12 +55,14 @@ import {
     SiXiaohongshu,
 } from "react-icons/si";
 import { analyzePassCode } from "@/app/utils/passCode";
+import { toast } from "sonner";
 
 const FormGarden = ({ trigger, onSuccess, categories, defaultValues = null }) => {
     const [openGarden, setOpenGarden] = useState(false);
     const [isLoadGarden, setIsLoadGarden] = useState(false);
     const [picUrls, setPicUrls] = useState([]);
     const [passCodeInfo, setPassCodeInfo] = useState(null);
+    const [submitAction, setSubmitAction] = useState("save");
 
     const form = useForm({
         defaultValues: {
@@ -81,7 +83,7 @@ const FormGarden = ({ trigger, onSuccess, categories, defaultValues = null }) =>
         const { data: userData, error } = await supabase.auth.getSession();
 
         const { locationPath, ...rest } = values;
-        await ky.post('/api/money/garden/upsert', {
+        const saved = await ky.post('/api/money/garden/upsert', {
             json: {
                 ...(defaultValues?.id && { id: defaultValues.id }),
                 ...rest, pics: picUrls,
@@ -91,8 +93,11 @@ const FormGarden = ({ trigger, onSuccess, categories, defaultValues = null }) =>
                 ...(userData?.session?.user?.id && { userId: userData.session.user.id }),
             }
         }).json();
+        if (submitAction === "saveAndGenerate") {
+            navigator.clipboard.writeText(saved.passCode);
+            toast.info("口令已复制到剪贴板")
+        }
         onSuccess();
-        // picRef.current.clear()
         setOpenGarden(false);
         setIsLoadGarden(false);
         form.reset();
@@ -291,12 +296,29 @@ const FormGarden = ({ trigger, onSuccess, categories, defaultValues = null }) =>
                         </Form>
                     </div>
                     <DialogFooter className="pt-4">
-                        <DialogClose asChild>
-                            <Button variant="outline">关闭</Button>
-                        </DialogClose>
-                        <Button type="submit" form="formGarden" disabled={isLoadGarden}>
-                            {isLoadGarden && <Spinner />}保存
-                        </Button>
+                        {defaultValues?.id ? (<>
+                            <DialogClose asChild>
+                                <Button variant="outline">关闭</Button>
+                            </DialogClose>
+                            <Button type="submit" form="formGarden" disabled={isLoadGarden}>
+                                {isLoadGarden && <Spinner />}保存
+                            </Button>
+                        </>) : (<>
+                            <div className="grid grid-cols-[49%_2%_49%] justify-between">
+                                <Button type="submit" form="formGarden" disabled={isLoadGarden}>
+                                    {isLoadGarden && <Spinner />}仅保存
+                                </Button>
+                                <div></div>
+                                <DialogClose asChild>
+                                    <Button variant="outline">关闭</Button>
+                                </DialogClose>
+                            </div>
+                            <Button type="submit" form="formGarden" disabled={isLoadGarden}
+                                onClick={() => setSubmitAction("saveAndGenerate")}>
+                                {isLoadGarden && <Spinner />}保存并生成口令
+                            </Button>
+                        </>)}
+
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

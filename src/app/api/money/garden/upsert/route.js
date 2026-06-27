@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import supabase from "@/app/utils/database";
+import { encode } from "@/app/utils/base64";
 
 export async function POST(request, context) {
     const requestBody = await request.json();
@@ -24,6 +25,10 @@ export async function POST(request, context) {
     }
 
     const { data } = await supabase.from('garden').upsert(requestBody).select();
-    console.log("Upserted Garden:", data);
-    return NextResponse.json({ ids: data.map(item => item.id) });
+    const passCode = encode({
+        table: "garden",
+        id: data[0].id,
+        title: data[0].title
+    });
+    return NextResponse.json({ ids: data.map(item => item.id), passCode });
 }
