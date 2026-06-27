@@ -437,9 +437,9 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess, prevTar }) => {
                             backgroundColor: spendCate.children?.bgColor || "#94A3B8",
                           }}
                         />
-                        <span className="grid grid-cols-[50px_50px] items-center text-base text-xl font-bold text-slate-900">
+                        <span className="grid grid-cols-[55px_50px] items-center text-base text-xl font-bold text-slate-900">
                           <span>{spendCate.label}</span>
-                          <span className="text-right text-slate-500 text-sm">
+                          <span className="text-left text-slate-500 text-sm">
                             {mode !== "month" && <>共{spendCate.spends.length}笔</>}
                             {mode === "month" && <>共{selDateCate.spends.length}笔</>}
                           </span>

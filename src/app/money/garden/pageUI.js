@@ -3,53 +3,55 @@ import { Button } from "@/components/ui/button";
 
 
 import {
-  ToggleGroup,
-  ToggleGroupItem,
+    ToggleGroup,
+    ToggleGroupItem,
 } from "@/components/ui/toggle-group";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import {
-  useEffect,
-  useState,
+    useEffect,
+    useState,
 } from "react";
 import supabase from "@/app/utils/database";
 import {
-  CircleUser,
-  ShieldCheck,
-  Satellite,
-  PenTool,
-  User,
+    CircleUser,
+    ShieldCheck,
+    Satellite,
+    PenTool,
+    User,
+    Mic
 } from "lucide-react";
 import ActionButton from "@/components/ActionButton";
 import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
+    Avatar,
+    AvatarFallback,
+    AvatarImage,
 } from "@/components/ui/avatar";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useUserStore } from "@/app/money/garden/_store/userStore";
-import ky from "ky"
+import ky from "ky";
+import VoiceRecordDialog from "@/components/VoiceRecordDialog";
 
 export const revalidate = 0;
 
 const Soybean = dynamic(() => import("./_component/list/Soybean"), {
-  ssr: false,
+    ssr: false,
 });
 const Greengrass = dynamic(() => import("./_component/list/Greengrass"), {
-  ssr: false,
+    ssr: false,
 });
 const Harvest = dynamic(() => import("./_component/list/Harvest"), {
-  ssr: false,
+    ssr: false,
 });
 const Granary = dynamic(() => import("./_component/list/Granary"), {
-  ssr: false,
+    ssr: false,
 });
 
 const GardenUI = ({ }) => {
@@ -57,6 +59,7 @@ const GardenUI = ({ }) => {
     const [user, setUser] = useState(null)
     const [isUserReady, setIsUserReady] = useState(false)
     const setUserInfoStore = useUserStore(state => state.setUserInfo);
+    const [isVoiceOpen, setIsVoiceOpen] = useState(false);
 
     useEffect(() => {
         const syncUser = async (session) => {
@@ -119,7 +122,7 @@ const GardenUI = ({ }) => {
     return (
         <>
             <div id="toolBar" className="flex p-2.5 justify-between overflow-x-auto items-center">
-                <div className="flex space-x-2 items-center">
+                <div className="flex space-x-1 items-center">
                     <Button variant="outline" asChild className="hidden">
                         <Link href={`/money/list`}>
                             返回
@@ -146,9 +149,13 @@ const GardenUI = ({ }) => {
                 >
                     开启提醒
                 </button> */}
+
+                <Button variant="outline" size="sm" onClick={() => setIsVoiceOpen(true)}>
+                    <Mic className="h-4 w-4" />语音
+                </Button>
                 {user ? (<DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="rounded-full">
+                        <Button variant="ghost" size="icon" className="rounded-full w-6 h-6">
                             <Avatar>
                                 <AvatarImage src={user?.user_metadata.avatar_url} alt="img" />
                                 <AvatarFallback>CN</AvatarFallback>
@@ -190,13 +197,18 @@ const GardenUI = ({ }) => {
                             <DropdownMenuItem variant="destructive" onClick={handleLogout}>注销</DropdownMenuItem>
                         </DropdownMenuGroup>
                     </DropdownMenuContent>
-                </DropdownMenu>) : <ActionButton icon={CircleUser} size="sm" onClick={handleLogin} />}
+                </DropdownMenu>) : <ActionButton icon={CircleUser} size="icon" onClick={handleLogin} />}
             </div >
             {tab === "Soybean" && <Soybean userInfo={user} />
             }
             {tab === "Greengrass" && <Greengrass userInfo={user} />}
             {tab === "Harvest" && <Harvest userInfo={user} isUserReady={isUserReady} />}
             {tab === "Granary" && <Granary userInfo={user} />}
+            {isVoiceOpen && (
+                <VoiceRecordDialog
+                    onClose={() => setIsVoiceOpen(false)}
+                />
+            )}
         </>
     );
 }
