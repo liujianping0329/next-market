@@ -54,7 +54,7 @@ export async function generateAI(questionTemplate) {
     picResult = await generateImage({
       model: aiPicTemplate.children.model,
       prompt: questionPic,
-      size: "1024x1024",
+      size: "1920x1920",
       quality: "low",
       output_format: "jpeg",
       compression: 50

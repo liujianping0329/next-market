@@ -1,0 +1,44 @@
+id,created_at,category,label,value,children,sort,planetId,userId
+1,2026-02-22 12:30:46.548363+00,gardenCategory,菜谱,recipe,,1,,
+2,2026-02-22 12:34:35.766038+00,gardenCategory,想去的店,shop,"[{""id"":201,""label"":""東京"",""value"":""shop-dongjing""}]",2,,
+3,2026-02-22 12:34:35.766038+00,gardenCategory,周末好去处,weekend,,3,,
+4,2026-02-22 12:34:35.766038+00,gardenCategory,台湾,taiwan,,4,,
+5,2026-02-22 12:34:35.766038+00,gardenCategory,哈尔滨,haerbin,"[{""id"":501,""label"":""必去"",""value"":""haerbin-biqu""},{""id"":502,""label"":""必吃"",""value"":""haerbin-bichi""},{""id"":503,""label"":""行程"",""value"":""哈尔滨-xingcheng""}]",5,,
+6,2026-02-22 12:34:35.766038+00,gardenCategory,日本,japan,"[{""id"":601,""label"":""関西"",""value"":""japan-kansai""},{""id"":602,""label"":""関東"",""value"":""japan-kantou""},{""id"":603,""label"":""名古屋"",""value"":""japan-nagoya""}]",6,,
+7,2026-02-22 12:34:35.766038+00,gardenCategory,其他,else,,7,,
+23,2026-02-24 14:48:15.468922+00,gardenCategory,时尚单品,shishangdanpin,"[{""id"":2301,""label"":""吃的"",""value"":""shishangdanpin-chide""},{""id"":2302,""label"":""日用品"",""value"":""shishangdanpin-riyongpin""}]",8,,
+24,2026-03-02 12:19:17.355228+00,gardenCategory,醫療,yiliao,,9,,
+26,2026-03-08 02:51:04.734383+00,aiTemplate_garden,种草模板_deepseek/deepseek-v3.2,"介绍${title},${content}。要求:
+1. 返回 压缩过的纯字符串JSON
+2. 介绍的字段是desp
+3. 请只返回 JSON 数据，不要添加任何解释文字，也不要使用 ```json 代码块。
+
+返回格式：
+{
+  ""desp"": ""100字左右介绍""
+}","{""model"":""deepseek/deepseek-v3.2""}",1,,
+27,2026-03-08 02:51:04.734383+00,aiTemplate_news,新闻模板_openai,"${title},${content}。${ext}
+要求:
+1. 返回 压缩过的纯字符串JSON
+2. 介绍的字段是ans
+3. 请只返回 JSON 数据，不要添加任何解释文字，也不要使用 ```json 代码块。
+4. 指令中有明确说""要detailHtml字段""的时候，才生成那两个字段，不然，不要返回那两个字段
+
+返回格式：
+{
+  ""ans"": ""175字左右介绍"",
+  ""emoji"": ""根据ans字段选一个最符合的emoji"",
+  ""bgColor"":""根据ans字段选一个最符合的颜色号，井字开头那种"",
+  ""url"":""如果问题中包含url，提取出来放在这里，如果没有url就不返回这个字段"",
+  ""detailHtml"":""详尽的解答问题，生成可以直接放在页面上的html的圆角卡片以div开头，因为你会被外面的div框住，所以不要最外层加padding或者magin之类的，内部格式要好看，背景颜色要和bgColor字段搭配起来不突兀，有条理，可以考虑在生成卡片的css上下功夫或者加些emoji，项目已经引入tailwind，所以你可以用tailwind写样式，尽量好看，且切合主题，注意这里不要求内容175字的上限，重新审视问题，回答的角度要和ans字段不一样，尽可能详尽""
+}","{""model"":""openai/gpt-5-nano"",""web"":""1""}",2,,
+29,2026-06-02 09:41:42.694055+00,spendCate,衣,yi,"{""isFixOnly"":""1"",""bgColor"":""#FB7185""}",5,1,
+30,2026-06-01 13:49:33.414641+00,spendCate,杂费,zafei,"{""isFixOnly"":""1"",""bgColor"":""#A78BFA""}",4,1,
+32,2026-06-01 13:49:33.414641+00,spendCate,住,zhu,"{""isFixOnly"":0,""bgColor"":""#38BDF8""}",1,1,
+33,2026-06-04 14:08:00.659218+00,spendCate,行,xing,"{""isFixOnly"":0,""bgColor"":""#34D399""}",3,1,
+34,2026-06-04 14:08:34.291239+00,spendCate,食,shi,"{""isFixOnly"":0,""bgColor"":""#FBBF24""}",2,1,
+36,2026-06-10 10:16:31.339601+00,spendCate,醫療,yiliao,"{""bgColor"":""#2069cf""}",6,1,
+40,2026-06-19 02:20:04.101154+00,CameraCate,抖音长图,douyinchangtu,"{""startX"":""112"",""startY"":""206"",""width"":""900"",""height"":""1180""}",1,,
+41,2026-06-19 10:51:20.886533+00,CameraCate,抖音宽图,douyinkuantu,"{""startX"":""149"",""startY"":""475"",""width"":""875"",""height"":""681""}",2,,
+42,2026-06-19 11:37:19.006484+00,CameraCate,大众图片,dazhongtupian,"{""startX"":""100"",""startY"":""100"",""width"":""1020"",""height"":""750""}",3,,
+43,2026-06-27 11:15:01.134608+00,aiPicTemplate_news,新闻模板_picOpenai,"根据下面生成一张图，不要文字，要古风氛围感的。${ans},","{""model"":""bytedance/seedream-5.0-lite"",""web"":""1""}",3,,
