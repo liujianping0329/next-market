@@ -6,8 +6,9 @@ import {
   ArrowLeft,
   BookOpenCheck,
   Landmark,
+  Library,
   Pencil,
-  Trash2,
+  Trash2
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
@@ -16,6 +17,7 @@ import {
 } from "react";
 
 import FormGarden from "@/app/money/garden/_component/form/FormGarden";
+import FormGardenRef from "@/app/money/garden/_component/form/FormGardenRef";
 import FormGardenRemark from "@/app/money/garden/_component/form/FormGardenRemark";
 import FormSoy from "@/app/money/garden/_component/form/FormSoy";
 import { toast } from "sonner";
@@ -128,7 +130,6 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips }) => {
     ...normalizePics(detail?.pics),
     ...normalizePics(detail?.garden_remark?.map((remark) => remark.pics)),
   ];
-  console.log(carouselImages);
 
   return (
     <>
@@ -143,6 +144,11 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips }) => {
             trigger={
               <ActionButton icon={Pencil} label="修改" />
             } onSuccess={() => fetchDetail()} defaultValues={detail} categories={categories} />
+          <FormGardenRef
+            key={`${detail?.id}-${editVer}-ref`}
+            trigger={
+              <ActionButton icon={Library} label="参考" />
+            } onSuccess={() => fetchDetail()} defaultValues={detail.garden_ext ?? { gardenId: detail.id }} />
           <ActionButton icon={Trash2} label="删除" onClick={handleDelete} disabled={deleting || !detail} />
           {/* <ActionButton icon={Share2} label="分享" onClick={handleShare} disabled={copied || !detail} /> */}
 
@@ -210,13 +216,14 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips }) => {
           </section>
 
           {/* 地点 */}
-          {detail.location?.path && (
-            <div className="mt-3 flex flex-wrap gap-2">
-              <Link
-                href={detail.location.path}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="
+          {(detail.location?.path || detail.garden_ext?.refInfo) && (
+            <>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Link
+                  href={detail.location.path}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="
         group inline-flex max-w-full items-center gap-1.5
         rounded-full border border-sky-100 bg-sky-50/80
         px-3 py-1.5 text-sm text-sky-700
@@ -224,16 +231,57 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips }) => {
         hover:border-sky-200 hover:bg-sky-100 hover:text-sky-800
         active:scale-[0.98]
       "
-              >
-                <LinkIcon className="h-3.5 w-3.5 shrink-0" />
+                >
+                  <LinkIcon className="h-3.5 w-3.5 shrink-0" />
 
-                <span className="truncate underline-offset-4 group-hover:underline">
-                  {detail.location.name || "查看原始链接"}
-                </span>
+                  <span className="truncate underline-offset-4 group-hover:underline">
+                    {detail.location.name || "查看原始链接"}
+                  </span>
+                  {/* {detail.created_at && (
+                  <span className="ml-1 shrink-0 text-[10px] text-sky-500/70">
+                    {formatDistanceToNow(new Date(detail.created_at), {
+                      addSuffix: true,
+                      locale: zhCN,
+                    })}
+                  </span>
+                )} */}
 
-                <ExternalLink className="h-3 w-3 shrink-0 opacity-70 transition group-hover:translate-x-0.5" />
-              </Link>
-            </div>
+                  <ExternalLink className="h-3 w-3 shrink-0 opacity-70 transition group-hover:translate-x-0.5" />
+                </Link>
+                {detail?.garden_ext?.refInfo.map((refItem, index) => {
+                  return (<Link
+                    key={`${refItem.url}-${index}`}
+                    href={refItem.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="
+        group inline-flex max-w-full items-center gap-1.5
+        rounded-full border border-sky-100 bg-sky-50/80
+        px-3 py-1.5 text-sm text-sky-700
+        shadow-sm transition
+        hover:border-sky-200 hover:bg-sky-100 hover:text-sky-800
+        active:scale-[0.98]
+      "
+                  >
+                    <LinkIcon className="h-3.5 w-3.5 shrink-0" />
+
+                    <span className="truncate underline-offset-4 group-hover:underline">
+                      {refItem.name}
+                    </span>
+                    {/* {detail.created_at && (
+                  <span className="ml-1 shrink-0 text-[10px] text-sky-500/70">
+                    {formatDistanceToNow(new Date(detail.created_at), {
+                      addSuffix: true,
+                      locale: zhCN,
+                    })}
+                  </span>
+                )} */}
+
+                    <ExternalLink className="h-3 w-3 shrink-0 opacity-70 transition group-hover:translate-x-0.5" />
+                  </Link>);
+                })}
+              </div>
+            </>
           )}
 
           {/* 内容 */}
