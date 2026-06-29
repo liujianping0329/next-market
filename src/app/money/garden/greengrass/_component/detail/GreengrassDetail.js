@@ -8,7 +8,8 @@ import {
   Landmark,
   Library,
   Pencil,
-  Trash2
+  Trash2,
+  MessageSquarePlus
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
@@ -38,6 +39,7 @@ import {
   MessageSquare,
   Sparkles
 } from "lucide-react";
+import { useUserStore } from "@/app/money/garden/_store/userStore";
 
 
 const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips }) => {
@@ -49,6 +51,7 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips }) => {
   const [deleting, setDeleting] = useState(false);
   const [categories, setCategories] = useState([]);
   const [aiing, setAiing] = useState(false);
+  const userInfoStore = useUserStore(state => state.userInfo);
 
   const fetchDetail = async () => {
     const response = await ky.post('/api/money/garden/greenGrass/detail', {
@@ -177,13 +180,13 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips }) => {
         </div>
       </div>}
 
-      {detail && showRemarkbar && <div id="toolBarBottom" className="fixed bottom-0 left-0 right-0 flex p-2.5 justify-center overflow-x-auto items-center border-t bg-background">
+      {/* {detail && showRemarkbar && <div id="toolBarBottom" className="fixed bottom-0 left-0 right-0 flex p-2.5 justify-center overflow-x-auto items-center border-t bg-background">
         <FormGardenRemark
           key={`${detail?.id}-${editVer}`}
           trigger={
             <ActionButton icon={MessageSquare} label="点评" />
           } onSuccess={() => fetchDetail()} defaultValues={detail} />
-      </div>}
+      </div>} */}
 
       <ImageCarousel images={carouselImages} ratio={cssTips?.ImageCarousel?.ratio || 3 / 4} />
       {detail && (
@@ -308,53 +311,56 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips }) => {
               </p>
             </section>
           )}
-
           {/* 评论 */}
-          {detail?.garden_remark?.length > 0 && (
-            <section className="mt-8">
-              <div className="space-y-4">
-                {detail?.garden_remark?.length > 0 && (
-                  <section className="mt-8">
-                    <h3 className="mb-2 text-base font-semibold">
-                      用户评论（{detail.garden_remark.length}）
-                    </h3>
+          <section className="mt-8">
+            <h3 className="flex justify-between mb-2 text-base font-semibold">
+              <span>用户评论（{detail.garden_remark.length}）</span>
+              {userInfoStore?.id && (<FormGardenRemark
+                key={`${detail?.id}-${editVer}-remark`}
+                trigger={
+                  <ActionButton icon={MessageSquarePlus} />
+                } onSuccess={() => fetchDetail()} detail={detail} />)}
 
-                    <div className="divide-y">
-                      {detail.garden_remark.map((data) => (
-                        <div key={data.id} className="flex gap-3 py-5">
-                          <Avatar className="h-10 w-10 shrink-0">
-                            <AvatarImage
-                              src={data?.f_user?.raw_user_meta_data?.avatar_url}
-                              alt="img"
-                            />
-                            <AvatarFallback>CN</AvatarFallback>
-                          </Avatar>
+            </h3>
 
-                          <div className="min-w-0 flex-1">
-                            <div className="flex items-center justify-between gap-3">
-                              <span className="truncate text-sm font-medium">
-                                {data?.f_user?.raw_user_meta_data?.name || "用户"}
+            <div className="divide-y">
+              {detail?.garden_remark?.length > 0 &&
+                <>
+                  {
+                    detail.garden_remark.map((data) => (
+                      <div key={data.id} className="flex gap-3 py-5">
+                        <Avatar className="h-10 w-10 shrink-0">
+                          <AvatarImage
+                            src={data?.f_user?.raw_user_meta_data?.avatar_url}
+                            alt="img"
+                          />
+                          <AvatarFallback>CN</AvatarFallback>
+                        </Avatar>
+
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="truncate text-sm font-medium">
+                              {data?.f_user?.raw_user_meta_data?.name || "用户"}
+                            </span>
+
+                            {data?.point && (
+                              <span className="shrink-0 text-xs text-yellow-500">
+                                {"★".repeat(Number(data.point))}
                               </span>
-
-                              {data?.point && (
-                                <span className="shrink-0 text-xs text-yellow-500">
-                                  {"★".repeat(Number(data.point))}
-                                </span>
-                              )}
-                            </div>
-
-                            <p className="mt-2 whitespace-pre-wrap text-sm leading-7 text-muted-foreground">
-                              {data?.remark}
-                            </p>
+                            )}
                           </div>
+
+                          <p className="mt-2 whitespace-pre-wrap text-sm leading-7 text-muted-foreground">
+                            {data?.remark}
+                          </p>
                         </div>
-                      ))}
-                    </div>
-                  </section>
-                )}
-              </div>
-            </section>
-          )}
+                      </div>
+                    ))
+                  }
+                </>
+              }
+            </div>
+          </section>
         </main>
       )}
     </>
