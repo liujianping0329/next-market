@@ -190,7 +190,7 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips }) => {
 
       <ImageCarousel images={carouselImages} ratio={cssTips?.ImageCarousel?.ratio || 3 / 4} />
       {detail && (
-        <main className="relative z-10 -mt-6 rounded-t-[28px] bg-background px-5 pt-7 pb-28">
+        <main className="rounded-t-[28px] bg-background px-5 pt-2 pb-28">
           {/* 标题 + 评分 */}
           <section className="flex items-start justify-between gap-4">
             <div className="min-w-0 flex-1">
