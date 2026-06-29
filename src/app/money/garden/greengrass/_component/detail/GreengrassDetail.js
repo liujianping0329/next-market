@@ -9,7 +9,8 @@ import {
   Library,
   Pencil,
   Trash2,
-  MessageSquarePlus
+  MessageSquarePlus,
+  MessagesSquare
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
@@ -142,17 +143,15 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips }) => {
         </div>
         <div className="flex space-x-2 items-center">
           <ActionButton onClick={handlePassCode} icon={KeyRound} label="口令" />
-          <FormGarden
-            key={`${detail?.id}-${editVer}`}
-            trigger={
-              <ActionButton icon={Pencil} label="修改" />
-            } onSuccess={() => fetchDetail()} defaultValues={detail} categories={categories} />
+          <ActionButton onClick={() => {
+            toast.info("敬请期待");
+          }} icon={MessagesSquare} label="邀评" />
           <FormGardenRef
             key={`${detail?.id}-${editVer}-ref`}
             trigger={
               <ActionButton icon={Library} label="参考" />
             } onSuccess={() => fetchDetail()} defaultValues={detail.garden_ext ?? { gardenId: detail.id }} />
-          <ActionButton icon={Trash2} label="删除" onClick={handleDelete} disabled={deleting || !detail} />
+
           {/* <ActionButton icon={Share2} label="分享" onClick={handleShare} disabled={copied || !detail} /> */}
 
           <FormSoy trigger={
@@ -176,6 +175,12 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips }) => {
               fetchDetail()
               toast.success("已添加到行程");
             }} />
+          <FormGarden
+            key={`${detail?.id}-${editVer}`}
+            trigger={
+              <ActionButton icon={Pencil} label="修改" />
+            } onSuccess={() => fetchDetail()} defaultValues={detail} categories={categories} />
+          <ActionButton icon={Trash2} label="删除" onClick={handleDelete} disabled={deleting || !detail} />
           <ActionButton onClick={handleAi} icon={Sparkles} label="润色" />
         </div>
       </div>}
