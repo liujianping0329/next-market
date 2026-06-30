@@ -63,7 +63,8 @@ const FormGranary = ({ trigger, openGranaryCtrl, setOpenGranaryCtrl, onSuccess, 
                 ...normalizeObjectNumbers(values),
                 date: formatDateLocal(values.date),
                 cash: normalizeObjectNumbers(cash),
-                userId
+                userId,
+                isUpdate: !!defaultValues
             }
         }).json();
         setOpenGranaryCtrl ? setOpenGranaryCtrl(false) : setOpenGranary(false);

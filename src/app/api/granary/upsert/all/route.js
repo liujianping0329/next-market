@@ -8,7 +8,7 @@ import {
 } from "@/app/api/granary/_lib/biz";
 
 export async function POST(request, context) {
-    const { id, userId, date, cash, ...detail } = await request.json();
+    const { id, userId, date, cash, isUpdate, ...detail } = await request.json();
     //拿星球id
     let planetId = null;
     if (userId) {
@@ -85,23 +85,26 @@ export async function POST(request, context) {
     await outputOldSys(userId, date, cash, totalUser);
 
     //拿个人固定费用模板
-    const { data: spendFix } = await supabase.from('spend_fix').select().eq("userId", userId);
+    if (!isUpdate) {
+        const { data: spendFix } = await supabase.from('spend_fix').select().eq("userId", userId);
 
-    const spends = spendFix.map(element => {
-        return {
-            userId,
-            date,
-            category: element.spendCate,
-            title: element.title,
-            amount: element.cost,
-            cashType: element.cashType,
-            ...cash,
-            planetId,
-            isFix: true
-        }
-    });
+        const spends = spendFix.map(element => {
+            return {
+                userId,
+                date,
+                category: element.spendCate,
+                title: element.title,
+                amount: element.cost,
+                cashType: element.cashType,
+                ...cash,
+                planetId,
+                isFix: true
+            }
+        });
 
-    await supabase.from('spend').upsert(spends);
+        await supabase.from('spend').upsert(spends);
+    } else {
 
+    }
     return NextResponse.json({ detailsInsert });
 }
