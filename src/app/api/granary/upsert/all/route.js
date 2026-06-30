@@ -3,8 +3,8 @@ import supabase from "@/app/utils/database";
 
 import { applyPlanetFilter } from "@/app/utils/query";
 import {
-  calGranaryTotal,
-  outputOldSys,
+    calGranaryTotal,
+    outputOldSys,
 } from "@/app/api/granary/_lib/biz";
 
 export async function POST(request, context) {
@@ -85,24 +85,23 @@ export async function POST(request, context) {
     await outputOldSys(userId, date, cash, totalUser);
 
     //拿个人固定费用模板
-    if (!curGranary) {
-        const { data: spendFix } = await supabase.from('spend_fix').select().eq("userId", userId);
+    const { data: spendFix } = await supabase.from('spend_fix').select().eq("userId", userId);
 
-        const spends = spendFix.map(element => {
-            return {
-                userId,
-                date,
-                category: element.spendCate,
-                title: element.title,
-                amount: element.cost,
-                cashType: element.cashType,
-                ...cash,
-                planetId,
-                isFix: true
-            }
-        });
+    const spends = spendFix.map(element => {
+        return {
+            userId,
+            date,
+            category: element.spendCate,
+            title: element.title,
+            amount: element.cost,
+            cashType: element.cashType,
+            ...cash,
+            planetId,
+            isFix: true
+        }
+    });
 
-        await supabase.from('spend').upsert(spends);
-    }
+    await supabase.from('spend').upsert(spends);
+
     return NextResponse.json({ detailsInsert });
 }
