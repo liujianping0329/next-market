@@ -29,7 +29,7 @@ import { Button } from "@/components/ui/button";
 import { useUserStore } from "@/app/money/garden/_store/userStore";
 import PicUploaderAdvance from "@/components/PicUploaderAdvance";
 
-const FormGardenRemark = ({ trigger, onSuccess, defaultValues, detail }) => {
+const FormGardenRemark = ({ trigger, onSuccess, defaultValues, detail, userFront }) => {
     const [openGardenRemark, setOpenGardenRemark] = useState(false);
     const [isLoadGardenRemark, setIsLoadGardenRemark] = useState(false);
     const userInfoStore = useUserStore(state => state.userInfo);
@@ -48,7 +48,7 @@ const FormGardenRemark = ({ trigger, onSuccess, defaultValues, detail }) => {
             json: {
                 id: defaultValues?.id, ...values,
                 pics: picUrls,
-                userId: userInfoStore?.id,
+                userId: userInfoStore?.id || userFront?.id,
                 gardenId: detail.id,
             }
         }).json();

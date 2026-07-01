@@ -18,7 +18,7 @@ export async function POST(request, context) {
             en: "邀您评论"
         },
         contents: { en: detail.title || "no title" },
-        web_url: `${origin}/money/garden/greengrass/${detail.id}`
+        web_url: `${origin}/remark/gardenInvite/${detail.id}`
     };
 
     try {

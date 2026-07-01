@@ -43,7 +43,7 @@ import {
 import { useUserStore } from "@/app/money/garden/_store/userStore";
 
 
-const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips }) => {
+const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips, userFront }) => {
   const router = useRouter()
   const [detail, setDetail] = useState(null)
   const [copied, setCopied] = useState(false)
@@ -145,6 +145,7 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips }) => {
           <ActionButton onClick={handlePassCode} icon={KeyRound} label="口令" />
           <ActionButton onClick={async () => {
             await ky.post("/api/garden_remark/inviteWithPush", { json: { planetId: userInfoStore?.planetId, detail } }).json();
+            toast.success("已发出邀请");
           }} icon={MessagesSquare} label="邀评" />
           <FormGardenRef
             key={`${detail?.id}-${editVer}-ref`}
@@ -320,11 +321,11 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips }) => {
           <section className="mt-8">
             <h3 className="flex justify-between mb-2 text-base font-semibold">
               <span>用户评论（{detail.garden_remark.length}）</span>
-              {userInfoStore?.id && (<FormGardenRemark
+              {(userInfoStore?.id || userFront?.id) && (<FormGardenRemark
                 key={`${detail?.id}-${editVer}-remark`}
                 trigger={
                   <ActionButton icon={MessageSquarePlus} />
-                } onSuccess={() => fetchDetail()} detail={detail} />)}
+                } onSuccess={() => fetchDetail()} detail={detail} userFront={userFront} />)}
 
             </h3>
 
