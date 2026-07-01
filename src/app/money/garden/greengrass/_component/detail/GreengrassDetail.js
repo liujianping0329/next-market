@@ -143,8 +143,8 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips }) => {
         </div>
         <div className="flex space-x-2 items-center">
           <ActionButton onClick={handlePassCode} icon={KeyRound} label="口令" />
-          <ActionButton onClick={() => {
-            toast.info("敬请期待");
+          <ActionButton onClick={async () => {
+            await ky.post("/api/garden_remark/inviteWithPush", { json: { planetId: userInfoStore?.planetId, detail } }).json();
           }} icon={MessagesSquare} label="邀评" />
           <FormGardenRef
             key={`${detail?.id}-${editVer}-ref`}

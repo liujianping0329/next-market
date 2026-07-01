@@ -109,7 +109,7 @@ const FormGranary = ({ trigger, openGranaryCtrl, setOpenGranaryCtrl, onSuccess, 
                                                         </div>
                                                     </FormLabel>
                                                     <FormControl>
-                                                        <Input {...field} />
+                                                        <Input type="number" {...field} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
