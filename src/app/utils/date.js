@@ -87,3 +87,7 @@ export const calcRemindTime = (startTime, remindBeforeMin) => {
 export const changeDateStrDay = (dateStr, days = 0) => {
       return formatDateLocal(changeDay(parseLocalDate(dateStr), days));
 };
+
+export const fixWrongUtcAsJst = (value) => {
+      return new Date(new Date(value).getTime() - 9 * 60 * 60 * 1000);
+};

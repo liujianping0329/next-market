@@ -27,5 +27,8 @@ export async function POST(request, context) {
                 }, 0) / detail.garden_remark.length
             ).toFixed(1)
             : "0.0";
+    detail.garden_remark.sort(
+        (a, b) => new Date(b.created_at) - new Date(a.created_at)
+    );
     return NextResponse.json({ detail: detail, cates: cates });
 }

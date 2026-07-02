@@ -41,6 +41,9 @@ import {
   Sparkles
 } from "lucide-react";
 import { useUserStore } from "@/app/money/garden/_store/userStore";
+import { formatDistanceToNow } from "date-fns";
+import { zhCN } from "date-fns/locale";
+import { fixWrongUtcAsJst } from "@/app/utils/date";
 
 
 const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips, userFront }) => {
@@ -355,10 +358,17 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips, userFront }
                               </span>
                             )}
                           </div>
-
-                          <p className="mt-2 whitespace-pre-wrap text-sm leading-7 text-muted-foreground">
-                            {data?.remark}
-                          </p>
+                          <div className="flex justify-between">
+                            <p className="mt-2 whitespace-pre-wrap text-sm leading-7 text-muted-foreground">
+                              {data?.remark}
+                            </p>
+                            <p className="mt-2 whitespace-pre-wrap text-sm leading-7 text-muted-foreground">
+                              {formatDistanceToNow(fixWrongUtcAsJst(data.created_at), {
+                                addSuffix: true,
+                                locale: zhCN,
+                              })}
+                            </p>
+                          </div>
                         </div>
                       </div>
                     ))

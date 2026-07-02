@@ -55,7 +55,7 @@ const Granary = dynamic(() => import("./_component/list/Granary"), {
 });
 
 const GardenUI = ({ }) => {
-    const [tab, setTab] = useState("Harvest");
+    const [tab, setTab] = useState("Granary");
     const [user, setUser] = useState(null)
     const [isUserReady, setIsUserReady] = useState(false)
     const setUserInfoStore = useUserStore(state => state.setUserInfo);
@@ -199,11 +199,10 @@ const GardenUI = ({ }) => {
                     </DropdownMenuContent>
                 </DropdownMenu>) : <ActionButton icon={CircleUser} size="icon" onClick={handleLogin} />}
             </div >
-            {tab === "Soybean" && <Soybean userInfo={user} />
-            }
-            {tab === "Greengrass" && <Greengrass userInfo={user} />}
+            {tab === "Soybean" && <Soybean userInfo={user} isUserReady={isUserReady} />}
+            {tab === "Greengrass" && <Greengrass userInfo={user} isUserReady={isUserReady} />}
             {tab === "Harvest" && <Harvest userInfo={user} isUserReady={isUserReady} />}
-            {tab === "Granary" && <Granary userInfo={user} />}
+            {tab === "Granary" && <Granary userInfo={user} isUserReady={isUserReady} />}
             {isVoiceOpen && (
                 <VoiceRecordDialog
                     onClose={() => setIsVoiceOpen(false)}

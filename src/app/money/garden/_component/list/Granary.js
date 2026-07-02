@@ -27,7 +27,7 @@ import {
     AvatarImage,
 } from "@/components/ui/avatar";
 import { useGranaryStore } from "@/app/money/garden/_store/granaryStore";
-const Granary = ({ userInfo }) => {
+const Granary = ({ userInfo, isUserReady }) => {
     const [cash, setCash] = useState(null);
     const [userTemplate, setUserTemplate] = useState(null);
     const [spendCate, setSpendCate] = useState(null);
@@ -68,9 +68,10 @@ const Granary = ({ userInfo }) => {
     }
 
     useEffect(() => {
+        if (!isUserReady) return
         fetchCash();
         fetchData();
-    }, []);
+    }, [isUserReady]);
 
     const handleDetail = (item) => {
         setTargetItemDetail(item);
