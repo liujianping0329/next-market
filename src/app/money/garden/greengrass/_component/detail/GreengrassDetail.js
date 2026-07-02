@@ -46,7 +46,7 @@ import { zhCN } from "date-fns/locale";
 import { fixWrongUtcAsJst } from "@/app/utils/date";
 
 
-const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips, userFront }) => {
+const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips, userFront, scrollTo }) => {
   const router = useRouter()
   const [detail, setDetail] = useState(null)
   const [copied, setCopied] = useState(false)
@@ -137,6 +137,19 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips, userFront }
     ...normalizePics(detail?.pics),
     ...normalizePics(detail?.garden_remark?.map((remark) => remark.pics)),
   ];
+
+  useEffect(() => {
+    if (!detail || !scrollTo) return;
+
+    const timer = setTimeout(() => {
+      document.getElementById(scrollTo)?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [detail, scrollTo]);
 
   return (
     <>
@@ -321,7 +334,7 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips, userFront }
             </section>
           )}
           {/* 评论 */}
-          <section className="mt-8">
+          <section id="remarks" className="mt-8">
             <h3 className="flex justify-between mb-2 text-base font-semibold">
               <span>用户评论（{detail.garden_remark.length}）</span>
               {(userInfoStore?.id || userFront?.id) && (<FormGardenRemark

@@ -24,7 +24,7 @@ const GardenInviteRemarkUI = ({ id }) => {
         });
     }, [])
 
-    return <GreengrassDetail id={id} showToolbar={false} showRemarkbar={false} userFront={userInfo} />;
+    return <GreengrassDetail id={id} showToolbar={false} showRemarkbar={false} userFront={userInfo} scrollTo="remarks" />;
 }
 
 export default GardenInviteRemarkUI;
