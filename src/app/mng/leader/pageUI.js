@@ -1,23 +1,40 @@
 "use client";
 import supabase from "@/app/utils/database";
 import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
+    Avatar,
+    AvatarFallback,
+    AvatarImage,
 } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import ky from "ky";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import {
-  useEffect,
-  useState,
+    useEffect,
+    useState,
 } from "react";
 
 import SpendItems from "../_component/list/SpendItems";
+import LocationItems from "../_component/list/LocationItems";
+import GardenCate from "../_component/list/GardenCate";
 
 const configs = [{
-    name: "冬藏园", value: "granary", isDefault: true, children:
+    name: "共通", value: "common", isDefault: false, children:
+        [
+            {
+                name: "位置", value: "locationItems"
+            }
+        ]
+}, {
+    name: "夏荣园", value: "garden", isDefault: true, children:
+        [
+            {
+                name: "类目", value: "gardenCate"
+            }
+        ]
+},
+{
+    name: "冬藏园", value: "granary", isDefault: false, children:
         [
             {
                 name: "固定支出项目", value: "spendItems"
@@ -105,6 +122,8 @@ const MngLeaderUI = ({ }) => {
                 ))}
             </div>
             {configsChildSel === "spendItems" && userInfo && <SpendItems userInfo={userInfo} />}
+            {configsChildSel === "locationItems" && userInfo && <LocationItems userInfo={userInfo} />}
+            {configsChildSel === "gardenCate" && userInfo && <GardenCate userInfo={userInfo} />}
         </>
     );
 }
