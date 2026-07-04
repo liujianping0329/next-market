@@ -185,7 +185,7 @@ const NewsUI = ({ }) => {
                                     </div>
                                 )}
 
-                                <div className={`mt-2 text-sm leading-6 text-gray-600 transition-all duration-200`} >
+                                <div className={`mt-2 break-words text-sm leading-6 text-gray-600 transition-all duration-200`} >
                                     {item.answer}
                                 </div>
 
