@@ -155,13 +155,19 @@ const NewsUI = ({ }) => {
                                             }
                                         </div>
                                     </div>
-                                    {item.url && (<Link href={`${item.url}`} target="_blank" className="flex items-center gap-1">
-                                        <ActionButton icon={LinkIcon} />
-                                    </Link>)}
+
                                     {!isPlanetView && (<div className="flex gap-2 items-center">
                                         {item.status === "updating" && <Spinner className="" />}
+                                        {item.url && (<Link href={`${item.url}`} target="_blank" className="flex items-center gap-1">
+                                            <ActionButton icon={LinkIcon} />
+                                        </Link>)}
                                         <ActionButton icon={Pencil} onClick={() => updateHandle(item)} />
                                         <ActionButton icon={Trash2} onClick={() => deleteHandle(item)} disabled={deleting} />
+                                    </div>)}
+                                    {isPlanetView && (<div className="flex gap-2 items-center">
+                                        {item.url && (<Link href={`${item.url}`} target="_blank" className="flex items-center gap-1">
+                                            <ActionButton icon={LinkIcon} />
+                                        </Link>)}
                                     </div>)}
                                 </div>
 
