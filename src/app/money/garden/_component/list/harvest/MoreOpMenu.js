@@ -1,14 +1,14 @@
 "use client";
 import {
-  useEffect,
-  useState,
+    useEffect,
+    useState,
 } from "react";
 import ky from "ky";
 import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
+    Drawer,
+    DrawerContent,
+    DrawerHeader,
+    DrawerTitle,
 } from "@/components/ui/drawer";
 import { Spinner } from "@/components/ui/spinner";
 import { Button } from "@/components/ui/button";
@@ -76,6 +76,17 @@ const MoreOpMenu = ({ open, onOpenChange, target, onSuccess }) => {
                             <Button
                                 variant="ghost"
                                 className="h-auto min-h-20 flex-col items-center justify-center gap-1 rounded-xl px-4 py-4"
+                                onClick={async () => {
+                                    await ky.post('/api/money/harvest/upsert', {
+                                        json: {
+                                            id: target?.harvest?.[0]?.id,
+                                            gardenId: passCodeGarden.id,
+                                            title: passCodeGarden.title,
+                                        }
+                                    }).json();
+                                    onSuccess();
+                                    onOpenChange(false)
+                                }}
                             >
                                 <div className="flex items-center gap-2">
                                     <span className="text-base font-medium">
@@ -105,7 +116,7 @@ const MoreOpMenu = ({ open, onOpenChange, target, onSuccess }) => {
                         </Button>
                     </div>
                 </DrawerContent>
-            </Drawer>
+            </Drawer >
         </>
     );
 }
