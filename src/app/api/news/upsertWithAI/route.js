@@ -3,6 +3,7 @@ import supabase from "@/app/utils/database";
 import { generateAI } from "@/app/api/ai/_lib/generateAI";
 
 import { deleteByPublicUrls } from "@/app/api/file/_lib/delete";
+import { waitUntil } from "@vercel/functions";
 
 export async function POST(request, context) {
     const requestBody = await request.json();
@@ -15,7 +16,7 @@ export async function POST(request, context) {
         .join("，");
 
     await supabase.from("news").update({ status: "updating" }).eq("id", insertData.id);
-    generateAI({
+    waitUntil(generateAI({
         type: "news",
         ...(requestBody.isPic ? { pic: true } : {}),
         filled: {
@@ -42,6 +43,13 @@ export async function POST(request, context) {
                 status: "done", updated_at: new Date()
             })
             .eq("id", insertData.id);
-    });
+    })
+        .catch((err) => {
+            console.error("news generateAI failed:", err);
+            return supabase
+                .from("news")
+                .update({ status: "failed" })
+                .eq("id", insertData.id);
+        }));
     return NextResponse.json({ id: insertData.id });
 }

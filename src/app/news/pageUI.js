@@ -14,6 +14,7 @@ import {
     Trash2,
     Orbit,
     Link as LinkIcon,
+    AlertCircle
 } from "lucide-react";
 import Link from "next/link";
 import {
@@ -158,6 +159,9 @@ const NewsUI = ({ }) => {
 
                                     {!isPlanetView && (<div className="flex gap-2 items-center">
                                         {item.status === "updating" && <Spinner className="" />}
+                                        {item.status === "failed" && (
+                                            <AlertCircle className="h-4 w-4 text-red-500" />
+                                        )}
                                         {item.url && (<Link href={`${item.url}`} target="_blank" className="flex items-center gap-1">
                                             <ActionButton icon={LinkIcon} />
                                         </Link>)}
