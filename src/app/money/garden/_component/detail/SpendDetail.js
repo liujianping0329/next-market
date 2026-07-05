@@ -22,7 +22,8 @@ import {
   ChevronLeft,
   RotateCcw,
   CopyCheck,
-  CalendarPlus
+  CalendarPlus,
+  MapPin
 } from "lucide-react";
 import {
   PieChart,
@@ -531,8 +532,13 @@ const SpendDetail = ({ open, onOpenChange, target, onSuccess, prevTar }) => {
                                 )}
                               </div>
 
-                              <div className="mt-1 text-base text-slate-500">
-                                {item.date?.slice(5)}
+                              <div className="flex mt-1 text-base text-slate-500">
+                                <span>{item.date?.slice(5)}</span>
+
+                                {item.location && (<span className="ml-2 inline-flex items-center gap-0.5 rounded-full bg-slate-100 px-1.5 py-0.5 text-slate-500 whitespace-nowrap">
+                                  <MapPin className="h-4 w-4 shrink-0" />
+                                  {item.location?.name}
+                                </span>)}
                               </div>
 
 

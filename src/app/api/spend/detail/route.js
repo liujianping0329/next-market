@@ -6,7 +6,7 @@ import { getContants } from "@/app/api/constants/_lib/biz";
 export async function POST(request, context) {
     const { planetId, userId, gteDate, ltDateMaybe, ...requestBody } = await request.json();
 
-    let query = supabase.from("spend").select("*,f_user(*)").match(requestBody).order("isFix", { ascending: false })
+    let query = supabase.from("spend").select("*,f_user(*),location(*)").match(requestBody).order("isFix", { ascending: false })
         .order("date", { ascending: false }).order("created_at", { ascending: false });
     if (planetId) {
         query = query.eq("planetId", planetId);
