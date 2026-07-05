@@ -28,6 +28,7 @@ const LocationItems = ({ userInfo }) => {
     const response = await ky.post('/api/location/list/match', {
       json: {
         planetId: userInfo.planet.id,
+        status: 1
       }
     }).json();
     setList(response.list);
@@ -45,9 +46,10 @@ const LocationItems = ({ userInfo }) => {
 
   const deleteHandle = async (item) => {
     if (!confirm("确认删除？")) return
-    await ky.post('/api/location/delete', {
+    await ky.post('/api/location/upsert', {
       json: {
-        id: item.id
+        id: item.id,
+        status: -1
       }
     }).json();
     fetchList();

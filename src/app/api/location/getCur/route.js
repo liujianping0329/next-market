@@ -5,7 +5,7 @@ import { isNearPoint } from "@/app/utils/location";
 export async function POST(request, context) {
     const requestBody = await request.json();
     console.log("requestBody", requestBody);
-    const { data: allList } = await supabase.from("location").select();
+    const { data: allList } = await supabase.from("location").select().eq("status", 1);
     const nearList = allList
         .map(item => {
             const result = isNearPoint(
