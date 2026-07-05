@@ -24,12 +24,20 @@ import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import ky from "ky";
 import {
+    useEffect,
     useState
 } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import { useUserStore } from "@/app/money/garden/_store/userStore";
+import {
+    Alert,
+    AlertDescription,
+    AlertTitle,
+} from "@/components/ui/alert";
+
+import { AlertTriangle } from "lucide-react";
 
 
 
@@ -39,6 +47,8 @@ const FormLocationItems = ({ trigger, openLocationCtrl, setOpenLocationCtrl, onS
 
     const [openLocation, setOpenLocation] = useState(false);
     const [isLoadLocation, setIsLoadLocation] = useState(false);
+    const [canGetLocation, setCanGetLocation] = useState(true);
+    const [isGettingLocation, setIsGettingLocation] = useState(false);
 
     const userInfoStore = useUserStore(state => state.userInfo);
     const form = useForm({
@@ -46,8 +56,27 @@ const FormLocationItems = ({ trigger, openLocationCtrl, setOpenLocationCtrl, onS
             name: defaultValues?.name || "",
             lat: defaultValues?.lat || 0,
             lng: defaultValues?.lng || 0,
+            radius: defaultValues?.radius || 0,
         }
     });
+
+    useEffect(() => {
+        setIsGettingLocation(true);
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const latitude = Number(position.coords.latitude.toFixed(8));
+                const longitude = Number(position.coords.longitude.toFixed(8));
+
+                form.setValue("lat", latitude);
+                form.setValue("lng", longitude);
+                setIsGettingLocation(false);
+            },
+            (error) => {
+                setCanGetLocation(false);
+                console.error("获取地理位置失败:", error.message);
+            }
+        );
+    }, []);
 
     const onSubmit = async (values) => {
         setIsLoadLocation(true);
@@ -81,6 +110,22 @@ const FormLocationItems = ({ trigger, openLocationCtrl, setOpenLocationCtrl, onS
                     <DialogHeader>
                         <DialogTitle>{defaultValues?.id ? "修改" : "新增"}</DialogTitle>
                     </DialogHeader>
+                    {isGettingLocation && (
+                        <Alert>
+                            <Spinner />
+                            <AlertTitle>正在获取当前位置</AlertTitle>
+                            <AlertDescription>
+                                浏览器可能会请求定位权限，请允许后继续。
+                            </AlertDescription>
+                        </Alert>
+                    )}
+                    {!canGetLocation && <Alert variant="destructive" className="">
+                        <AlertTriangle className="h-4 w-4" />
+                        <AlertTitle>注意</AlertTitle>
+                        <AlertDescription>
+                            无法获取地理位置，请检查浏览器权限设置。
+                        </AlertDescription>
+                    </Alert>}
 
                     <div className="w-full max-h-dvh overflow-y-auto overscroll-contain">
                         <Form {...form}>
@@ -110,6 +155,16 @@ const FormLocationItems = ({ trigger, openLocationCtrl, setOpenLocationCtrl, onS
                                         render={({ field }) => (
                                             <FormItem className="">
                                                 <FormLabel>经度</FormLabel>
+                                                <FormControl>
+                                                    <Input type="number" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )} />
+                                    <FormField name="radius" control={form.control}
+                                        render={({ field }) => (
+                                            <FormItem className="">
+                                                <FormLabel>半径</FormLabel>
                                                 <FormControl>
                                                     <Input type="number" {...field} />
                                                 </FormControl>
