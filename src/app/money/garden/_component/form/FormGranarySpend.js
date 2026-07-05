@@ -42,6 +42,7 @@ import {
 import { useUserStore } from "@/app/money/garden/_store/userStore";
 import { useLocationStore } from "@/app/money/garden/_store/locationStore";
 import { MapPin } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 const cashList = [
     {
@@ -88,6 +89,14 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
 
         loadSession();
     }, []);
+
+    useEffect(() => {
+        if (defaultValues?.title) return;
+        if (!locationInfoStore?.spendNames) return;
+
+        form.setValue("title", locationInfoStore?.spendNames.split('\n')[0]);
+    }, [locationInfoStore?.spendNames, openGranarySpend]);
+
     const onSubmit = async (values) => {
         setIsLoadGranarySpend(true);
         await ky.post('/api/spend/upsert', {
@@ -162,6 +171,18 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
                                                 <FormControl>
                                                     <Input {...field} />
                                                 </FormControl>
+                                                {locationInfoStore.spendNames && (<div className="flex flex-wrap gap-1.5 pb-[-10px]">
+                                                    {locationInfoStore.spendNames.split('\n').map((text) => (
+                                                        <Badge
+                                                            key={text}
+                                                            variant="secondary"
+                                                            className="cursor-pointer bg-blue-50 text-blue-600 hover:bg-blue-100"
+                                                            onClick={() => form.setValue("title", text)}
+                                                        >
+                                                            {text}
+                                                        </Badge>
+                                                    ))}
+                                                </div>)}
                                                 <FormMessage />
                                             </FormItem>
                                         )} />

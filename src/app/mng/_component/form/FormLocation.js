@@ -38,7 +38,7 @@ import {
 } from "@/components/ui/alert";
 
 import { AlertTriangle } from "lucide-react";
-
+import { Textarea } from "@/components/ui/textarea";
 
 
 
@@ -57,6 +57,7 @@ const FormLocationItems = ({ trigger, openLocationCtrl, setOpenLocationCtrl, onS
             lat: defaultValues?.lat || 0,
             lng: defaultValues?.lng || 0,
             radius: defaultValues?.radius || 50,
+            spendNames: defaultValues?.spendNames || "",
         }
     });
 
@@ -90,6 +91,7 @@ const FormLocationItems = ({ trigger, openLocationCtrl, setOpenLocationCtrl, onS
                     lat: values.lat,
                     lng: values.lng,
                     radius: values.radius,
+                    spendNames: values.spendNames,
                 }
             }).json();
             onSuccess();
@@ -168,6 +170,16 @@ const FormLocationItems = ({ trigger, openLocationCtrl, setOpenLocationCtrl, onS
                                                 <FormLabel>半径</FormLabel>
                                                 <FormControl>
                                                     <Input type="number" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )} />
+                                    <FormField name="spendNames" control={form.control}
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>支出联想名称（每行对应一个选项）</FormLabel>
+                                                <FormControl>
+                                                    <Textarea {...field} className="min-h-[120px] resize-none" />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>

@@ -19,14 +19,7 @@ import LocationItems from "../_component/list/LocationItems";
 import GardenCate from "../_component/list/GardenCate";
 
 const configs = [{
-    name: "共通", value: "common", isDefault: false, children:
-        [
-            {
-                name: "位置", value: "locationItems"
-            }
-        ]
-}, {
-    name: "夏荣园", value: "garden", isDefault: true, children:
+    name: "夏荣园", value: "garden", isDefault: false, children:
         [
             {
                 name: "类目", value: "gardenCate"
@@ -34,9 +27,11 @@ const configs = [{
         ]
 },
 {
-    name: "冬藏园", value: "granary", isDefault: false, children:
+    name: "冬藏园", value: "granary", isDefault: true, children:
         [
             {
+                name: "位置", value: "locationItems"
+            }, {
                 name: "固定支出项目", value: "spendItems"
             }
         ]
