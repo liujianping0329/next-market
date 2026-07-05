@@ -90,6 +90,10 @@ const LocationItems = ({ userInfo }) => {
                 <span className="w-20">经度lng:</span>
                 <span className="w-10">{item.lng}</span>
               </div>
+              <div className="flex items-center gap-2">
+                <span className="w-20">半径:</span>
+                <span className="w-10">{item.radius}</span>
+              </div>
 
             </div>
           )

@@ -19,7 +19,7 @@ import {
     Satellite,
     PenTool,
     User,
-    Mic
+    MapPin
 } from "lucide-react";
 import ActionButton from "@/components/ActionButton";
 import {
@@ -38,6 +38,7 @@ import {
 import { useUserStore } from "@/app/money/garden/_store/userStore";
 import ky from "ky";
 import VoiceRecordDialog from "@/components/VoiceRecordDialog";
+import { Spinner } from "@/components/ui/spinner";
 
 export const revalidate = 0;
 
@@ -60,6 +61,28 @@ const GardenUI = ({ }) => {
     const [isUserReady, setIsUserReady] = useState(false)
     const setUserInfoStore = useUserStore(state => state.setUserInfo);
     const [isVoiceOpen, setIsVoiceOpen] = useState(false);
+    const [nearestLocation, setNearestLocation] = useState(null);
+    const [canGetLocation, setCanGetLocation] = useState(true);
+    const [isGettingLocation, setIsGettingLocation] = useState(false);
+
+    const getLocation = async () => {
+        setIsGettingLocation(true);
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                const latitude = Number(position.coords.latitude.toFixed(8));
+                const longitude = Number(position.coords.longitude.toFixed(8));
+
+                const response = await ky.post('/api/location/getCur', { json: { lat: latitude, lng: longitude } }).json();
+                setNearestLocation(response.nearestLocation);
+                setIsGettingLocation(false);
+            },
+            (error) => {
+                setCanGetLocation(false);
+                setIsGettingLocation(false);
+                console.error("获取地理位置失败:", error.message);
+            }
+        );
+    }
 
     useEffect(() => {
         const syncUser = async (session) => {
@@ -93,6 +116,7 @@ const GardenUI = ({ }) => {
         } = supabase.auth.onAuthStateChange((_event, session) => {
             syncUser(session);
         });
+        getLocation();
 
         return () => subscription.unsubscribe();
     }, [])
@@ -153,6 +177,20 @@ const GardenUI = ({ }) => {
                 {/* <Button variant="outline" size="sm" onClick={() => setIsVoiceOpen(true)}>
                     <Mic className="h-4 w-4" />语音
                 </Button> */}
+                <div>
+                    {nearestLocation && (
+                        <p>
+                            <MapPin className="h-4 w-4 inline mr-1" />
+                            {nearestLocation?.name || "未知位置"}
+                        </p>
+                    )}
+                    {isGettingLocation && (
+                        <p>
+                            <MapPin className="h-4 w-4 inline mr-1" />
+                            <Spinner className="h-4 w-4 inline mr-1" />
+                        </p>
+                    )}
+                </div>
                 {user ? (<DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon" className="rounded-full w-6 h-6">

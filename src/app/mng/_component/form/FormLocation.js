@@ -56,7 +56,7 @@ const FormLocationItems = ({ trigger, openLocationCtrl, setOpenLocationCtrl, onS
             name: defaultValues?.name || "",
             lat: defaultValues?.lat || 0,
             lng: defaultValues?.lng || 0,
-            radius: defaultValues?.radius || 0,
+            radius: defaultValues?.radius || 50,
         }
     });
 
@@ -89,6 +89,7 @@ const FormLocationItems = ({ trigger, openLocationCtrl, setOpenLocationCtrl, onS
                     name: values.name,
                     lat: values.lat,
                     lng: values.lng,
+                    radius: values.radius,
                 }
             }).json();
             onSuccess();
