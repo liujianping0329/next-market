@@ -177,66 +177,69 @@ const GardenUI = ({ }) => {
                 {/* <Button variant="outline" size="sm" onClick={() => setIsVoiceOpen(true)}>
                     <Mic className="h-4 w-4" />语音
                 </Button> */}
-                <div>
-                    {nearestLocation && (
-                        <p>
-                            <MapPin className="h-4 w-4 inline mr-1" />
-                            {nearestLocation?.name || "未知位置"}
+                <div className="flex items-center gap-3 shrink-0">
+                    <div className="flex justify-end">
+                        <p className="flex items-center gap-1 text-sm whitespace-nowrap">
+                            <MapPin className="h-4 w-4 shrink-0" />
+
+                            {isGettingLocation ? (
+                                <span className="inline-flex items-center gap-1">
+                                    <Spinner className="h-4 w-4" />
+                                </span>
+                            ) : (
+                                <span className="truncate max-w-[80px]">
+                                    {nearestLocation?.name || "未知"}
+                                </span>
+                            )}
                         </p>
-                    )}
-                    {isGettingLocation && (
-                        <p>
-                            <MapPin className="h-4 w-4 inline mr-1" />
-                            <Spinner className="h-4 w-4 inline mr-1" />
-                        </p>
-                    )}
-                </div>
-                {user ? (<DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="rounded-full w-6 h-6">
-                            <Avatar>
-                                <AvatarImage src={user?.user_metadata.avatar_url} alt="img" />
-                                <AvatarFallback>CN</AvatarFallback>
-                            </Avatar>
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-32">
-                        <DropdownMenuGroup>
-                            <DropdownMenuItem>
-                                <Link href="/news" className="flex items-center gap-2">
-                                    <PenTool className="h-4 w-4" />
-                                    <span>妙笔生花</span>
-                                </Link>
-                            </DropdownMenuItem>
-                        </DropdownMenuGroup>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuGroup>
-                            <DropdownMenuItem>
-                                <Link href="/mng/admin" className="flex items-center gap-2">
-                                    <ShieldCheck className="h-4 w-4" />
-                                    <span>执枢司要</span>
-                                </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                                <Link href="/mng/leader" className="flex items-center gap-2">
-                                    <Satellite className="h-4 w-4" />
-                                    <span>分星主事</span>
-                                </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                                <Link href="/mng/user" className="flex items-center gap-2">
-                                    <User className="h-4 w-4" />
-                                    <span>安身立簿</span>
-                                </Link>
-                            </DropdownMenuItem>
-                        </DropdownMenuGroup>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuGroup>
-                            <DropdownMenuItem variant="destructive" onClick={handleLogout}>注销</DropdownMenuItem>
-                        </DropdownMenuGroup>
-                    </DropdownMenuContent>
-                </DropdownMenu>) : <ActionButton icon={CircleUser} size="icon" onClick={handleLogin} />}
-            </div >
+                    </div>
+                    {user ? (<DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="rounded-full w-6 h-6">
+                                <Avatar>
+                                    <AvatarImage src={user?.user_metadata.avatar_url} alt="img" />
+                                    <AvatarFallback>CN</AvatarFallback>
+                                </Avatar>
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent className="w-32">
+                            <DropdownMenuGroup>
+                                <DropdownMenuItem>
+                                    <Link href="/news" className="flex items-center gap-2">
+                                        <PenTool className="h-4 w-4" />
+                                        <span>妙笔生花</span>
+                                    </Link>
+                                </DropdownMenuItem>
+                            </DropdownMenuGroup>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuGroup>
+                                <DropdownMenuItem>
+                                    <Link href="/mng/admin" className="flex items-center gap-2">
+                                        <ShieldCheck className="h-4 w-4" />
+                                        <span>执枢司要</span>
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                    <Link href="/mng/leader" className="flex items-center gap-2">
+                                        <Satellite className="h-4 w-4" />
+                                        <span>分星主事</span>
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                    <Link href="/mng/user" className="flex items-center gap-2">
+                                        <User className="h-4 w-4" />
+                                        <span>安身立簿</span>
+                                    </Link>
+                                </DropdownMenuItem>
+                            </DropdownMenuGroup>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuGroup>
+                                <DropdownMenuItem variant="destructive" onClick={handleLogout}>注销</DropdownMenuItem>
+                            </DropdownMenuGroup>
+                        </DropdownMenuContent>
+                    </DropdownMenu>) : <ActionButton icon={CircleUser} size="icon" onClick={handleLogin} />}
+                </div >
+            </div>
             {tab === "Soybean" && <Soybean userInfo={user} isUserReady={isUserReady} />}
             {tab === "Greengrass" && <Greengrass userInfo={user} isUserReady={isUserReady} />}
             {tab === "Harvest" && <Harvest userInfo={user} isUserReady={isUserReady} />}
