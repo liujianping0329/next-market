@@ -171,7 +171,7 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
                                                 <FormControl>
                                                     <Input {...field} />
                                                 </FormControl>
-                                                {locationInfoStore.spendNames && (<div className="flex flex-wrap gap-1.5 pb-[-10px]">
+                                                {locationInfoStore?.spendNames && (<div className="flex flex-wrap gap-1.5 pb-[-10px]">
                                                     {locationInfoStore.spendNames.split('\n').map((text) => (
                                                         <Badge
                                                             key={text}
