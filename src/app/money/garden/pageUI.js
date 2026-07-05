@@ -36,6 +36,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useUserStore } from "@/app/money/garden/_store/userStore";
+import { useLocationStore } from "@/app/money/garden/_store/locationStore";
 import ky from "ky";
 import VoiceRecordDialog from "@/components/VoiceRecordDialog";
 import { Spinner } from "@/components/ui/spinner";
@@ -65,6 +66,8 @@ const GardenUI = ({ }) => {
     const [canGetLocation, setCanGetLocation] = useState(true);
     const [isGettingLocation, setIsGettingLocation] = useState(false);
 
+    const setLocationInfoStore = useLocationStore(state => state.setLocationInfo);
+
     const getLocation = async () => {
         setIsGettingLocation(true);
         navigator.geolocation.getCurrentPosition(
@@ -74,6 +77,7 @@ const GardenUI = ({ }) => {
 
                 const response = await ky.post('/api/location/getCur', { json: { lat: latitude, lng: longitude } }).json();
                 setNearestLocation(response.nearestLocation);
+                setLocationInfoStore(response.nearestLocation);
                 setIsGettingLocation(false);
             },
             (error) => {

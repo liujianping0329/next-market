@@ -40,6 +40,8 @@ import {
     parseLocalDate,
 } from "@/app/utils/date";
 import { useUserStore } from "@/app/money/garden/_store/userStore";
+import { useLocationStore } from "@/app/money/garden/_store/locationStore";
+import { MapPin } from "lucide-react";
 
 const cashList = [
     {
@@ -66,6 +68,7 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
     const [userId, setUserId] = useState(null);
 
     const userInfoStore = useUserStore(state => state.userInfo);
+    const locationInfoStore = useLocationStore(state => state.locationInfo);
 
     const form = useForm({
         defaultValues: {
@@ -98,6 +101,7 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
                 ...cash,
                 userId,
                 planetId: userInfoStore?.planetId,
+                ...(locationInfoStore?.id && { locationId: locationInfoStore?.id }),
             }
         }).json();
         setOpenGranarySpendCtrl ? setOpenGranarySpendCtrl(false) : setOpenGranarySpend(false);
@@ -204,6 +208,14 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
                         </DialogClose>
                         <Button type="submit" form="formGranarySpend" disabled={isLoadGranarySpend}>
                             {isLoadGranarySpend && <Spinner />}保存
+                            {locationInfoStore?.id && (
+                                <span className="inline-flex items-center gap-0.5 whitespace-nowrap">
+                                    (
+                                    <MapPin className="h-4 w-4 shrink-0" />
+                                    <span>{locationInfoStore.name}</span>
+                                    )
+                                </span>
+                            )}
                         </Button>
                     </DialogFooter>
                 </DialogContent >
