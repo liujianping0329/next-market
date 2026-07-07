@@ -95,9 +95,11 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
         if (!locationInfoStore?.spendNames) return;
 
         form.setValue("title", locationInfoStore?.spendNames.split('\n')[0]);
-        setTimeout(() => {
-            form.setFocus("amount");
-        }, 100);
+        if (openGranarySpendCtrl ?? openGranarySpend) {
+            setTimeout(() => {
+                form.setFocus("amount");
+            }, 100);
+        }
     }, [locationInfoStore?.spendNames, openGranarySpendCtrl ?? openGranarySpend]);
 
     const onSubmit = async (values) => {
