@@ -31,6 +31,7 @@ import { toast } from "sonner";
 
 import { useUserStore } from "@/app/money/garden/_store/userStore";
 import { slugify } from "transliteration";
+import { Textarea } from "@/components/ui/textarea";
 
 const FormGardenCate = ({ trigger, openGardenCateCtrl, setOpenGardenCateCtrl, onSuccess, defaultValues = null, userInfo }) => {
 
@@ -41,7 +42,7 @@ const FormGardenCate = ({ trigger, openGardenCateCtrl, setOpenGardenCateCtrl, on
     const form = useForm({
         defaultValues: {
             name: defaultValues?.name || "",
-            parentId: defaultValues?.parentId || 0,
+            ...(!defaultValues?.id && { children: "" }),
         }
     });
 
@@ -49,14 +50,21 @@ const FormGardenCate = ({ trigger, openGardenCateCtrl, setOpenGardenCateCtrl, on
         setIsLoadGardenCate(true);
 
         try {
-            await ky.post('/api/garden_cate/upsert', {
+            await ky.post('/api/garden_cate/upsertWithChildren', {
                 json: {
                     ...(defaultValues?.id && { id: defaultValues.id }),
                     planetId: userInfoStore.planet?.id,
                     name: values.name,
-                    parentId: values.parentId,
                     value: slugify(values.name, {
                         separator: "",
+                    }),
+                    ...(!defaultValues?.id && {
+                        children: values.children.split('\n').filter(item => item.trim() !== "").map(item => ({
+                            name: item,
+                            value: slugify(item, {
+                                separator: "",
+                            }),
+                        }))
                     }),
                 }
             }).json();
@@ -94,16 +102,16 @@ const FormGardenCate = ({ trigger, openGardenCateCtrl, setOpenGardenCateCtrl, on
                                                 <FormMessage />
                                             </FormItem>
                                         )} />
-                                    <FormField name="parentId" control={form.control}
+                                    {!defaultValues?.id && <FormField name="children" control={form.control}
                                         render={({ field }) => (
-                                            <FormItem className="">
-                                                <FormLabel>父类目</FormLabel>
+                                            <FormItem>
+                                                <FormLabel>二级类目（每行对应一个）</FormLabel>
                                                 <FormControl>
-                                                    <Input type="number" {...field} />
+                                                    <Textarea {...field} className="min-h-[120px] resize-none" />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
-                                        )} />
+                                        )} />}
                                 </FieldGroup>
                             </form>
                         </Form>
