@@ -95,7 +95,10 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
         if (!locationInfoStore?.spendNames) return;
 
         form.setValue("title", locationInfoStore?.spendNames.split('\n')[0]);
-    }, [locationInfoStore?.spendNames, openGranarySpend]);
+        setTimeout(() => {
+            form.setFocus("amount");
+        }, 100);
+    }, [locationInfoStore?.spendNames, openGranarySpendCtrl ?? openGranarySpend]);
 
     const onSubmit = async (values) => {
         setIsLoadGranarySpend(true);
@@ -177,7 +180,10 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
                                                             key={text}
                                                             variant="secondary"
                                                             className="cursor-pointer bg-blue-50 text-blue-600 hover:bg-blue-100"
-                                                            onClick={() => form.setValue("title", text)}
+                                                            onClick={() => {
+                                                                form.setValue("title", text)
+                                                                form.setFocus("amount");
+                                                            }}
                                                         >
                                                             {text}
                                                         </Badge>

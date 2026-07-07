@@ -37,7 +37,7 @@ import {
     AlertTitle,
 } from "@/components/ui/alert";
 
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, MapPin } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 
 
@@ -56,12 +56,12 @@ const FormLocationItems = ({ trigger, openLocationCtrl, setOpenLocationCtrl, onS
             name: defaultValues?.name || "",
             lat: defaultValues?.lat || 0,
             lng: defaultValues?.lng || 0,
-            radius: defaultValues?.radius || 50,
+            radius: defaultValues?.radius || 100,
             spendNames: defaultValues?.spendNames || "",
         }
     });
 
-    useEffect(() => {
+    const getLocation = () => {
         setIsGettingLocation(true);
         navigator.geolocation.getCurrentPosition(
             (position) => {
@@ -77,6 +77,12 @@ const FormLocationItems = ({ trigger, openLocationCtrl, setOpenLocationCtrl, onS
                 console.error("获取地理位置失败:", error.message);
             }
         );
+    };
+
+    useEffect(() => {
+        if (!defaultValues?.id) {
+            getLocation();
+        }
     }, []);
 
     const onSubmit = async (values) => {
@@ -189,12 +195,27 @@ const FormLocationItems = ({ trigger, openLocationCtrl, setOpenLocationCtrl, onS
                         </Form>
                     </div>
                     <DialogFooter>
-                        <DialogClose asChild>
-                            <Button variant="outline">关闭</Button>
-                        </DialogClose>
-                        <Button type="submit" form="formLocation" disabled={isLoadLocation}>
-                            {isLoadLocation && <Spinner />}保存
-                        </Button>
+                        {!defaultValues?.id ? (<>
+                            <DialogClose asChild>
+                                <Button variant="outline">关闭</Button>
+                            </DialogClose>
+                            <Button type="submit" form="formLocation" disabled={isLoadLocation}>
+                                {isLoadLocation && <Spinner />}保存
+                            </Button>
+                        </>) : (<>
+                            <DialogClose asChild>
+                                <Button variant="outline">关闭</Button>
+                            </DialogClose>
+                            <div className="grid grid-cols-[49%_2%_49%] justify-between">
+                                <Button type="button" onClick={() => getLocation()} disabled={isGettingLocation}>
+                                    {isGettingLocation && <Spinner />}<MapPin className="w-4 h-4 mr-2" />获取位置
+                                </Button>
+                                <div></div>
+                                <Button type="submit" form="formLocation" disabled={isLoadLocation}>
+                                    {isLoadLocation && <Spinner />}保存
+                                </Button>
+                            </div>
+                        </>)}
                     </DialogFooter>
                 </DialogContent>
 
