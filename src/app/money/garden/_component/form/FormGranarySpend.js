@@ -99,6 +99,7 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
             setTimeout(() => {
                 form.setFocus("amount");
             }, 100);
+
         }
     }, [locationInfoStore?.spendNames, openGranarySpendCtrl ?? openGranarySpend]);
 
