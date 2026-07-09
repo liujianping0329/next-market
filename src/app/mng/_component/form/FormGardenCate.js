@@ -33,7 +33,7 @@ import { useUserStore } from "@/app/money/garden/_store/userStore";
 import { slugify } from "transliteration";
 import { Textarea } from "@/components/ui/textarea";
 
-const FormGardenCate = ({ trigger, openGardenCateCtrl, setOpenGardenCateCtrl, onSuccess, defaultValues = null, userInfo }) => {
+const FormGardenCate = ({ trigger, openGardenCateCtrl, setOpenGardenCateCtrl, onSuccess, defaultValues = null, userInfo, isAddChild = false }) => {
 
     const [openGardenCate, setOpenGardenCate] = useState(false);
     const [isLoadGardenCate, setIsLoadGardenCate] = useState(false);
@@ -42,7 +42,7 @@ const FormGardenCate = ({ trigger, openGardenCateCtrl, setOpenGardenCateCtrl, on
     const form = useForm({
         defaultValues: {
             name: defaultValues?.name || "",
-            ...(!defaultValues?.id && { children: "" }),
+            ...((!defaultValues?.id || isAddChild) && { children: "" }),
         }
     });
 
@@ -50,24 +50,33 @@ const FormGardenCate = ({ trigger, openGardenCateCtrl, setOpenGardenCateCtrl, on
         setIsLoadGardenCate(true);
 
         try {
-            await ky.post('/api/garden_cate/upsertWithChildren', {
-                json: {
-                    ...(defaultValues?.id && { id: defaultValues.id }),
-                    planetId: userInfoStore.planet?.id,
-                    name: values.name,
-                    value: slugify(values.name, {
-                        separator: "",
-                    }),
-                    ...(!defaultValues?.id && {
-                        children: values.children.split('\n').filter(item => item.trim() !== "").map(item => ({
-                            name: item,
-                            value: slugify(item, {
-                                separator: "",
-                            }),
-                        }))
-                    }),
-                }
-            }).json();
+            if (isAddChild) {
+                await ky.post("/api/garden_cate/upsert", {
+                    json: [
+
+                    ],
+                }).json();
+            } else {
+                await ky.post('/api/garden_cate/upsertWithChildren', {
+                    json: {
+                        ...(defaultValues?.id && { id: defaultValues.id }),
+                        planetId: userInfoStore.planet?.id,
+                        name: values.name,
+                        value: slugify(values.name, {
+                            separator: "",
+                        }),
+                        ...(!defaultValues?.id && {
+                            children: values.children.split('\n').filter(item => item.trim() !== "").map(item => ({
+                                name: item,
+                                value: slugify(item, {
+                                    separator: "",
+                                }),
+                            }))
+                        }),
+                    }
+                }).json();
+            }
+
             onSuccess();
             setOpenGardenCateCtrl ? setOpenGardenCateCtrl(false) : setOpenGardenCate(false);
             form.reset();

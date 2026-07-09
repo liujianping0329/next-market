@@ -14,20 +14,24 @@ import FormGardenCate from "../form/FormGardenCate"
 import {
   Pencil,
   Trash2,
+  CircleFadingPlus,
 } from "lucide-react";
 
 
 const GardenCate = ({ userInfo }) => {
   const [list, setList] = useState([]);
   const [openUpdate, setOpenUpdate] = useState(false)
+  const [openAddChild, setOpenAddChild] = useState(false)
 
   const [formVersion, setFormVersion] = useState(0);
   const [updateTarget, setUpdateTarget] = useState(null)
+  const [addChildTarget, setAddChildTarget] = useState(null)
 
   const fetchList = async () => {
-    const response = await ky.post('/api/garden_cate/list/match', {
+    const response = await ky.post('/api/garden_cate/list/matchWithChildren', {
       json: {
         planetId: userInfo.planet.id,
+        status: 1
       }
     }).json();
     setList(response.list);
@@ -45,9 +49,10 @@ const GardenCate = ({ userInfo }) => {
 
   const deleteHandle = async (item) => {
     if (!confirm("确认删除？")) return
-    await ky.post('/api/garden_cate/delete', {
+    await ky.post('/api/garden_cate/upsert', {
       json: {
-        id: item.id
+        id: item.id,
+        status: -1
       }
     }).json();
     fetchList();
@@ -78,13 +83,29 @@ const GardenCate = ({ userInfo }) => {
                 </div>
 
                 <div className="flex shrink-0 items-center gap-1">
+                  <ActionButton icon={CircleFadingPlus} onClick={() => {
+                    setAddChildTarget(item);
+                    setFormVersion((v) => v + 1);
+                    setOpenAddChild(true);
+                  }} />
                   <ActionButton icon={Pencil} onClick={() => updateHandle(item)} />
                   <ActionButton icon={Trash2} onClick={() => deleteHandle(item)} />
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="w-20">parentId:</span>
-                <span className="w-10">{item.parentId}</span>
+              <div className="grid grid-cols-2 gap-2">
+                {item.children?.map((child) => (
+                  <div
+                    key={child.id}
+                    className="flex items-center justify-between gap-2 rounded-md border border-gray-200 bg-gray-50 px-2 py-1 text-sm text-gray-700"
+                  >
+                    <span className="min-w-0 truncate">{child.name}</span>
+
+                    <div className="flex shrink-0 items-center gap-1">
+                      <ActionButton icon={Pencil} onClick={() => updateHandle(child)} />
+                      <ActionButton icon={Trash2} onClick={() => deleteHandle(child)} />
+                    </div>
+                  </div>
+                ))}
               </div>
 
             </div>
@@ -95,6 +116,9 @@ const GardenCate = ({ userInfo }) => {
       <FormGardenCate openGardenCateCtrl={openUpdate} setOpenGardenCateCtrl={setOpenUpdate}
         onSuccess={() => fetchList()} defaultValues={updateTarget}
         key={`${updateTarget?.id ?? "-1"}-${formVersion}`} />
+      <FormGardenCate openGardenCateCtrl={openAddChild} setOpenGardenCateCtrl={setOpenAddChild}
+        onSuccess={() => fetchList()} isAddChild={true} defaultValues={addChildTarget}
+        key={`${addChildTarget?.id ?? "-1"}-${formVersion}-addChild`} />
     </>
   )
 }
