@@ -112,6 +112,7 @@ const FormGardenCateExport = ({ trigger, openCtrl, setOpenCtrl, onSuccess, defau
             await navigator.clipboard.writeText(clipboardText);
             toast.success("提示词生成成功,请输入至AI")
             onSuccess();
+
             setOpenCtrl ? setOpenCtrl(false) : setOpen(false);
             form.reset();
         } catch (error) {
