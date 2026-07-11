@@ -52,9 +52,14 @@ const FormGardenCate = ({ trigger, openGardenCateCtrl, setOpenGardenCateCtrl, on
         try {
             if (isAddChild) {
                 await ky.post("/api/garden_cate/upsert", {
-                    json: [
-
-                    ],
+                    json: values.children.split('\n').filter(item => item.trim() !== "").map(item => ({
+                        name: item,
+                        value: slugify(item, {
+                            separator: "",
+                        }),
+                        parentId: defaultValues.id,
+                        planetId: userInfoStore.planet?.id,
+                    })),
                 }).json();
             } else {
                 await ky.post('/api/garden_cate/upsertWithChildren', {
@@ -101,17 +106,18 @@ const FormGardenCate = ({ trigger, openGardenCateCtrl, setOpenGardenCateCtrl, on
                         <Form {...form}>
                             <form onSubmit={form.handleSubmit(onSubmit)} id="formGardenCate" className="">
                                 <FieldGroup className="gap-4">
-                                    <FormField name="name" control={form.control}
-                                        render={({ field }) => (
-                                            <FormItem className="">
-                                                <FormLabel>类目名称</FormLabel>
-                                                <FormControl>
-                                                    <Input {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )} />
-                                    {!defaultValues?.id && <FormField name="children" control={form.control}
+                                    {!isAddChild &&
+                                        <FormField name="name" control={form.control}
+                                            render={({ field }) => (
+                                                <FormItem className="">
+                                                    <FormLabel>类目名称</FormLabel>
+                                                    <FormControl>
+                                                        <Input {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )} />}
+                                    {(!defaultValues?.id || isAddChild) && <FormField name="children" control={form.control}
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel>二级类目（每行对应一个）</FormLabel>
