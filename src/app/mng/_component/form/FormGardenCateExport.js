@@ -73,12 +73,43 @@ const FormGardenCateExport = ({ trigger, openCtrl, setOpenCtrl, onSuccess, defau
                     needAll: values.needAll,
                 }
             }).json();
-            await navigator.clipboard.writeText(
-                JSON.stringify({
-                    gardenList: response.gardenList,
-                    ...defaultValues
-                })
-            );
+
+            const {
+                created_at,
+                value,
+                parentId,
+                planetId,
+                status,
+                children = [],
+                ...rest
+            } = defaultValues;
+
+            const cleanedChildren = children.map((item) => {
+                const {
+                    created_at,
+                    value,
+                    parentId,
+                    planetId,
+                    status,
+                    ...childRest
+                } = item;
+
+                return childRest;
+            });
+            const jsonText = JSON.stringify({
+                ...rest,
+                gardenList: response.gardenList,
+                labels: cleanedChildren,
+            })
+            const clipboardText = [
+                "<<json_start>>",
+                jsonText,
+                "<<json_end>>",
+                "",
+                values.prompt,
+            ].join("\n");
+
+            await navigator.clipboard.writeText(clipboardText);
             toast.success("提示词生成成功,请输入至AI")
             onSuccess();
             setOpenCtrl ? setOpenCtrl(false) : setOpen(false);
