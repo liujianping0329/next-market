@@ -16,6 +16,7 @@ import {
   Trash2,
   CircleFadingPlus,
   MonitorDown,
+  EraserIcon
 } from "lucide-react";
 import FormGardenCateExport from "../form/FormGardenCateExport";
 
@@ -24,6 +25,7 @@ const GardenCate = ({ userInfo }) => {
   const [openUpdate, setOpenUpdate] = useState(false)
   const [openAddChild, setOpenAddChild] = useState(false)
   const [openExport, setOpenExport] = useState(false)
+  const [isObjDeleted, setIsObjDeleted] = useState(false)
 
   const [formVersion, setFormVersion] = useState(0);
   const [updateTarget, setUpdateTarget] = useState(null)
@@ -86,19 +88,42 @@ const GardenCate = ({ userInfo }) => {
                 </div>
 
                 <div className="flex shrink-0 items-center gap-1">
-                  <ActionButton icon={MonitorDown} onClick={() => {
-                    setExportTarget(item);
-                    setFormVersion((v) => v + 1);
-                    setOpenExport(true);
-                  }} />
-                  <ActionButton icon={CircleFadingPlus} onClick={() => {
-                    setAddChildTarget(item);
-                    setFormVersion((v) => v + 1);
-                    setOpenAddChild(true);
-                  }} />
                   <ActionButton icon={Pencil} onClick={() => updateHandle(item)} />
                   <ActionButton icon={Trash2} onClick={() => deleteHandle(item)} />
                 </div>
+              </div>
+              <div className="grid shrink-0 grid-cols-3 gap-2">
+                <Button size="sm" variant="outline" onClick={() => {
+                  setAddChildTarget(item);
+                  setFormVersion((v) => v + 1);
+                  setOpenAddChild(true);
+                }} >
+                  <CircleFadingPlus className="h-4 w-4 text-sky-500" />
+                  <span>批量新增子项</span>
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => {
+                  setIsObjDeleted(true);
+                  ky.post('/api/garden_cate/delete/allChildren', {
+                    json: {
+                      id: item.id
+                    }
+                  }).then(() => {
+                    fetchList();
+                    setIsObjDeleted(false);
+                  });
+                }} disabled={isObjDeleted} >
+                  <EraserIcon className="h-4 w-4 text-sky-500" />
+                  <span>物理重置子项</span>
+                </Button>
+
+                <Button size="sm" variant="outline" onClick={() => {
+                  setExportTarget(item);
+                  setFormVersion((v) => v + 1);
+                  setOpenExport(true);
+                }} >
+                  <MonitorDown className="h-4 w-4 text-sky-500" />
+                  <span>导出AI提示词</span>
+                </Button>
               </div>
               <div className="grid grid-cols-2 gap-2">
                 {item.children?.map((child) => (

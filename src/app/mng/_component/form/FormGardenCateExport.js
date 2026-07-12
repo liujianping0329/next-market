@@ -47,6 +47,7 @@ const FormGardenCateExport = ({ trigger, openCtrl, setOpenCtrl, onSuccess, defau
 
     useEffect(() => {
         const getPrompt = async () => {
+            setIsLoad(true);
             const response = await ky.post('/api/constants/list/match', {
                 json: {
                     category: "GardenCateExport"
@@ -54,11 +55,10 @@ const FormGardenCateExport = ({ trigger, openCtrl, setOpenCtrl, onSuccess, defau
             }).json();
 
             form.setValue("prompt", response.list[0]?.value || "");
+            setIsLoad(false);
         }
         if (openCtrl ?? open) {
-            setIsLoad(true);
             getPrompt();
-            setIsLoad(false);
         }
     }, [openCtrl ?? open]);
 
