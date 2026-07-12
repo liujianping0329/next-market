@@ -16,9 +16,11 @@ import {
   Trash2,
   CircleFadingPlus,
   MonitorDown,
-  EraserIcon
+  EraserIcon,
+  FileDown
 } from "lucide-react";
 import FormGardenCateExport from "../form/FormGardenCateExport";
+import { toast } from "sonner";
 
 const GardenCate = ({ userInfo }) => {
   const [list, setList] = useState([]);
@@ -101,7 +103,33 @@ const GardenCate = ({ userInfo }) => {
                   <CircleFadingPlus className="h-4 w-4 text-sky-500" />
                   <span>批量新增子项</span>
                 </Button>
+                <Button size="sm" variant="outline"
+                  onClick={async () => {
+                    const text = (item.children ?? [])
+                      .map((child) => {
+                        const lines = [child.name];
+
+                        if (child.children?.length) {
+                          lines.push(
+                            ` ${child.children
+                              .map((grandchild) => grandchild.name)
+                              .join(" ")}`
+                          );
+                        }
+
+                        return lines.join("\n");
+                      })
+                      .join("\n");
+
+                    await navigator.clipboard.writeText(text);
+                    toast.success("类目文本已复制到剪贴板");
+                  }}
+                >
+                  <FileDown className="h-4 w-4 text-sky-500" />
+                  <span>导出类目文本</span>
+                </Button>
                 <Button size="sm" variant="outline" onClick={() => {
+                  if (!confirm("确认物理删除该类目下的所有子项？")) return
                   setIsObjDeleted(true);
                   ky.post('/api/garden_cate/delete/allChildren', {
                     json: {
