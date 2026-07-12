@@ -13,10 +13,15 @@ export async function POST(request, context) {
         .map((parent) => {
             return {
                 ...parent,
-                children: matchList.filter((child) => child.parentId === parent.id),
+                children: matchList.filter((child) => child.parentId === parent.id)
+                    .map((child) => ({
+                        ...child,
+                        children: matchList.filter(
+                            (grandchild) => grandchild.parentId === child.id
+                        ),
+                    })),
             };
         });
-
 
     return NextResponse.json({ list });
 }

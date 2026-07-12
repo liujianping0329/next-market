@@ -92,7 +92,7 @@ const GardenCate = ({ userInfo }) => {
                   <ActionButton icon={Trash2} onClick={() => deleteHandle(item)} />
                 </div>
               </div>
-              <div className="grid shrink-0 grid-cols-3 gap-2">
+              <div className="grid shrink-0 grid-cols-3 gap-2 pb-1">
                 <Button size="sm" variant="outline" onClick={() => {
                   setAddChildTarget(item);
                   setFormVersion((v) => v + 1);
@@ -125,21 +125,68 @@ const GardenCate = ({ userInfo }) => {
                   <span>导出AI提示词</span>
                 </Button>
               </div>
-              <div className="grid grid-cols-2 gap-2">
-                {item.children?.map((child) => (
-                  <div
-                    key={child.id}
-                    className="flex items-center justify-between gap-2 rounded-md border border-gray-200 bg-gray-50 px-2 py-1 text-sm text-gray-700"
-                  >
-                    <span className="min-w-0 truncate">{child.name}</span>
+
+              {item.children?.map((child) => (
+                <div
+                  key={child.id}
+                  className="overflow-hidden rounded-lg border border-gray-200"
+                >
+                  {/* 二级标题栏 */}
+                  <div className="flex items-center justify-between gap-2 bg-slate-100 px-3 py-2">
+                    <div className="flex min-w-0 items-center gap-2">
+                      <span className="rounded bg-slate-700 px-1.5 py-0.5 text-[10px] font-medium text-white">
+
+                      </span>
+
+                      <span className="min-w-0 truncate text-sm font-semibold text-gray-900">
+                        {child.name}
+                      </span>
+                    </div>
 
                     <div className="flex shrink-0 items-center gap-1">
-                      <ActionButton icon={Pencil} onClick={() => updateHandle(child)} />
-                      <ActionButton icon={Trash2} onClick={() => deleteHandle(child)} />
+                      <ActionButton
+                        icon={Pencil}
+                        onClick={() => updateHandle(child)}
+                      />
+                      <ActionButton
+                        icon={Trash2}
+                        onClick={() => deleteHandle(child)}
+                      />
                     </div>
                   </div>
-                ))}
-              </div>
+
+                  {/* 三级区域 */}
+                  {child.children?.length > 0 && (
+                    <div className="grid grid-cols-2 gap-2 bg-gray-50 p-2">
+                      {child.children.map((grandchild) => (
+                        <div
+                          key={grandchild.id}
+                          className="flex min-w-0 items-center justify-between gap-1 rounded-md border border-gray-200 bg-white px-2 py-1.5"
+                        >
+                          <div className="flex min-w-0 items-center gap-1.5">
+                            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-sky-400" />
+
+                            <span className="min-w-0 truncate text-xs text-gray-700">
+                              {grandchild.name}
+                            </span>
+                          </div>
+
+                          <div className="flex shrink-0 items-center gap-0.5">
+                            <ActionButton
+                              icon={Pencil}
+                              onClick={() => updateHandle(grandchild)}
+                            />
+                            <ActionButton
+                              icon={Trash2}
+                              onClick={() => deleteHandle(grandchild)}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
 
             </div>
           )

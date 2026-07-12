@@ -32,6 +32,58 @@ import { toast } from "sonner";
 import { useUserStore } from "@/app/money/garden/_store/userStore";
 import { slugify } from "transliteration";
 import { Textarea } from "@/components/ui/textarea";
+const parseChildren = (text = "") => {
+    const children = [];
+    let currentChild = null;
+
+    text.split("\n").forEach((rawLine) => {
+        if (!rawLine.trim()) return;
+
+        // 半角空格开头：三级目录
+        if (rawLine.startsWith(" ")) {
+            if (!currentChild) return;
+
+            const grandchildren = rawLine
+                .trim()
+                .split(/\s+/)
+                .filter(Boolean)
+                .map((name) => ({
+                    name,
+                    value: slugify(name, {
+                        separator: "",
+                    }),
+                }));
+
+            currentChild.children.push(...grandchildren);
+            return;
+        }
+
+        // 不以半角空格开头：二级目录
+        const name = rawLine.trim();
+
+        currentChild = {
+            name,
+            value: slugify(name, {
+                separator: "",
+            }),
+            children: [],
+        };
+
+        children.push(currentChild);
+    });
+
+    return children;
+};
+
+const CHILDREN_EXAMPLE = [
+    "主食",
+    " 米饭 面条 馒头",
+    "肉类",
+    " 牛肉 猪肉 鸡肉",
+    "饮料",
+    " 咖啡 茶 果汁",
+].join("\n");
+
 
 const FormGardenCate = ({ trigger, openGardenCateCtrl, setOpenGardenCateCtrl, onSuccess, defaultValues = null, userInfo, isAddChild = false }) => {
 
@@ -51,15 +103,12 @@ const FormGardenCate = ({ trigger, openGardenCateCtrl, setOpenGardenCateCtrl, on
 
         try {
             if (isAddChild) {
-                await ky.post("/api/garden_cate/upsert", {
-                    json: values.children.split('\n').filter(item => item.trim() !== "").map(item => ({
-                        name: item,
-                        value: slugify(item, {
-                            separator: "",
-                        }),
-                        parentId: defaultValues.id,
+                await ky.post("/api/garden_cate/upsertWithChildren", {
+                    json: {
+                        id: defaultValues.id,
                         planetId: userInfoStore.planet?.id,
-                    })),
+                        children: parseChildren(values.children),
+                    },
                 }).json();
             } else {
                 await ky.post('/api/garden_cate/upsertWithChildren', {
@@ -71,12 +120,7 @@ const FormGardenCate = ({ trigger, openGardenCateCtrl, setOpenGardenCateCtrl, on
                             separator: "",
                         }),
                         ...(!defaultValues?.id && {
-                            children: values.children.split('\n').filter(item => item.trim() !== "").map(item => ({
-                                name: item,
-                                value: slugify(item, {
-                                    separator: "",
-                                }),
-                            }))
+                            children: parseChildren(values.children),
                         }),
                     }
                 }).json();
@@ -120,7 +164,23 @@ const FormGardenCate = ({ trigger, openGardenCateCtrl, setOpenGardenCateCtrl, on
                                     {(!defaultValues?.id || isAddChild) && <FormField name="children" control={form.control}
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>二级类目（每行对应一个）</FormLabel>
+                                                <div className="flex items-center justify-between gap-3">
+                                                    <FormLabel>子类目</FormLabel>
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="h-7 px-2 text-xs"
+                                                        onClick={() => {
+                                                            form.setValue("children", CHILDREN_EXAMPLE);
+                                                        }}
+                                                    >
+                                                        输入示例
+                                                    </Button>
+                                                </div>
+                                                <p className="text-xs leading-5 text-muted-foreground">
+                                                    每行一个二级类目；三级类目以前导半角空格开头，并用空格分隔。
+                                                </p>
                                                 <FormControl>
                                                     <Textarea {...field} className="min-h-[120px] resize-none" />
                                                 </FormControl>

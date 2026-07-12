@@ -74,7 +74,7 @@ const FormGardenCateExport = ({ trigger, openCtrl, setOpenCtrl, onSuccess, defau
                 }
             }).json();
 
-            const {
+            const cleanCate = ({
                 created_at,
                 value,
                 parentId,
@@ -82,25 +82,24 @@ const FormGardenCateExport = ({ trigger, openCtrl, setOpenCtrl, onSuccess, defau
                 status,
                 children = [],
                 ...rest
-            } = defaultValues;
-
-            const cleanedChildren = children.map((item) => {
-                const {
-                    created_at,
-                    value,
-                    parentId,
-                    planetId,
-                    status,
-                    ...childRest
-                } = item;
-
-                return childRest;
-            });
-            const jsonText = JSON.stringify({
+            }) => ({
                 ...rest,
+                ...(children.length > 0 && {
+                    children: children.map(cleanCate),
+                }),
+            });
+
+            const {
+                children = [],
+                ...parentRest
+            } = cleanCate(defaultValues);
+
+            const jsonText = JSON.stringify({
+                ...parentRest,
                 gardenList: response.gardenList,
-                labels: cleanedChildren,
-            })
+                labels: children,
+            });
+
             const clipboardText = [
                 "<<json_start>>",
                 jsonText,
