@@ -77,7 +77,6 @@ const FormGardenCateExport = ({ trigger, openCtrl, setOpenCtrl, onSuccess, defau
             const cleanCate = ({
                 created_at,
                 value,
-                parentId,
                 planetId,
                 status,
                 children = [],

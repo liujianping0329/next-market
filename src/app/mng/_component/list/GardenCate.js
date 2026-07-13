@@ -17,9 +17,11 @@ import {
   CircleFadingPlus,
   MonitorDown,
   EraserIcon,
-  FileDown
+  FileDown,
+  MonitorUp
 } from "lucide-react";
 import FormGardenCateExport from "../form/FormGardenCateExport";
+import FormGardenCateImport from "../form/FormGardenCateImport";
 import { toast } from "sonner";
 
 const GardenCate = ({ userInfo }) => {
@@ -27,12 +29,14 @@ const GardenCate = ({ userInfo }) => {
   const [openUpdate, setOpenUpdate] = useState(false)
   const [openAddChild, setOpenAddChild] = useState(false)
   const [openExport, setOpenExport] = useState(false)
+  const [openImport, setOpenImport] = useState(false)
   const [isObjDeleted, setIsObjDeleted] = useState(false)
 
   const [formVersion, setFormVersion] = useState(0);
   const [updateTarget, setUpdateTarget] = useState(null)
   const [addChildTarget, setAddChildTarget] = useState(null)
   const [exportTarget, setExportTarget] = useState(null)
+  const [importTarget, setImportTarget] = useState(null)
 
   const fetchList = async () => {
     const response = await ky.post('/api/garden_cate/list/matchWithChildren', {
@@ -152,6 +156,14 @@ const GardenCate = ({ userInfo }) => {
                   <MonitorDown className="h-4 w-4 text-sky-500" />
                   <span>导出AI提示词</span>
                 </Button>
+                <Button size="sm" variant="outline" onClick={() => {
+                  setImportTarget(item);
+                  setFormVersion((v) => v + 1);
+                  setOpenImport(true);
+                }} >
+                  <MonitorUp className="h-4 w-4 text-sky-500" />
+                  <span>导入AI结果</span>
+                </Button>
               </div>
 
               {item.children?.map((child) => (
@@ -230,6 +242,9 @@ const GardenCate = ({ userInfo }) => {
       <FormGardenCateExport openCtrl={openExport} setOpenCtrl={setOpenExport}
         onSuccess={() => { }} defaultValues={exportTarget}
         key={`${exportTarget?.id ?? "-1"}-${formVersion}-export`} />
+      <FormGardenCateImport openCtrl={openImport} setOpenCtrl={setOpenImport}
+        onSuccess={() => { fetchList(); }} defaultValues={importTarget}
+        key={`${importTarget?.id ?? "-1"}-${formVersion}-import`} />
     </>
   )
 }
