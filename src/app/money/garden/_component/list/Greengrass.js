@@ -22,7 +22,7 @@ import FormGarden from "../form/FormGarden";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 
-import ListBar from "@/app/money/garden/_component/list/bar/ListBar";
+import ListBar2 from "@/app/money/garden/_component/list/bar/ListBar2";
 import {
   SiTiktok,
   SiDazhongdianping,
@@ -157,7 +157,7 @@ const Greengrass = ({ userInfo }) => {
           </div>
         </div>
       </div>
-      <ListBar onApply={(category) => {
+      <ListBar2 onApply={(category) => {
         setSubCategory(category);
         console.log("selected category:", category);
       }} />
