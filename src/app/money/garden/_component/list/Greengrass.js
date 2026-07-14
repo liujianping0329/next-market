@@ -38,6 +38,7 @@ const Greengrass = ({ userInfo }) => {
   const [categories, setCategories] = useState([]);
   const pathname = usePathname();
   const [keyword, setKeyword] = useState("");
+  const [gardenLabels, setGardenLabels] = useState([]);
 
   const router = useRouter()
 
@@ -53,6 +54,9 @@ const Greengrass = ({ userInfo }) => {
 
   useEffect(() => {
     fetchData();
+    ky.get('/api/garden_labels/list').json().then((data) => {
+      setGardenLabels(data.list);
+    });
   }, [pathname]);
 
   const filteredList = list
@@ -180,6 +184,10 @@ const Greengrass = ({ userInfo }) => {
             len <= 8 ? "text-4xl" :
               len <= 16 ? "text-lg" :
                 "text-base";
+          const itemLabels = gardenLabels.filter(
+            (gardenLabel) =>
+              Number(gardenLabel.gardenId) === Number(item.id)
+          );
 
           return (
             <Card key={item.id} onClick={() => router.push(`/money/garden/greengrass/${item.id}`)} className="mx-auto w-full max-w-sm pt-0 overflow-hidden">
@@ -255,6 +263,16 @@ const Greengrass = ({ userInfo }) => {
                     </span>
 
                   </div>
+                  {itemLabels.length > 0 && (
+                    <div className="mt-1 flex flex-wrap items-center text-xs text-muted-foreground">
+
+                      {itemLabels.map(label => (
+                        <span key={label.label.id} className="mr-1 rounded bg-sky-100 px-1.5 py-0.5 text-[10px] font-medium text-sky-800">
+                          {label.label.name}
+                        </span>
+                      ))}
+
+                    </div>)}
                   <p className={"mt-2 whitespace-pre-line " + (expanded ? "" : "line-clamp-3")}>
                     {item.content}
                   </p>

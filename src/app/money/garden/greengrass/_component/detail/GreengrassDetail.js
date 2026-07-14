@@ -151,6 +151,14 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips, userFront, 
     return () => clearTimeout(timer);
   }, [detail, scrollTo]);
 
+  const linkClassName = `
+  group inline-flex max-w-full items-center gap-1.5
+  rounded-full border border-sky-100
+  bg-white px-2.5 py-1
+  text-xs font-medium text-sky-700
+  transition-colors
+  hover:border-sky-200 hover:bg-sky-50 hover:text-sky-800
+`;
   return (
     <>
       {showToolbar && detail && categories && <div id="toolBar" className="flex p-2.5 justify-between overflow-x-auto items-center border-b">
@@ -240,73 +248,62 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips, userFront, 
             </div>
           </section>
 
+          {detail.garden_labels?.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {detail.garden_labels.map((label) => (
+                <span
+                  key={label.garden_cate.id}
+                  className="
+          inline-flex items-center
+          rounded-full border border-sky-100
+          bg-sky-50 px-2.5 py-1
+          text-xs font-medium leading-none text-sky-700
+        "
+                >
+                  {label.garden_cate.name}
+                </span>
+              ))}
+            </div>
+          )}
+
           {/* 地点 */}
-          {(detail.location?.path || detail.garden_ext?.refInfo) && (
-            <>
-              <div className="mt-3 flex flex-wrap gap-2">
+          {(detail.location?.path || detail.garden_ext?.refInfo?.length > 0) && (
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {detail.location?.path && (
                 <Link
                   href={detail.location.path}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="
-        group inline-flex max-w-full items-center gap-1.5
-        rounded-full border border-sky-100 bg-sky-50/80
-        px-3 py-1.5 text-sm text-sky-700
-        shadow-sm transition
-        hover:border-sky-200 hover:bg-sky-100 hover:text-sky-800
-        active:scale-[0.98]
-      "
+                  className={linkClassName}
                 >
                   <LinkIcon className="h-3.5 w-3.5 shrink-0" />
 
-                  <span className="truncate underline-offset-4 group-hover:underline">
+                  <span className="max-w-48 truncate">
                     {detail.location.name || "查看原始链接"}
                   </span>
-                  {/* {detail.created_at && (
-                  <span className="ml-1 shrink-0 text-[10px] text-sky-500/70">
-                    {formatDistanceToNow(new Date(detail.created_at), {
-                      addSuffix: true,
-                      locale: zhCN,
-                    })}
-                  </span>
-                )} */}
 
-                  <ExternalLink className="h-3 w-3 shrink-0 opacity-70 transition group-hover:translate-x-0.5" />
+                  <ExternalLink className="h-3 w-3 shrink-0 opacity-60" />
                 </Link>
-                {detail?.garden_ext?.refInfo.map((refItem, index) => {
-                  return (<Link
-                    key={`${refItem.url}-${index}`}
-                    href={refItem.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="
-        group inline-flex max-w-full items-center gap-1.5
-        rounded-full border border-sky-100 bg-sky-50/80
-        px-3 py-1.5 text-sm text-sky-700
-        shadow-sm transition
-        hover:border-sky-200 hover:bg-sky-100 hover:text-sky-800
-        active:scale-[0.98]
-      "
-                  >
-                    <LinkIcon className="h-3.5 w-3.5 shrink-0" />
+              )}
 
-                    <span className="truncate underline-offset-4 group-hover:underline">
-                      {refItem.name}
-                    </span>
-                    {/* {detail.created_at && (
-                  <span className="ml-1 shrink-0 text-[10px] text-sky-500/70">
-                    {formatDistanceToNow(new Date(detail.created_at), {
-                      addSuffix: true,
-                      locale: zhCN,
-                    })}
+              {detail.garden_ext?.refInfo?.map((refItem, index) => (
+                <Link
+                  key={`${refItem.url}-${index}`}
+                  href={refItem.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={linkClassName}
+                >
+                  <LinkIcon className="h-3.5 w-3.5 shrink-0" />
+
+                  <span className="max-w-48 truncate">
+                    {refItem.name || "查看链接"}
                   </span>
-                )} */}
 
-                    <ExternalLink className="h-3 w-3 shrink-0 opacity-70 transition group-hover:translate-x-0.5" />
-                  </Link>);
-                })}
-              </div>
-            </>
+                  <ExternalLink className="h-3 w-3 shrink-0 opacity-60" />
+                </Link>
+              ))}
+            </div>
           )}
 
           {/* 内容 */}

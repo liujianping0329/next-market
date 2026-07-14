@@ -6,7 +6,8 @@ import { encode } from "@/app/utils/base64";
 export async function POST(request, context) {
     const requestBody = await request.json();
 
-    let detailQuery = supabase.from("garden").select("*,garden_ai(*),garden_remark(*,f_user(*)),garden_ext(*)").match({ id: requestBody.id })
+    let detailQuery = supabase.from("garden")
+        .select("*,garden_ai(*),garden_remark(*,f_user(*)),garden_ext(*),garden_labels(garden_cate!garden_labels_labelId_fkey(id,name))").match({ id: requestBody.id })
         .single();
     let cateQuery = supabase.from("constants").select().match({ category: "gardenCategory" })
         .order('sort', { ascending: true });
