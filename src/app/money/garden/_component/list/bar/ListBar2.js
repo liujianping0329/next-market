@@ -11,7 +11,7 @@ import {
   useState,
 } from "react";
 
-const ListBar2 = ({ onApply }) => {
+const ListBar2 = ({ onApply, labels }) => {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState("filter");
   const [activeFilter, setActiveFilter] = useState("全部");
@@ -87,10 +87,10 @@ const ListBar2 = ({ onApply }) => {
           <div className="border-b bg-background shadow-sm rounded-b-md">
             <div className="pt-4 overflow-auto">
               {active === "filter" && (
-                <FilterContent2 onConfirm={(category) => {
-                  onApply(category);
+                <FilterContent2 onConfirm={(selectedCategory, selLabels) => {
+                  onApply({ selectedCategory, selLabels });
                   setOpen(false);
-                }} />
+                }} labels={labels} />
               )}
             </div>
           </div>

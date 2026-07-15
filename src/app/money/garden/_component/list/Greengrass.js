@@ -157,10 +157,9 @@ const Greengrass = ({ userInfo }) => {
           </div>
         </div>
       </div>
-      <ListBar2 onApply={(category) => {
-        setSubCategory(category);
-        console.log("selected category:", category);
-      }} />
+      <ListBar2 onApply={({ selectedCategory, selLabels }) => {
+        setSubCategory(selectedCategory);
+      }} labels={gardenLabels} />
       {/* <div id="cateContainer" className="px-4 pt-2 flex gap-1 flex-wrap justify-center">
         {gardenCategories.map((cate) => (
           <Badge
@@ -267,7 +266,7 @@ const Greengrass = ({ userInfo }) => {
                     <div className="mt-1 flex flex-wrap items-center text-xs text-muted-foreground">
 
                       {itemLabels.map(label => (
-                        <span key={label.label.id} className="mr-1 rounded bg-sky-100 px-1.5 py-0.5 text-[10px] font-medium text-sky-800">
+                        <span key={label.label.id} className="mr-1 rounded bg-sky-100 px-1.5 py-0.5 font-medium text-sky-800">
                           {label.label.name}
                         </span>
                       ))}
