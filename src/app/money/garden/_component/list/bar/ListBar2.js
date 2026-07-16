@@ -88,7 +88,7 @@ const ListBar2 = ({ onApply, labels }) => {
             <div className="pt-4 overflow-auto">
               {active === "filter" && (
                 <FilterContent2 onConfirm={(selectedCategory, selLabels) => {
-                  onApply({ selectedCategory, selLabels });
+                  onApply(selectedCategory, selLabels);
                   setOpen(false);
                 }} labels={labels} />
               )}

@@ -129,7 +129,7 @@ const FilterContent2 = ({ onConfirm, labels }) => {
           variant="outline"
           className="bg-primary text-primary-foreground w-2/5"
           onClick={() => {
-            onConfirm({ selectedCategory, selLabels });
+            onConfirm(selectedCategory, selLabels);
           }}
         >
           确定

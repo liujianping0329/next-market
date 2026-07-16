@@ -33,7 +33,8 @@ import { Input } from "@/components/ui/input"
 
 const Greengrass = ({ userInfo }) => {
   const [expanded, setExpanded] = useState(false);
-  const [subCategory, setSubCategory] = useState(null);
+  const [selCate, setSelCate] = useState(null);
+  const [selLabels, setSelLabels] = useState([]);
   const [list, setList] = useState([]);
   const [categories, setCategories] = useState([]);
   const pathname = usePathname();
@@ -61,11 +62,15 @@ const Greengrass = ({ userInfo }) => {
 
   const filteredList = list
     .filter((item) => {
-      if (!subCategory) return true;
+      if (!selCate) return true;
 
-      return subCategory.includes("-")
-        ? item.category === subCategory
-        : item.category.startsWith(subCategory);
+      return selCate.id === item.cate2;
+    })
+    .filter((item) => {
+      if (!selLabels.length) return true;
+      const curLabels = gardenLabels.filter((label) => label.gardenId === item.id).map((label) => label.label.id);
+
+      return selLabels.some((selLabel) => curLabels.some((curLabel) => curLabel === selLabel));
     })
     .filter((item) => {
       const text = keyword.trim().toLowerCase();
@@ -157,8 +162,9 @@ const Greengrass = ({ userInfo }) => {
           </div>
         </div>
       </div>
-      <ListBar2 onApply={({ selectedCategory, selLabels }) => {
-        setSubCategory(selectedCategory);
+      <ListBar2 onApply={(selectedCategory, selLabels) => {
+        setSelCate(selectedCategory);
+        setSelLabels(selLabels);
       }} labels={gardenLabels} />
       {/* <div id="cateContainer" className="px-4 pt-2 flex gap-1 flex-wrap justify-center">
         {gardenCategories.map((cate) => (
