@@ -68,9 +68,18 @@ const Greengrass = ({ userInfo }) => {
     })
     .filter((item) => {
       if (!selLabels.length) return true;
-      const curLabels = gardenLabels.filter((label) => label.gardenId === item.id).map((label) => label.label.id);
 
-      return selLabels.some((selLabel) => curLabels.some((curLabel) => curLabel === selLabel));
+      const curLabels = gardenLabels.filter(
+        (label) => label.gardenId === item.id
+      );
+
+      return selLabels.every(({ subCateId, labelIds }) =>
+        curLabels.some(
+          (curLabel) =>
+            curLabel.subCate?.id === subCateId &&
+            labelIds.includes(curLabel.label?.id)
+        )
+      );
     })
     .filter((item) => {
       const text = keyword.trim().toLowerCase();

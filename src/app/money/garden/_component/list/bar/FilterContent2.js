@@ -85,24 +85,64 @@ const FilterContent2 = ({ onConfirm, labels }) => {
               <div className="text-sm font-medium mb-2 text-muted-foreground">{subCategory?.subCate?.name}</div>
 
               <div className="flex flex-wrap gap-2">
-                {subCategory.labels.map((label) => {
+                {subCategory.labels.map((item) => {
+                  const subCateId = item?.subCate?.id;
+                  const labelId = item?.label?.id;
+
+                  const isSelected = selLabels.some(
+                    (group) =>
+                      group.subCateId === subCateId &&
+                      group.labelIds.includes(labelId)
+                  );
+
                   return (
                     <Button
-                      key={label?.label?.id}
+                      key={labelId}
                       size="sm"
                       onClick={() => {
-                        setSelLabels(prev => selLabels.includes(label?.label?.id)
-                          ? prev.filter(id => id !== label?.label?.id) : [...prev, label?.label?.id]);
+                        setSelLabels((prev) => {
+                          const subCateGroup = prev.find(
+                            (group) => group.subCateId === subCateId
+                          );
+
+                          if (!subCateGroup) {
+                            return [
+                              ...prev,
+                              {
+                                subCateId,
+                                labelIds: [labelId],
+                              },
+                            ];
+                          }
+
+                          const alreadySelected =
+                            subCateGroup.labelIds.includes(labelId);
+
+                          const next = prev.map((group) => {
+                            if (group.subCateId !== subCateId) {
+                              return group;
+                            }
+
+                            return {
+                              ...group,
+                              labelIds: alreadySelected
+                                ? group.labelIds.filter((id) => id !== labelId)
+                                : [...group.labelIds, labelId],
+                            };
+                          });
+
+                          return next.filter((group) => group.labelIds.length > 0);
+                        });
                       }}
                       className={cn(
-                        "px-4 py-2 text-sm rounded-md border-2 transition",
+                        "rounded-md border-2 px-4 py-2 text-sm transition",
                         "bg-background hover:bg-muted",
-                        selLabels.includes(label?.label?.id)
+                        isSelected
                           ? "border-foreground/60 bg-foreground text-background"
                           : "border-border text-foreground"
                       )}
                     >
-                      {label?.label?.name}
+                      {item?.label?.name}
                     </Button>
                   );
                 })}
