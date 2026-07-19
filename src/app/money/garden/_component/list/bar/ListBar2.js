@@ -10,12 +10,36 @@ import {
   useRef,
   useState,
 } from "react";
+import ky from "ky";
+import { useUserStore } from "@/app/money/garden/_store/userStore";
+import { Spinner } from "@/components/ui/spinner";
 
 const ListBar2 = ({ onApply, labels }) => {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState("filter");
   const [activeFilter, setActiveFilter] = useState("全部");
+  const [categories, setCategories] = useState(null);
+  const [isLoadCategories, setIsLoadCategories] = useState(false);
   const barRef = useRef(null);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+
+  const [selLabels, setSelLabels] = useState([]);
+
+  const userInfoStore = useUserStore(state => state.userInfo);
+
+  const fetchCates = async () => {
+    setIsLoadCategories(true);
+    const response = await ky.post('/api/garden_cate/list/match', {
+      json: { planetId: userInfoStore.planet.id, parentNull: true, status: 1 }
+    }).json();
+    setCategories(response.list);
+    setIsLoadCategories(false);
+    return response.list;
+  }
+
+  useEffect(() => {
+    fetchCates();
+  }, []);
 
   const openTo = (type) => {
     if (open && active === type) {
@@ -59,6 +83,7 @@ const ListBar2 = ({ onApply, labels }) => {
           <Button variant="ghost" className="h-9 gap-2" onClick={() => openTo("filter")}>
             <Filter className="h-4 w-4" />
             筛选
+            {isLoadCategories && <Spinner />}
             <ChevronDown
               className={cn(
                 "h-4 w-4 transition",
@@ -89,8 +114,12 @@ const ListBar2 = ({ onApply, labels }) => {
               {active === "filter" && (
                 <FilterContent2 onConfirm={(selectedCategory, selLabels) => {
                   onApply(selectedCategory, selLabels);
+                  setSelectedCategory(selectedCategory)
+                  setSelLabels(selLabels);
                   setOpen(false);
-                }} labels={labels} />
+                }} labels={labels} categories={categories} selectedCategory={selectedCategory}
+                  selLabels={selLabels} setSelectedCategory={setSelectedCategory}
+                  setSelLabels={setSelLabels} />
               )}
             </div>
           </div>

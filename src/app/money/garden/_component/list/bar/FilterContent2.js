@@ -6,33 +6,12 @@ import {
   useState,
 } from "react";
 
-import { useUserStore } from "@/app/money/garden/_store/userStore";
-import { Spinner } from "@/components/ui/spinner";
-import ky from "ky";
 
-const FilterContent2 = ({ onConfirm, labels }) => {
-
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [categories, setCategories] = useState(null);
-  const [isLoadCategories, setIsLoadCategories] = useState(false);
+const FilterContent2 = ({ onConfirm, labels, categories, selectedCategory, selLabels,
+  setSelectedCategory, setSelLabels
+}) => {
 
   const [subCategories, setSubCategories] = useState([]);
-  const [selLabels, setSelLabels] = useState([]);
-
-  const userInfoStore = useUserStore(state => state.userInfo);
-  const fetchValues = async () => {
-    setIsLoadCategories(true);
-    const response = await ky.post('/api/garden_cate/list/match', {
-      json: { planetId: userInfoStore.planet.id, parentNull: true, status: 1 }
-    }).json();
-    setCategories(response.list);
-    setIsLoadCategories(false);
-    return response.list;
-  }
-
-  useEffect(() => {
-    fetchValues();
-  }, []);
 
   useEffect(() => {
     if (!selectedCategory) return;
@@ -53,7 +32,6 @@ const FilterContent2 = ({ onConfirm, labels }) => {
         <div className="flex items-center gap-4">
           <span className="h-5 w-1 rounded-sm bg-foreground/80" />
           <div className="font-semibold">类别</div>
-          {isLoadCategories && <Spinner />}
         </div>
 
         {/* 胶囊选项：单选 */}
@@ -63,6 +41,10 @@ const FilterContent2 = ({ onConfirm, labels }) => {
               <Button
                 key={category.id}
                 onClick={() => {
+                  if (selectedCategory?.id !== category.id) {
+                    setSelLabels([]);
+                    setSubCategories([]);
+                  }
                   setSelectedCategory(category)
                 }}
                 className={cn(
