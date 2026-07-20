@@ -18,10 +18,12 @@ import {
   MonitorDown,
   EraserIcon,
   FileDown,
-  MonitorUp
+  MonitorUp,
+  Search
 } from "lucide-react";
 import FormGardenCateExport from "../form/FormGardenCateExport";
 import FormGardenCateImport from "../form/FormGardenCateImport";
+import FormGardenResearch from "../form/FormGardenResearch";
 import { toast } from "sonner";
 
 const GardenCate = ({ userInfo }) => {
@@ -30,6 +32,7 @@ const GardenCate = ({ userInfo }) => {
   const [openAddChild, setOpenAddChild] = useState(false)
   const [openExport, setOpenExport] = useState(false)
   const [openImport, setOpenImport] = useState(false)
+  const [openResearch, setOpenResearch] = useState(false)
   const [isObjDeleted, setIsObjDeleted] = useState(false)
 
   const [formVersion, setFormVersion] = useState(0);
@@ -37,6 +40,8 @@ const GardenCate = ({ userInfo }) => {
   const [addChildTarget, setAddChildTarget] = useState(null)
   const [exportTarget, setExportTarget] = useState(null)
   const [importTarget, setImportTarget] = useState(null)
+
+  const [researchTarget, setResearchTarget] = useState(null)
 
   const fetchList = async () => {
     const response = await ky.post('/api/garden_cate/list/matchWithChildren', {
@@ -164,6 +169,14 @@ const GardenCate = ({ userInfo }) => {
                   <MonitorUp className="h-4 w-4 text-sky-500" />
                   <span>导入AI结果</span>
                 </Button>
+                <Button size="sm" variant="outline" onClick={() => {
+                  setResearchTarget(item);
+                  setFormVersion((v) => v + 1);
+                  setOpenResearch(true);
+                }} >
+                  <Search className="h-4 w-4 text-sky-500" />
+                  <span>探索&发现</span>
+                </Button>
               </div>
 
               {item.children?.map((child) => (
@@ -245,6 +258,9 @@ const GardenCate = ({ userInfo }) => {
       <FormGardenCateImport openCtrl={openImport} setOpenCtrl={setOpenImport}
         onSuccess={() => { fetchList(); }} defaultValues={importTarget}
         key={`${importTarget?.id ?? "-1"}-${formVersion}-import`} />
+      <FormGardenResearch openCtrl={openResearch} setOpenCtrl={setOpenResearch}
+        onSuccess={() => { fetchList(); }} defaultValues={researchTarget}
+        key={`${researchTarget?.id ?? "-1"}-${formVersion}-research`} />
     </>
   )
 }
