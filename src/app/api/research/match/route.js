@@ -8,6 +8,6 @@ export async function POST(request, context) {
     let query = supabase.from("garden_research").select().match(requestBody);
 
     const { data: matchList, error } = await query.order('created_at', { ascending: false });
-    console.log(matchList)
+
     return NextResponse.json({ list: matchList });
 }

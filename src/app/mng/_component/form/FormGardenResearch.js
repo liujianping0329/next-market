@@ -22,6 +22,7 @@ const FormGardenResearch = ({ trigger, openCtrl, setOpenCtrl, onSuccess, default
 
     const [open, setOpen] = useState(false);
     const [isLoad, setIsLoad] = useState(false);
+    const [isApiLoad, setIsApiLoad] = useState(false);
     const [videos, setVideos] = useState([]);
     const [keyword, setKeyword] = useState("");
 
@@ -71,13 +72,16 @@ const FormGardenResearch = ({ trigger, openCtrl, setOpenCtrl, onSuccess, default
                                     <Button
                                         size="sm"
                                         className="h-7 px-2 text-xs"
+                                        disabled={isApiLoad || !keyword.trim()}
                                         onClick={async () => {
+                                            setIsApiLoad(true);
                                             await ky.post('/api/research/douyin/getOne', {
                                                 json: {
                                                     cateId: defaultValues.id,
                                                     keyword
                                                 }
                                             }).json();
+                                            setIsApiLoad(false);
                                             fetchVideos();
                                         }}
                                     >
@@ -86,11 +90,20 @@ const FormGardenResearch = ({ trigger, openCtrl, setOpenCtrl, onSuccess, default
                                     <Button
                                         size="sm"
                                         className="h-7 px-2 text-xs"
-                                        onClick={() => {
-
+                                        disabled={isApiLoad || !keyword.trim()}
+                                        onClick={async () => {
+                                            setIsApiLoad(true);
+                                            await ky.post('/api/research/douyin/rapid', {
+                                                json: {
+                                                    cateId: defaultValues.id,
+                                                    keyword
+                                                }
+                                            }).json();
+                                            setIsApiLoad(false);
+                                            fetchVideos();
                                         }}
                                     >
-                                        输入示例
+                                        rapidApi
                                     </Button>
                                 </div>
                             </div>
@@ -129,8 +142,8 @@ const FormGardenResearch = ({ trigger, openCtrl, setOpenCtrl, onSuccess, default
                                                         <span className="rounded-md bg-rose-50 text-rose-500">
                                                             {channelMap[item.channel] || item.channel}
                                                         </span>
-                                                        {item?.hashtags?.map((tag) => (
-                                                            <span className="rounded bg-sky-50 text-sky-600">
+                                                        {item?.hashtags?.map((tag, index) => (
+                                                            <span key={`${tag}-${index}`} className="rounded bg-sky-50 text-sky-600">
                                                                 {tag}
                                                             </span>
                                                         ))}
