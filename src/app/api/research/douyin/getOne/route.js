@@ -4,7 +4,11 @@ import ky from "ky";
 import supabase from "@/app/utils/database";
 
 export async function POST(request, context) {
-    const { keyword, ...otherPara } = await request.json();
+    const { keyword, cateId, ...otherPara } = await request.json();
+
+    const { data: keywordObj } = await supabase.from('garden_research_keyword').insert({
+        cateId, keyword
+    }).select().single();
 
     const result = await ky.post(
         "https://api.getoneapi.com/api/douyin/search_video",
@@ -14,7 +18,7 @@ export async function POST(request, context) {
             },
             json: {
                 keyword,
-                count: 10,
+                count: 18,
                 offset: "0",
                 publish_time: "0",
                 sort_type: 0,
@@ -24,6 +28,7 @@ export async function POST(request, context) {
 
     const videos =
         result?.data?.aweme_list?.map((item) => ({
+            platform: "getOneApi",
             channel: "douyin",
             // 唯一标识
             platformId: item.aweme_id,
@@ -46,9 +51,13 @@ export async function POST(request, context) {
                 item.video?.origin_cover?.url_list?.[0] ||
                 item.video?.dynamic_cover?.url_list?.[0] ||
                 "",
+            hashtags:
+                item.text_extra
+                    ?.filter((tag) => tag.type === 1)
+                    .map((tag) => (tag.hashtag_name)) ?? [],
+            keywordId: keywordObj.id
         })) ?? [];
-    const { data, error } = await supabase.from('garden_research').upsert(videos);
-    console.log(error)
+    await supabase.from('garden_research').upsert(videos);
 
     return NextResponse.json({ videos });
 }
