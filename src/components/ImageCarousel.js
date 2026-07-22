@@ -13,6 +13,23 @@ import {
   CarouselItem,
 } from "@/components/ui/carousel";
 
+const NEXT_IMAGE_HOSTS = [
+  "flrzlulvyzokzwptsidz.supabase.co",
+];
+
+const canUseNextImage = (src) => {
+  if (!src) return false;
+
+  // 本地图片
+  if (src.startsWith("/")) return true;
+
+  try {
+    return NEXT_IMAGE_HOSTS.includes(new URL(src).hostname);
+  } catch {
+    return false;
+  }
+};
+
 export default function ImageCarousel({ images = [], ratio = 3 / 4 }) {
   const [api, setApi] = useState(null);
   const [selected, setSelected] = useState(0);
@@ -38,14 +55,32 @@ export default function ImageCarousel({ images = [], ratio = 3 / 4 }) {
     <div className="w-full">
       <Carousel className="w-full" setApi={setApi}>
         <CarouselContent>
-          {images.map((img, idx) => (
-            <CarouselItem key={img + idx}>
-              <div className="relative w-full overflow-hidden bg-muted"
-                style={{ aspectRatio: `${ratio}` }} >
-                <Image src={img} alt={img} fill className="object-contain" priority={idx === 0} />
-              </div>
-            </CarouselItem>
-          ))}
+          {images.map((img, idx) => {
+            const useNextImage = canUseNextImage(img);
+            return (
+              <CarouselItem key={img + idx}>
+                <div className="relative w-full overflow-hidden bg-muted"
+                  style={{ aspectRatio: `${ratio}` }} >
+                  {useNextImage ? (
+                    <Image
+                      src={img}
+                      alt={img}
+                      fill
+                      className="object-contain"
+                      priority={idx === 0}
+                    />
+                  ) : (
+                    <img
+                      src={img}
+                      alt={img}
+                      loading={idx === 0 ? "eager" : "lazy"}
+                      className="absolute inset-0 h-full w-full object-contain"
+                    />
+                  )}
+                </div>
+              </CarouselItem>
+            )
+          })}
         </CarouselContent>
       </Carousel>
 

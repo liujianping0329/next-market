@@ -16,7 +16,13 @@ import {
     useEffect,
     useState
 } from "react";
+import {
+    CircleCheckBig,
+    Trash2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { useUserStore } from "@/app/money/garden/_store/userStore";
 
 const FormGardenResearch = ({ trigger, openCtrl, setOpenCtrl, onSuccess, defaultValues = null }) => {
 
@@ -25,6 +31,7 @@ const FormGardenResearch = ({ trigger, openCtrl, setOpenCtrl, onSuccess, default
     const [isApiLoad, setIsApiLoad] = useState(false);
     const [videos, setVideos] = useState([]);
     const [keyword, setKeyword] = useState("");
+    const userInfoStore = useUserStore(state => state.userInfo);
 
     const fetchVideos = async () => {
         setIsLoad(true);
@@ -138,7 +145,7 @@ const FormGardenResearch = ({ trigger, openCtrl, setOpenCtrl, onSuccess, default
                                                         {item.title || "未命名视频"}
                                                     </h3>
 
-                                                    <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+                                                    <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
                                                         <span className="rounded-md bg-rose-50 text-rose-500">
                                                             {channelMap[item.channel] || item.channel}
                                                         </span>
@@ -155,6 +162,66 @@ const FormGardenResearch = ({ trigger, openCtrl, setOpenCtrl, onSuccess, default
                                             <p className="mt-1 line-clamp-3 whitespace-pre-line text-sm leading-6 text-muted-foreground">
                                                 {item.detail || "暂无详细说明"}
                                             </p>
+
+                                            {/* 操作区 */}
+                                            <div className="mt-3 flex gap-2 justify-end">
+                                                <Button
+                                                    size="sm"
+                                                    variant="outline"
+                                                    className="h-8 px-3 text-xs"
+                                                    onClick={async () => {
+                                                        try {
+                                                            await ky.post("/api/research/delete", {
+                                                                json: {
+                                                                    id: item.id
+                                                                },
+                                                            });
+                                                            toast.success("已删除");
+                                                            fetchVideos();
+                                                        } catch (error) {
+                                                            console.error(error);
+                                                            toast.error("删除失败");
+                                                        }
+                                                    }}
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                    删除
+                                                </Button>
+                                                <Button
+                                                    size="sm"
+                                                    variant="outline"
+                                                    className="h-8 px-3 text-xs"
+                                                    disabled={item.garden?.length > 0}
+                                                    onClick={async () => {
+                                                        try {
+                                                            await ky.post("/api/research/saveGarden", {
+                                                                json: {
+                                                                    userId: userInfoStore.id,
+                                                                    cateId: defaultValues.id,
+                                                                    ...(item),
+                                                                },
+                                                            });
+                                                            setVideos((prev) =>
+                                                                prev.map((video) =>
+                                                                    video.id === item.id
+                                                                        ? {
+                                                                            ...video,
+                                                                            garden: [-1],
+                                                                        }
+                                                                        : video
+                                                                )
+                                                            );
+                                                            toast.success("已保存到夏园");
+                                                        } catch (error) {
+                                                            console.error(error);
+                                                            toast.error("保存失败");
+                                                        }
+                                                    }}
+                                                >
+                                                    <CircleCheckBig className="h-4 w-4" />
+                                                    {item.garden?.length > 0 ? "已收藏" : "收藏到夏园"}
+                                                </Button>
+                                            </div>
                                         </div>
                                     </article>
                                 ))}
