@@ -277,16 +277,16 @@ const Greengrass = ({ userInfo }) => {
                     </span>
 
                   </div>
-                  {itemLabels.length > 0 && (
-                    <div className="mt-1 flex flex-wrap items-center text-xs text-muted-foreground">
-
-                      {itemLabels.map(label => (
-                        <span key={label.label.id} className="mr-1 rounded bg-sky-100 px-1.5 py-0.5 font-medium text-sky-800">
-                          {label.label.name}
-                        </span>
-                      ))}
-
-                    </div>)}
+                  <div className="mt-1 flex flex-wrap items-center text-xs text-muted-foreground">
+                    <span key={item.cate2.id} className="mr-1 rounded bg-rose-100 px-1.5 py-0.5 font-medium text-rose-800">
+                      {item.cate2.name}
+                    </span>
+                    {itemLabels.map(label => (
+                      <span key={label.label.id} className="mr-1 rounded bg-sky-100 px-1.5 py-0.5 font-medium text-sky-800">
+                        {label.label.name}
+                      </span>
+                    ))}
+                  </div>
                   <p className={"mt-2 whitespace-pre-line " + (expanded ? "" : "line-clamp-3")}>
                     {item.content}
                   </p>

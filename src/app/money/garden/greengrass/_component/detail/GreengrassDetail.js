@@ -219,21 +219,10 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips, userFront, 
         <main className="rounded-t-[28px] bg-background px-5 pt-2 pb-28">
           {/* 标题 + 评分 */}
           <section className="flex items-start justify-between gap-4">
-            <div className="min-w-0 flex-1">
-              <h1 className="text-3xl font-bold tracking-tight text-foreground">
+            <div className="min-w-0 flex-1 self-stretch flex items-center">
+              <h1 className="text-3xl font-bold tracking-tight text-foreground ">
                 {detail.title}
               </h1>
-
-              <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                <span>{detail.cate2.name || "未分类"}</span>
-
-                {detail.price && (
-                  <>
-                    <span>・</span>
-                    <span>¥{detail.price} / 人</span>
-                  </>
-                )}
-              </div>
             </div>
 
             <div className="flex h-20 w-24 shrink-0 flex-col items-center justify-center rounded-xl bg-muted">
@@ -244,23 +233,28 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips, userFront, 
             </div>
           </section>
 
-          {detail.garden_labels?.length > 0 && (
-            <div className="mt-2 flex flex-wrap gap-1.5">
-              {detail.garden_labels.map((label) => (
-                <span
-                  key={label.garden_cate.id}
-                  className="
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            <span className="
+          inline-flex items-center
+          rounded-full border border-sky-100
+          bg-rose-50 px-2.5 py-1
+          text-xs font-medium leading-none text-rose-700
+        ">{detail.cate2.name || "未分类"}</span>
+            {detail.garden_labels.map((label) => (
+              <span
+                key={label.garden_cate.id}
+                className="
           inline-flex items-center
           rounded-full border border-sky-100
           bg-sky-50 px-2.5 py-1
           text-xs font-medium leading-none text-sky-700
         "
-                >
-                  {label.garden_cate.name}
-                </span>
-              ))}
-            </div>
-          )}
+              >
+                {label.garden_cate.name}
+              </span>
+            ))}
+
+          </div>
 
           {/* 地点 */}
           {(detail.location?.path || detail.garden_ext?.refInfo?.length > 0) && (
