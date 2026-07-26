@@ -112,6 +112,24 @@ const FormGardenResearch = ({ trigger, openCtrl, setOpenCtrl, onSuccess, default
                                     >
                                         rapidApi
                                     </Button>
+                                    <Button
+                                        size="sm"
+                                        className="h-7 px-2 text-xs"
+                                        disabled={isApiLoad || !keyword.trim()}
+                                        onClick={async () => {
+                                            setIsApiLoad(true);
+                                            await ky.post('/api/research/ig/rapid', {
+                                                json: {
+                                                    cateId: defaultValues.id,
+                                                    keyword
+                                                }
+                                            }).json();
+                                            setIsApiLoad(false);
+                                            fetchVideos();
+                                        }}
+                                    >
+                                        rapidIG
+                                    </Button>
                                 </div>
                             </div>
                             <div className="space-y-4 max-h-[600px] overflow-y-auto mt-[-8px]">
