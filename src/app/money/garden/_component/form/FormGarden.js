@@ -64,11 +64,10 @@ const FormGarden = ({ trigger, onSuccess, cate2s, defaultValues = null }) => {
     const [passCodeInfo, setPassCodeInfo] = useState(null);
     const [submitAction, setSubmitAction] = useState("save");
 
-    console.log(defaultValues);
     const form = useForm({
         defaultValues: {
             date: defaultValues?.date ? parseLocalDate(defaultValues.date) : new Date(),
-            cate2: String(defaultValues?.cate2.id) || "",
+            cate2: String(defaultValues?.cate2?.id ?? ""),
             title: defaultValues?.title || "",
             location: defaultValues?.location?.name || "",
             locationPath: defaultValues?.location?.path || "",

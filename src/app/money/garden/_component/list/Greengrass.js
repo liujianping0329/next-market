@@ -64,7 +64,7 @@ const Greengrass = ({ userInfo }) => {
     .filter((item) => {
       if (!selCate) return true;
 
-      return selCate.id === item.cate2;
+      return selCate.id === item.cate2.id;
     })
     .filter((item) => {
       if (!selLabels.length) return true;
