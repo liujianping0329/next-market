@@ -57,17 +57,18 @@ import {
 import { analyzePassCode } from "@/app/utils/passCode";
 import { toast } from "sonner";
 
-const FormGarden = ({ trigger, onSuccess, categories, defaultValues = null }) => {
+const FormGarden = ({ trigger, onSuccess, cate2s, defaultValues = null }) => {
     const [openGarden, setOpenGarden] = useState(false);
     const [isLoadGarden, setIsLoadGarden] = useState(false);
     const [picUrls, setPicUrls] = useState([]);
     const [passCodeInfo, setPassCodeInfo] = useState(null);
     const [submitAction, setSubmitAction] = useState("save");
 
+    console.log(defaultValues);
     const form = useForm({
         defaultValues: {
             date: defaultValues?.date ? parseLocalDate(defaultValues.date) : new Date(),
-            category: defaultValues?.category || "else",
+            cate2: String(defaultValues?.cate2.id) || "",
             title: defaultValues?.title || "",
             location: defaultValues?.location?.name || "",
             locationPath: defaultValues?.location?.path || "",
@@ -183,7 +184,33 @@ const FormGarden = ({ trigger, onSuccess, categories, defaultValues = null }) =>
                         <Form {...form}>
                             <form onSubmit={form.handleSubmit(onSubmit)} id="formGarden" className="">
                                 <FieldGroup>
-                                    <FormField name="date" control={form.control}
+                                    <FormField name="cate2" control={form.control}
+                                        rules={{
+                                            required: "请选择类型",
+                                        }}
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>新类型</FormLabel>
+                                                <FormControl>
+                                                    <Select onValueChange={(value) => {
+                                                        field.onChange(value);
+                                                    }} value={field.value}>
+                                                        <SelectTrigger className="w-full">
+                                                            <SelectValue placeholder="请选择类型" ></SelectValue>
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {cate2s.map(cate => (
+                                                                <SelectItem value={String(cate.id)} key={cate.id} className="font-medium">
+                                                                    {cate.name}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )} />
+                                    {/* <FormField name="date" control={form.control}
                                         render={({ field }) => (
                                             <FormItem className="hidden">
                                                 <FormLabel>日期</FormLabel>
@@ -192,8 +219,8 @@ const FormGarden = ({ trigger, onSuccess, categories, defaultValues = null }) =>
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
-                                        )} />
-                                    <FormField name="category" control={form.control}
+                                        )} /> */}
+                                    {/* <FormField name="category" control={form.control}
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel>种类</FormLabel>
@@ -205,12 +232,11 @@ const FormGarden = ({ trigger, onSuccess, categories, defaultValues = null }) =>
                                                         <SelectContent>
                                                             {categories.map(cate => (
                                                                 <div key={cate.value}>
-                                                                    {/* 父项（可选） */}
                                                                     <SelectItem value={cate.value} className="font-medium">
                                                                         {cate.label}
                                                                     </SelectItem>
 
-                                                                    {/* 子项（缩进） */}
+
                                                                     {cate.children?.map((child) => (
                                                                         <SelectItem
                                                                             key={child.value}
@@ -227,7 +253,7 @@ const FormGarden = ({ trigger, onSuccess, categories, defaultValues = null }) =>
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
-                                        )} />
+                                        )} /> */}
                                     {/* <FormItem>
                                         <FormLabel>图片</FormLabel>
                                         <FormControl>

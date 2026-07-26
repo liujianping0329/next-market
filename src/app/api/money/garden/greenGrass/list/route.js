@@ -7,13 +7,13 @@ export async function POST(request, context) {
 
     let listQuery = supabase.from("garden").select().match({ topic: "Greengrass" });
 
-    listQuery = applyPlanetFilter(listQuery, { planetId, userId });
+    listQuery = applyPlanetFilter(listQuery, { planetId, userId }, "*,cate2(id,name),");
     listQuery = listQuery.order("date", { ascending: false }).order("created_at", { ascending: false });
 
-    let cateQuery = supabase.from("constants").select().match({ category: "gardenCategory" })
-        .order('sort', { ascending: true });
+    let cateQuery = supabase.from("garden_cate").select().is("parentId", null).eq("status", 1)
+        .order('id', { ascending: true });
 
     const { data: matchList } = await listQuery;
-    const { data: cates } = await cateQuery;
-    return NextResponse.json({ list: matchList, cates: cates });
+    const { data: cate2s } = await cateQuery;
+    return NextResponse.json({ list: matchList, cate2s });
 }

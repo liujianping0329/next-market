@@ -7,10 +7,10 @@ import {
   BookOpenCheck,
   Landmark,
   Library,
-  Pencil,
-  Trash2,
   MessageSquarePlus,
-  MessagesSquare
+  MessagesSquare,
+  Pencil,
+  Trash2
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
@@ -25,7 +25,7 @@ import FormSoy from "@/app/money/garden/_component/form/FormSoy";
 import { toast } from "sonner";
 
 import FormHarvest from "@/app/money/garden/_component/form/FormHarvest";
-import { convertCateName } from "@/app/utils/data";
+import { useUserStore } from "@/app/money/garden/_store/userStore";
 import ActionButton from "@/components/ActionButton";
 import ImageCarousel from "@/components/ImageCarousel";
 import {
@@ -33,17 +33,14 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/avatar";
+import { formatDistanceToNow } from "date-fns";
+import { zhCN } from "date-fns/locale";
 import {
   ExternalLink,
   KeyRound,
   LinkIcon,
-  MessageSquare,
   Sparkles
 } from "lucide-react";
-import { useUserStore } from "@/app/money/garden/_store/userStore";
-import { formatDistanceToNow } from "date-fns";
-import { zhCN } from "date-fns/locale";
-import { fixWrongUtcAsJst } from "@/app/utils/date";
 
 
 const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips, userFront, scrollTo }) => {
@@ -53,7 +50,7 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips, userFront, 
 
   const [editVer, setEditVer] = useState(0);
   const [deleting, setDeleting] = useState(false);
-  const [categories, setCategories] = useState([]);
+  const [cate2s, setCate2s] = useState([]);
   const [aiing, setAiing] = useState(false);
   const userInfoStore = useUserStore(state => state.userInfo);
 
@@ -63,7 +60,7 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips, userFront, 
     }).json();
     console.log(response.detail);
     setDetail(response.detail);
-    setCategories(response.cates);
+    setCate2s(response.cate2s);
     setEditVer(prev => prev + 1)
   }
 
@@ -161,7 +158,7 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips, userFront, 
 `;
   return (
     <>
-      {showToolbar && detail && categories && <div id="toolBar" className="flex p-2.5 justify-between overflow-x-auto items-center border-b">
+      {showToolbar && detail && cate2s && <div id="toolBar" className="flex p-2.5 justify-between overflow-x-auto items-center border-b">
         <div className="flex space-x-2 items-center">
           <ActionButton icon={ArrowLeft} label="返回" onClick={() => router.back()} />
         </div>
@@ -183,8 +180,7 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips, userFront, 
             <ActionButton icon={BookOpenCheck} label="待办" />
           } defaultValues={
             {
-              category: `【${convertCateName(detail.category, categories) || "未分类"
-                }】${detail.title}`,
+              category: `【${detail.cate2.name}】${detail.title}`,
               titles: detail?.content
             }} onSuccess={() => {
               fetchDetail()
@@ -204,7 +200,7 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips, userFront, 
             key={`${detail?.id}-${editVer}`}
             trigger={
               <ActionButton icon={Pencil} label="修改" />
-            } onSuccess={() => fetchDetail()} defaultValues={detail} categories={categories} />
+            } onSuccess={() => fetchDetail()} defaultValues={detail} cate2s={cate2s} />
           <ActionButton icon={Trash2} label="删除" onClick={handleDelete} disabled={deleting || !detail} />
           <ActionButton onClick={handleAi} icon={Sparkles} label="润色" />
         </div>
@@ -229,7 +225,7 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips, userFront, 
               </h1>
 
               <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                <span>{convertCateName(detail.category, categories) || "未分类"}</span>
+                <span>{detail.cate2.name || "未分类"}</span>
 
                 {detail.price && (
                   <>
@@ -333,7 +329,7 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips, userFront, 
           {/* 评论 */}
           <section id="remarks" className="mt-8">
             <h3 className="flex justify-between mb-2 text-base font-semibold">
-              <span>用户评论（{detail.garden_remark.length}）</span>
+              <span>用户评论（{detail.garden_remark?.length ?? 0}）</span>
               {(userInfoStore?.id || userFront?.id) && (<FormGardenRemark
                 key={`${detail?.id}-${editVer}-remark`}
                 trigger={
@@ -373,7 +369,7 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips, userFront, 
                               {data?.remark}
                             </p>
                             <p className="mt-2 whitespace-pre-wrap text-sm leading-7 text-muted-foreground">
-                              {formatDistanceToNow(fixWrongUtcAsJst(data.created_at), {
+                              {formatDistanceToNow(data.created_at, {
                                 addSuffix: true,
                                 locale: zhCN,
                               })}

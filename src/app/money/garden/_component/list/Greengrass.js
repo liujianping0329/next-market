@@ -36,7 +36,7 @@ const Greengrass = ({ userInfo }) => {
   const [selCate, setSelCate] = useState(null);
   const [selLabels, setSelLabels] = useState([]);
   const [list, setList] = useState([]);
-  const [categories, setCategories] = useState([]);
+  const [cate2s, setCate2s] = useState([]);
   const pathname = usePathname();
   const [keyword, setKeyword] = useState("");
   const [gardenLabels, setGardenLabels] = useState([]);
@@ -49,7 +49,7 @@ const Greengrass = ({ userInfo }) => {
         ...(userInfo?.planet ? { planetId: userInfo.planet.id } : { userId: userInfo?.id })
       }
     }).json();
-    setCategories(response.cates);
+    setCate2s(response.cate2s);
     setList(response.list);
   }
 
@@ -163,7 +163,7 @@ const Greengrass = ({ userInfo }) => {
 
             <FormGarden trigger={
               <Button size="sm" variant="outline">新增记录</Button>
-            } onSuccess={() => fetchData()} categories={categories} />
+            } onSuccess={() => fetchData()} cate2s={cate2s} />
 
             {/* <Button size="sm" variant="outline" onClick={() => setExpanded(!expanded)}>
               {expanded ? "全收起" : "全展开"}
