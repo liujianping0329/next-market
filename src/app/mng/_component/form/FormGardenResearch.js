@@ -36,7 +36,7 @@ const FormGardenResearch = ({ trigger, openCtrl, setOpenCtrl, onSuccess, default
     const fetchVideos = async () => {
         setIsLoad(true);
         const response = await ky.post('/api/research/match', {
-            json: {}
+            json: { cateId: defaultValues.id, }
         }).json();
         setVideos(response.list);
         setIsLoad(false);

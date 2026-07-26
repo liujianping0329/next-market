@@ -19,7 +19,9 @@ import {
   EraserIcon,
   FileDown,
   MonitorUp,
-  Search
+  Search,
+  ChevronsUpDown,
+  ChevronsDownUp
 } from "lucide-react";
 import FormGardenCateExport from "../form/FormGardenCateExport";
 import FormGardenCateImport from "../form/FormGardenCateImport";
@@ -40,6 +42,8 @@ const GardenCate = ({ userInfo }) => {
   const [addChildTarget, setAddChildTarget] = useState(null)
   const [exportTarget, setExportTarget] = useState(null)
   const [importTarget, setImportTarget] = useState(null)
+  const [openedId, setOpenedId] = useState(0)
+
 
   const [researchTarget, setResearchTarget] = useState(null)
 
@@ -99,6 +103,11 @@ const GardenCate = ({ userInfo }) => {
                 </div>
 
                 <div className="flex shrink-0 items-center gap-1">
+                  {openedId !== item.id ? (<ActionButton icon={ChevronsUpDown} onClick={() => {
+                    setOpenedId(item.id)
+                  }} />) : (<ActionButton icon={ChevronsDownUp} onClick={() => {
+                    setOpenedId(0)
+                  }} />)}
                   <ActionButton icon={Pencil} onClick={() => updateHandle(item)} />
                   <ActionButton icon={Trash2} onClick={() => deleteHandle(item)} />
                 </div>
@@ -179,7 +188,7 @@ const GardenCate = ({ userInfo }) => {
                 </Button>
               </div>
 
-              {item.children?.map((child) => (
+              {openedId === item.id && item.children?.map((child) => (
                 <div
                   key={child.id}
                   className="overflow-hidden rounded-lg border border-gray-200"
