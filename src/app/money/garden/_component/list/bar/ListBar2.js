@@ -117,6 +117,7 @@ const ListBar2 = ({ onApply, labels }) => {
                   setSelectedCategory(selectedCategory)
                   setSelLabels(selLabels);
                   setOpen(false);
+                  setActiveFilter(selectedCategory.name)
                 }} labels={labels} categories={categories} selectedCategory={selectedCategory}
                   selLabels={selLabels} setSelectedCategory={setSelectedCategory}
                   setSelLabels={setSelLabels} />
