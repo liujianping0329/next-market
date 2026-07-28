@@ -23,6 +23,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useUserStore } from "@/app/money/garden/_store/userStore";
+import { Textarea } from "@/components/ui/textarea";
 
 const FormGardenResearch = ({ trigger, openCtrl, setOpenCtrl, onSuccess, defaultValues = null }) => {
 
@@ -72,64 +73,67 @@ const FormGardenResearch = ({ trigger, openCtrl, setOpenCtrl, onSuccess, default
                         </div>
                     ) :
                         (<>
-                            <div className="flex gap-2 items-center">
-                                <Input className="flex-1 h-7" value={keyword}
+                            <div className="flex flex-col gap-y-2 items-center">
+                                <Textarea className="w-full" value={keyword}
                                     onChange={(e) => setKeyword(e.target.value)} />
-                                <div className="flex gap-2">
-                                    <Button
-                                        size="sm"
-                                        className="h-7 px-2 text-xs"
-                                        disabled={isApiLoad || !keyword.trim()}
-                                        onClick={async () => {
-                                            setIsApiLoad(true);
-                                            await ky.post('/api/research/douyin/getOne', {
-                                                json: {
-                                                    cateId: defaultValues.id,
-                                                    keyword
-                                                }
-                                            }).json();
-                                            setIsApiLoad(false);
-                                            fetchVideos();
-                                        }}
-                                    >
-                                        oneApi
-                                    </Button>
-                                    <Button
-                                        size="sm"
-                                        className="h-7 px-2 text-xs"
-                                        disabled={isApiLoad || !keyword.trim()}
-                                        onClick={async () => {
-                                            setIsApiLoad(true);
-                                            await ky.post('/api/research/douyin/rapid', {
-                                                json: {
-                                                    cateId: defaultValues.id,
-                                                    keyword
-                                                }
-                                            }).json();
-                                            setIsApiLoad(false);
-                                            fetchVideos();
-                                        }}
-                                    >
-                                        rapidApi
-                                    </Button>
-                                    <Button
-                                        size="sm"
-                                        className="h-7 px-2 text-xs"
-                                        disabled={isApiLoad || !keyword.trim()}
-                                        onClick={async () => {
-                                            setIsApiLoad(true);
-                                            await ky.post('/api/research/ig/rapid', {
-                                                json: {
-                                                    cateId: defaultValues.id,
-                                                    keyword
-                                                }
-                                            }).json();
-                                            setIsApiLoad(false);
-                                            fetchVideos();
-                                        }}
-                                    >
-                                        rapidIG
-                                    </Button>
+                                <div className="w-full flex justify-between">
+                                    <span>资料来源:</span>
+                                    <div className="flex gap-2">
+                                        <Button
+                                            size="sm"
+                                            className="h-7 px-2 text-xs"
+                                            disabled={isApiLoad || !keyword.trim()}
+                                            onClick={async () => {
+                                                setIsApiLoad(true);
+                                                await ky.post('/api/research/douyin/getOne', {
+                                                    json: {
+                                                        cateId: defaultValues.id,
+                                                        keyword
+                                                    }
+                                                }).json();
+                                                setIsApiLoad(false);
+                                                fetchVideos();
+                                            }}
+                                        >
+                                            one抖音
+                                        </Button>
+                                        <Button
+                                            size="sm"
+                                            className="h-7 px-2 text-xs"
+                                            disabled={isApiLoad || !keyword.trim()}
+                                            onClick={async () => {
+                                                setIsApiLoad(true);
+                                                await ky.post('/api/research/douyin/rapid', {
+                                                    json: {
+                                                        cateId: defaultValues.id,
+                                                        keyword
+                                                    }
+                                                }).json();
+                                                setIsApiLoad(false);
+                                                fetchVideos();
+                                            }}
+                                        >
+                                            rapid抖音
+                                        </Button>
+                                        <Button
+                                            size="sm"
+                                            className="h-7 px-2 text-xs"
+                                            disabled={isApiLoad || !keyword.trim()}
+                                            onClick={async () => {
+                                                setIsApiLoad(true);
+                                                await ky.post('/api/research/ig/rapid', {
+                                                    json: {
+                                                        cateId: defaultValues.id,
+                                                        keyword
+                                                    }
+                                                }).json();
+                                                setIsApiLoad(false);
+                                                fetchVideos();
+                                            }}
+                                        >
+                                            rapidIG
+                                        </Button>
+                                    </div>
                                 </div>
                             </div>
                             <div className="space-y-4 max-h-[600px] overflow-y-auto mt-[-8px]">

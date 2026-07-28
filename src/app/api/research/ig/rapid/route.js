@@ -12,9 +12,9 @@ export async function POST(request, context) {
     const { data: keywordObj } = await supabase.from('garden_research_keyword').insert({
         cateId, keyword
     }).select().single();
-
+    let result = {};
     try {
-        const result = await ky.get(
+        result = await ky.get(
             `https://${RAPID_API_HOST}/api/instagram/search-reels/v1`,
             {
                 headers: {
@@ -27,7 +27,6 @@ export async function POST(request, context) {
                 timeout: 120000,
             }
         ).json();
-        console.log(result)
     } catch (error) {
         if (error.response) {
             console.log("status:", error.response.status);
@@ -37,50 +36,49 @@ export async function POST(request, context) {
         throw error;
     }
     const awemeList =
-        result?.data?.business_data
-            ?.map((item) => item?.data?.aweme_info)
-            .filter(Boolean) ?? [];
+        result?.data?.data?.items?.filter(Boolean) ?? [];
 
-    const videos = awemeList.map((item) => ({
-        platform: "rapidApi",
-        channel: "douyin",
+    const videos = awemeList.map((item) => {
+        const detail = item.caption?.text || "";
 
-        platformId: item.aweme_id,
+        return {
+            platform: "rapidApi",
+            channel: "instagram",
 
-        title:
-            item.item_title ||
-            item.preview_title ||
-            item.desc
-                ?.replace(/#[^\s#]+/g, "")
-                .replace(/\s+/g, " ")
-                .trim()
-                .slice(0, 30) ||
-            "未命名视频",
+            platformId: String(item.id),
 
-        detail:
-            item.desc ||
-            item.caption ||
-            item.preview_title ||
-            "",
+            title:
+                detail
+                    .replace(/#[^\s#]+/g, "")
+                    .replace(/\s+/g, " ")
+                    .trim()
+                    .slice(0, 30) ||
+                item.user?.full_name ||
+                item.user?.username ||
+                "未命名视频",
 
-        url:
-            item.share_url ||
-            item.share_info?.share_url ||
-            "",
+            detail,
 
-        image:
-            item.video?.cover?.url_list?.[0] ||
-            item.video?.origin_cover?.url_list?.[0] ||
-            item.video?.dynamic_cover?.url_list?.[0] ||
-            "",
+            url:
+                item.code
+                    ? `https://www.instagram.com/reel/${item.code}/`
+                    : "",
 
-        hashtags:
-            item.text_extra
-                ?.filter((tag) => tag.type === 1)
-                .map((tag) => tag.hashtag_name) ?? [],
+            image:
+                item.thumbnail_url ||
+                item.image_versions?.items?.[0]?.url ||
+                item.image_versions?.additional_items?.first_frame?.url ||
+                "",
 
-        keywordId: keywordObj.id,
-    }));
+            hashtags:
+                item.caption?.hashtags?.map((tag) =>
+                    tag.replace(/^#/, "")
+                ) ?? [],
+
+            keywordId: keywordObj.id,
+        };
+    });
+
     await supabase.from('garden_research').upsert(videos);
 
     return NextResponse.json({ videos });
