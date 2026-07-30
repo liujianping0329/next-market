@@ -175,37 +175,58 @@ const Harvest = ({ userInfo, isUserReady }) => {
                     </div>
                 </div>
             </div>
-            <div className="p-4 py-2 sticky top-0 z-30 bg-background border-b">
-                <div ref={headerScrollRef}
-                    className="h-[35px] gap-1 flex overflow-x-hidden items-center font-medium">
-                    {header.map((n, i) => {
-                        const curDt = pullToZero(startTime, i - 1);
-                        const isHoliday =
-                            i !== 0 &&
-                            holidays.some((h) => pullToZero(h.date).getTime() === curDt.getTime());
+            <div className="p-4 py-2 sticky top-0 z-30 bg-background border-b flex gap-1">
+                {/* 第一格固定 */}
+                <div className="h-[35px] w-[36px] shrink-0 rounded border flex items-center justify-center font-medium">
+                    行程
+                </div>
 
-                        return (
-                            <div
-                                key={n}
-                                className={`
-                                    h-full border rounded flex flex-col items-center justify-center shrink-0
-                                    ${i === 0 ? "w-[36px]" : "w-[166px]"}
-                                    ${/土|日/.test(n) ? "bg-red-50 text-red-500 border-red-200" : ""}
-                                    ${isHoliday ? "bg-rose-100 text-rose-600 border-rose-300" : ""}
+                {/* 后面的日期跟随下面横向滚动 */}
+                <div
+                    ref={headerScrollRef}
+                    className="flex-1 overflow-x-hidden"
+                >
+                    <div className="h-[35px] min-w-max flex gap-1 items-center font-medium">
+                        {header.slice(1).map((n, index) => {
+                            const i = index + 1;
+                            const curDt = pullToZero(startTime, i - 1);
+
+                            const holiday = holidays.find(
+                                (h) =>
+                                    pullToZero(h.date).getTime() ===
+                                    curDt.getTime()
+                            );
+
+                            const isHoliday = Boolean(holiday);
+
+                            return (
+                                <div
+                                    key={n}
+                                    className={`
+                                h-full w-[166px] shrink-0
+                                border rounded
+                                flex flex-col items-center justify-center
+                                ${/土|日/.test(n)
+                                            ? "bg-red-50 text-red-500 border-red-200"
+                                            : ""}
+                                ${isHoliday
+                                            ? "bg-rose-100 text-rose-600 border-rose-300"
+                                            : ""}
                             `}
-                            >
-                                {/* 日期 */}
-                                <div className="text-sm font-medium">{n}</div>
-
-                                {/* 祝日名称 */}
-                                {isHoliday && (
-                                    <div className="text-[11px] leading-tight truncate max-w-full px-1">
-                                        {holidays.find((h) => pullToZero(h.date).getTime() === curDt.getTime())?.name}
+                                >
+                                    <div className="text-sm font-medium">
+                                        {n}
                                     </div>
-                                )}
-                            </div>
-                        );
-                    })}
+
+                                    {isHoliday && (
+                                        <div className="max-w-full truncate px-1 text-[11px] leading-tight">
+                                            {holiday.name}
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
                 </div>
             </div>
             <div className="p-4 pt-1">
