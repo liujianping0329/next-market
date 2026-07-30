@@ -31,6 +31,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import supabase from "@/app/utils/database";
+import DateRangePicker from "@/components/dateRangePicker";
 
 import { Textarea } from "@/components/ui/textarea";
 const FormComponent = ({ trigger, openCtrl, setOpenCtrl, onSuccess, defaultValues = null }) => {
@@ -41,8 +42,15 @@ const FormComponent = ({ trigger, openCtrl, setOpenCtrl, onSuccess, defaultValue
     const form = useForm({
         defaultValues: {
             title: defaultValues?.title || "",
-            startDate: defaultValues?.startDate || "",
-            endDate: defaultValues?.endDate || ""
+            dateRange: {
+                from: defaultValues?.startDate
+                    ? new Date(defaultValues.startDate)
+                    : undefined,
+
+                to: defaultValues?.endDate
+                    ? new Date(defaultValues.endDate)
+                    : undefined,
+            },
         }
     });
 
@@ -82,16 +90,26 @@ const FormComponent = ({ trigger, openCtrl, setOpenCtrl, onSuccess, defaultValue
                         <Form {...form}>
                             <form onSubmit={form.handleSubmit(onSubmit)} id="form" className="">
                                 <FieldGroup className="gap-4">
-                                    {/* <FormField name="startTime" control={form.control}
+                                    <FormField name="title" control={form.control}
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>开始时间</FormLabel>
+                                                <FormLabel>旅程名称</FormLabel>
                                                 <FormControl>
-                                                    <DateTimePicker dtFormat="yyyy-MM-dd hh:mm" dateDf={field.value} onChange={field.onChange} />
+                                                    <Input {...field} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
-                                        )} /> */}
+                                        )} />
+                                    <FormField name="dateRange" control={form.control}
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>日期范围(最大一个月)</FormLabel>
+                                                <FormControl>
+                                                    <DateRangePicker dateDf={field.value} onChange={field.onChange} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )} />
                                     {/* <FormField name="remindBefore" control={form.control}
                                     render={({ field }) => (
                                         <FormItem className="-mt-5">
@@ -110,16 +128,6 @@ const FormComponent = ({ trigger, openCtrl, setOpenCtrl, onSuccess, defaultValue
                                         </FormItem>
                                     )}
                                 /> */}
-                                    <FormField name="title" control={form.control}
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>日程说明</FormLabel>
-                                                <FormControl>
-                                                    <Input {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )} />
                                     <FormField name="questionDetail" control={form.control}
                                         render={({ field }) => (
                                             <FormItem>
