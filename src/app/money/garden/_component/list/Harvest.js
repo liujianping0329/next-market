@@ -24,6 +24,7 @@ import {
 } from "@/app/utils/date";
 
 import FormHarvest from "../form/FormHarvest";
+import FormJourney from "../form/FormJourney";
 
 import MoreOpMenu from "@/app/money/garden/_component/list/harvest/MoreOpMenu";
 import useLongPress from "@/hooks/useLongPress";
@@ -31,6 +32,7 @@ import HarvestDetail from "@/app/money/garden/_component/detail/HarvestDetail";
 
 import * as holiday_jp from "@holiday-jp/holiday_jp";
 import { useCallback } from "react";
+import { PlusCircle, Route } from "lucide-react";
 
 const Harvest = ({ userInfo, isUserReady }) => {
 
@@ -167,9 +169,18 @@ const Harvest = ({ userInfo, isUserReady }) => {
                                 }}>{n.title}</Button>
                             ))}
                         </div>
-                        <div>
+                        <div className="flex items-center gap-2">
+                            <FormJourney trigger={
+                                <Button size="sm" variant="outline">
+                                    <Route className="h-4 w-4" />
+                                    新增旅程
+                                </Button>
+                            } onSuccess={() => fetchList(startTime)} />
                             <FormHarvest trigger={
-                                <Button size="sm" variant="outline">新增</Button>
+                                <Button size="sm" variant="outline">
+                                    <PlusCircle className="h-4 w-4" />
+                                    新增
+                                </Button>
                             } onSuccess={() => fetchList(startTime)} />
                         </div>
                     </div>
