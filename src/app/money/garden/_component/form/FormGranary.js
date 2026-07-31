@@ -39,9 +39,18 @@ const FormGranary = ({ trigger, openGranaryCtrl, setOpenGranaryCtrl, onSuccess, 
 
     const [userId, setUserId] = useState(null);
 
+    let firstDayCate = "thisMonth";
+
+    const now = new Date();
+    let firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    if (now.getDate() >= 15) {
+        firstDayCate = "nextMonth";
+        firstDay = new Date(now.getFullYear(), now.getMonth() + 1, 1)
+    }
     const form = useForm({
         defaultValues: {
-            date: defaultValues?.date ? parseLocalDate(defaultValues.date) : new Date(),
+            date: defaultValues?.date ? parseLocalDate(defaultValues.date) : firstDay,
             ...Object.fromEntries(
                 userTemplate.map((n) => [n.value, defaultValues?.detailList?.find(item => item.templateId === n.id)?.price ?? n.dfValue])
             )
@@ -88,7 +97,9 @@ const FormGranary = ({ trigger, openGranaryCtrl, setOpenGranaryCtrl, onSuccess, 
                                 <FormField name="date" control={form.control}
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel>日期</FormLabel>
+                                            <FormLabel>结算日期
+                                                <span className="text-rose-500">{firstDayCate === "thisMonth" ? "（本月1日）" : "（次月1日）"}</span>
+                                            </FormLabel>
                                             <FormControl>
                                                 <Datepicker dateDf={field.value} onChange={field.onChange} />
                                             </FormControl>
