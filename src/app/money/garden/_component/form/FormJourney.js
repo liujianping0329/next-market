@@ -110,41 +110,6 @@ const FormComponent = ({ trigger, openCtrl, setOpenCtrl, onSuccess, defaultValue
                                                 <FormMessage />
                                             </FormItem>
                                         )} />
-                                    {/* <FormField name="remindBefore" control={form.control}
-                                    render={({ field }) => (
-                                        <FormItem className="-mt-5">
-                                            <FormControl>
-                                                <RadioGroup value={field.value} onValueChange={field.onChange}
-                                                    className="flex flex-wrap gap-3">
-                                                    {remindOptions.map((item) => (
-                                                        <div className="flex gap-2" key={item.value}>
-                                                            <RadioGroupItem value={item.value} />
-                                                            <Label className="text-muted-foreground">{item.label}</Label>
-                                                        </div>
-                                                    ))}
-                                                    <Label className="text-muted-foreground">前提醒我</Label>
-                                                </RadioGroup>
-                                            </FormControl>
-                                        </FormItem>
-                                    )}
-                                /> */}
-                                    <FormField name="questionDetail" control={form.control}
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                {/* <FormLabel>内容</FormLabel> */}
-                                                <FormControl>
-                                                    <Textarea {...field} className="min-h-[120px] resize-none"
-                                                        onFocus={(e) => {
-                                                            setTimeout(() => {
-                                                                const scroller = e.target.closest("[data-scroll]")
-                                                                scroller?.scrollTo({ top: scroller.scrollHeight, behavior: "smooth" })
-                                                            }, 350)
-                                                        }}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )} />
                                 </FieldGroup>
                             </form>
                         </Form>

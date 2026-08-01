@@ -15,6 +15,7 @@ import * as holiday_jp from "@holiday-jp/holiday_jp";
 
 import { formatDateLocal } from "@/app/utils/date";
 import { addMonths, endOfDay, startOfDay } from "date-fns";
+import { toast } from "sonner";
 
 const DateRangePicker = ({ dateDf, onChange, dtFormat = "yyyy-MM-dd", onMonthChange, redPointDates = [] }) => {
   const [open, setOpen] = useState(false);
@@ -43,22 +44,21 @@ const DateRangePicker = ({ dateDf, onChange, dtFormat = "yyyy-MM-dd", onMonthCha
       from: range.from,
       to: range.to ?? undefined,
     };
+
+    if (
+      nextRange.from &&
+      nextRange.to &&
+      nextRange.from.getTime() !== nextRange.to.getTime() &&
+      nextRange.to > addMonths(nextRange.from, 1)
+    ) {
+      toast.error("日期范围最多只能选择一个月");
+      return;
+    }
     onChange?.(nextRange);
-    if (nextRange.from && nextRange.to) {
+    if (nextRange.from && nextRange.to && nextRange.from.getTime() !== nextRange.to.getTime()) {
       setOpen(false);
     }
   }
-
-  const disabledDate = (date) => {
-    if (!dateDf?.from || dateDf?.to) {
-      return false;
-    }
-
-    const minDate = startOfDay(dateDf.from);
-    const maxDate = endOfDay(addMonths(dateDf.from, 1));
-
-    return date < minDate || date > maxDate;
-  };
 
   return (
     <>
@@ -77,12 +77,6 @@ const DateRangePicker = ({ dateDf, onChange, dtFormat = "yyyy-MM-dd", onMonthCha
             <Input className="text-left cursor-pointer" value={dateDf?.to
               ? formatDateLocal(dateDf.to, dtFormat)
               : ""} readOnly placeholder="结束日期" onClick={() => {
-                if (dateDf?.to) {
-                  setMonth(dateDf.to);
-                } else if (dateDf?.from) {
-                  setMonth(dateDf.from);
-                }
-
                 setOpen(true);
               }} />
           </div>
@@ -92,7 +86,7 @@ const DateRangePicker = ({ dateDf, onChange, dtFormat = "yyyy-MM-dd", onMonthCha
             month={month}
             onMonthChange={setMonth}
             numberOfMonths={2}
-            className="[--cell-size:1.75rem]"
+            className="[--cell-size:28px]"
             classNames={{
               months: "flex flex-row gap-4",
               nav: "absolute top-4 left-0 right-0 flex items-center justify-between px-2",
@@ -110,7 +104,6 @@ const DateRangePicker = ({ dateDf, onChange, dtFormat = "yyyy-MM-dd", onMonthCha
               redPointDates: "relative after:absolute after:right-[2px] after:top-[2px] after:h-2 after:w-2 after:rounded-full after:bg-red-500 after:ring-1 after:ring-background after:content-['']",
             }}
             onSelect={calendarSelect}
-            disabled={disabledDate}
           />
         </PopoverContent>
       </Popover>

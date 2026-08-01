@@ -106,7 +106,7 @@ const Harvest = ({ userInfo, isUserReady }) => {
 
     const journeys = [
         // { title: "大阪游", startDate: "2026-03-19" },
-        { title: "哈尔滨游2", startDate: "2026-06-19" }
+        // { title: "哈尔滨游2", startDate: "2026-06-19" }
     ]
 
     const longPressHandle = useLongPress({
