@@ -49,6 +49,8 @@ const Harvest = ({ userInfo, isUserReady }) => {
     const [detailOpen, setDetailOpen] = useState(false);
     const [holidays, setHolidays] = useState([]);
     const [redPointDates, setRedPointDates] = useState([]);
+    const [journeys, setJourneys] = useState([]);
+    const [selectedJourney, setSelectedJourney] = useState(null);
 
     const timeConst = Array.from({ length: 14 }).map((_, i) => i + 8);     // 1-12 冻结列
     const rest = Array.from({ length: 98 }).map((_, i) => i + 1);           // 13+ 右侧滚动区
@@ -95,19 +97,17 @@ const Harvest = ({ userInfo, isUserReady }) => {
             element.index = index
         });
         setTimeList(allTimes);
-        console.log("allTimes", allTimes);
         setEditVer(prev => prev + 1);
+
+        ky.get('/api/journey/list').json().then((data) => {
+            setJourneys(data.list);
+        });
     }
 
     useEffect(() => {
         if (!isUserReady) return
         fetchList(startTime);
     }, [startTime, isUserReady]);
-
-    const journeys = [
-        // { title: "大阪游", startDate: "2026-03-19" },
-        // { title: "哈尔滨游2", startDate: "2026-06-19" }
-    ]
 
     const longPressHandle = useLongPress({
         getPayload: (e) => {
@@ -183,6 +183,27 @@ const Harvest = ({ userInfo, isUserReady }) => {
                                 </Button>
                             } onSuccess={() => fetchList(startTime)} />
                         </div>
+                    </div>
+                    {/* 灰线 */}
+                    <div className="border-t border-border" />
+                    {/* 旅程标签区域 */}
+                    <div className="flex flex-wrap gap-2">
+                        {journeys.map((item) => (
+                            <button
+                                key={item.id}
+                                type="button"
+                                onClick={() => setSelectedJourney(item)}
+                                className="
+          inline-flex min-h-9 items-center gap-2 rounded-md border
+          bg-muted/40 px-3 py-1.5 text-sm font-medium
+          transition-colors hover:bg-muted
+        "
+                            >
+                                <span className="max-w-40 truncate">
+                                    {item.title}
+                                </span>
+                            </button>
+                        ))}
                     </div>
                 </div>
             </div>
