@@ -187,19 +187,21 @@ const Harvest = ({ userInfo, isUserReady }) => {
                     {/* 灰线 */}
                     <div className="border-t border-border" />
                     {/* 旅程标签区域 */}
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-1.5">
                         {journeys.map((item) => (
                             <button
                                 key={item.id}
                                 type="button"
                                 onClick={() => setSelectedJourney(item)}
                                 className="
-          inline-flex min-h-9 items-center gap-2 rounded-md border
-          bg-muted/40 px-3 py-1.5 text-sm font-medium
-          transition-colors hover:bg-muted
-        "
+        inline-flex h-7 items-center rounded-full
+        border border-sky-200 bg-sky-50
+        px-2.5 text-xs font-medium text-sky-700
+        transition-colors
+        hover:border-sky-300 hover:bg-sky-100
+      "
                             >
-                                <span className="max-w-40 truncate">
+                                <span className="max-w-32 truncate">
                                     {item.title}
                                 </span>
                             </button>
