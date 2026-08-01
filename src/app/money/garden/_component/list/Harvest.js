@@ -23,6 +23,7 @@ import {
 } from "@/app/utils/date";
 
 import FormHarvest from "../form/FormHarvest";
+import FormHarvestJourney from "../form/FormHarvestJourney";
 import FormJourney from "../form/FormJourney";
 
 import MoreOpMenu from "@/app/money/garden/_component/list/harvest/MoreOpMenu";
@@ -66,7 +67,7 @@ const Harvest = ({ userInfo, isUserReady }) => {
 
     const headerScrollRef = useRef(null);
     const bodyScrollRef = useRef(null);
-
+    let journeyHarvests = [];
     const fetchList = async () => {
         var startTime0 = pullToZero(startTime);
         var endTime = changeDay(startTime0, 7);
@@ -80,7 +81,8 @@ const Harvest = ({ userInfo, isUserReady }) => {
                 ...(userInfo?.planet ? { planetId: userInfo.planet.id } : { userId: userInfo?.id })
             }
         }).json();
-        let dbList = response.list;
+        let dbList = response.list.filter(item => !item.journeyId);
+        journeyHarvests = response.list.filter(item => item.journeyId);
         let dayStart = pullToZero(startTime)
         let allTimes = Array.from({ length: 24 * 7 }).map((_, i) => {
             return {
@@ -131,6 +133,13 @@ const Harvest = ({ userInfo, isUserReady }) => {
             return inRange
                 ? {
                     date,
+                    // harvests: journeyHarvests.find((item) => {
+                    //     return (
+                    //         pullToZero(parseLocalDate(item.startTime)).getTime() ===
+                    //         date.getTime() &&
+                    //         item.journeyId === selectedJourney.id
+                    //     );
+                    // })?.harvests || [],
                 }
                 : null;
         })
@@ -188,9 +197,11 @@ const Harvest = ({ userInfo, isUserReady }) => {
             setEmptyBlockAddOpen(true);
         }
     }
-    const detailJourneyHandle = (block) => {
+    const detailJourneyHandle = (block, item) => {
         setEmptyBlockJourneyAddTarget({
+            startTime: block.date,
             journeyId: selectedJourney.id,
+            journeyType: item.id
         })
         setEmptyBlockJourneyAddOpen(true);
     }
@@ -351,7 +362,7 @@ const Harvest = ({ userInfo, isUserReady }) => {
                                                     ? "border-sky-200 bg-sky-50"
                                                     : "border-transparent"
                                             )}
-                                            onClick={() => detailJourneyHandle(block)}
+                                            onClick={() => detailJourneyHandle(block, item)}
                                         >
                                             {block && formatDateLocal(block.date, "MM/dd")}
                                         </div>
@@ -459,7 +470,7 @@ const Harvest = ({ userInfo, isUserReady }) => {
                                     setEmptyBlockAddOpen(false);
                                 }
                             } defaultValues={emptyBlockAddTarget} key={emptyBlockAddTarget?.startTime ?? "emptyBlockAddTarget"} />
-                            <FormHarvest openHarvestCtrl={emptyBlockJourneyAddOpen} setOpenHarvestCtrl={setEmptyBlockJourneyAddOpen} needPassCode={true} onSuccess={
+                            <FormHarvestJourney openHarvestCtrl={emptyBlockJourneyAddOpen} setOpenHarvestCtrl={setEmptyBlockJourneyAddOpen} needPassCode={true} onSuccess={
                                 () => {
                                     fetchList(startTime)
                                     setEmptyBlockJourneyAddOpen(false);
