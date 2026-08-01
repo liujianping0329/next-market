@@ -7,11 +7,10 @@ import {
 
 import { Button } from "@/components/ui/button";
 import ky from "ky";
-
-
-
-
-
+import {
+    Hotel,
+    Airplane,
+} from "@icon-park/react";
 import Datepicker from "@/components/datepicker";
 import {
     pullToZero,
@@ -33,6 +32,7 @@ import HarvestDetail from "@/app/money/garden/_component/detail/HarvestDetail";
 import * as holiday_jp from "@holiday-jp/holiday_jp";
 import { useCallback } from "react";
 import { PlusCircle, Route } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const Harvest = ({ userInfo, isUserReady }) => {
 
@@ -46,11 +46,14 @@ const Harvest = ({ userInfo, isUserReady }) => {
     const [moreOpMenuTarget, setMoreOpMenuTarget] = useState(null);
     const [emptyBlockAddOpen, setEmptyBlockAddOpen] = useState(false);
     const [emptyBlockAddTarget, setEmptyBlockAddTarget] = useState(false);
+    const [emptyBlockJourneyAddOpen, setEmptyBlockJourneyAddOpen] = useState(false);
+    const [emptyBlockJourneyAddTarget, setEmptyBlockJourneyAddTarget] = useState(false);
     const [detailOpen, setDetailOpen] = useState(false);
     const [holidays, setHolidays] = useState([]);
     const [redPointDates, setRedPointDates] = useState([]);
     const [journeys, setJourneys] = useState([]);
     const [selectedJourney, setSelectedJourney] = useState(null);
+    const journeyScrollRefs = useRef([]);
 
     const timeConst = Array.from({ length: 14 }).map((_, i) => i + 8);     // 1-12 冻结列
     const rest = Array.from({ length: 98 }).map((_, i) => i + 1);           // 13+ 右侧滚动区
@@ -109,6 +112,59 @@ const Harvest = ({ userInfo, isUserReady }) => {
         fetchList(startTime);
     }, [startTime, isUserReady]);
 
+    const journeyStart = selectedJourney
+        ? pullToZero(parseLocalDate(selectedJourney.startDate))
+        : null;
+
+    const journeyEnd = selectedJourney
+        ? pullToZero(parseLocalDate(selectedJourney.endDate))
+        : null;
+
+    const blocks = selectedJourney
+        ? header.slice(1).map((_, index) => {
+            const date = pullToZero(startTime, index);
+
+            const inRange =
+                date >= journeyStart &&
+                date <= journeyEnd;
+
+            return inRange
+                ? {
+                    date,
+                }
+                : null;
+        })
+        : [];
+
+    const journeyItems = selectedJourney
+        ? [
+            {
+                id: "flight",
+                icon: (
+                    <Airplane
+                        theme="two-tone"
+                        size="18"
+                        strokeWidth={3}
+                        fill={["#7c3aed", "#ddd6fe"]}
+                    />
+                ),
+                blocks,
+            },
+            {
+                id: "hotel",
+                icon: (
+                    <Hotel
+                        theme="two-tone"
+                        size="18"
+                        strokeWidth={3}
+                        fill={["#0369a1", "#bae6fd"]}
+                    />
+                ),
+                blocks,
+            },
+        ]
+        : [];
+
     const longPressHandle = useLongPress({
         getPayload: (e) => {
             const no = e.currentTarget.dataset.no;
@@ -131,6 +187,12 @@ const Harvest = ({ userInfo, isUserReady }) => {
             })
             setEmptyBlockAddOpen(true);
         }
+    }
+    const detailJourneyHandle = (block) => {
+        setEmptyBlockJourneyAddTarget({
+            journeyId: selectedJourney.id,
+        })
+        setEmptyBlockJourneyAddOpen(true);
     }
 
     const handleMonthChange = useCallback(async (start, end) => {
@@ -163,11 +225,6 @@ const Harvest = ({ userInfo, isUserReady }) => {
                             <Button size="sm" variant="ghost" className="underline px-1" onClick={() => {
                                 setStartTime(pullToZero(startTime, 7));
                             }}>下周</Button>
-                            {journeys.map((n, i) => (
-                                <Button key={n.title} size="sm" variant="ghost" className="underline px-1" onClick={() => {
-                                    setStartTime(parseLocalDate(n.startDate));
-                                }}>{n.title}</Button>
-                            ))}
                         </div>
                         <div className="flex items-center gap-2">
                             <FormJourney trigger={
@@ -188,80 +245,121 @@ const Harvest = ({ userInfo, isUserReady }) => {
                     <div className="border-t border-border" />
                     {/* 旅程标签区域 */}
                     <div className="flex flex-wrap gap-1.5">
-                        {journeys.map((item) => (
-                            <button
-                                key={item.id}
-                                type="button"
-                                onClick={() => setSelectedJourney(item)}
-                                className="
-        inline-flex h-7 items-center rounded-full
-        border border-sky-200 bg-sky-50
-        px-2.5 text-xs font-medium text-sky-700
-        transition-colors
-        hover:border-sky-300 hover:bg-sky-100
-      "
-                            >
-                                <span className="max-w-32 truncate">
-                                    {item.title}
-                                </span>
-                            </button>
-                        ))}
+                        {journeys.map((item) => {
+                            const selected = selectedJourney?.id === item.id;
+                            return (
+                                <button
+                                    key={item.id} type="button" onClick={() => {
+                                        const isCancel = selectedJourney?.id === item.id;
+                                        setSelectedJourney(isCancel ? null : item);
+                                        setStartTime(
+                                            isCancel
+                                                ? new Date()
+                                                : parseLocalDate(item.startDate)
+                                        );
+                                    }}
+                                    className={cn(
+                                        "inline-flex h-7 items-center rounded-md border px-2.5",
+                                        "text-xs font-medium transition-colors",
+                                        selected
+                                            ? "border-sky-700 bg-sky-700 text-white"
+                                            : "border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100"
+                                    )}
+                                >
+                                    <span className="max-w-32 truncate">
+                                        {item.title}
+                                    </span>
+                                </button>
+                            )
+                        })}
                     </div>
                 </div>
-            </div>
-            <div className="p-4 py-2 sticky top-0 z-30 bg-background border-b flex gap-1">
-                {/* 第一格固定 */}
-                <div className="h-[35px] w-[36px] shrink-0 rounded border flex items-center justify-center font-medium">
-                    行程
-                </div>
+            </div >
+            <div className="p-4 py-2 sticky top-0 z-30 bg-background border-b flex flex-col gap-1">
+                <div className="flex gap-1">
+                    {/* 第一格固定 */}
+                    <div className="h-[35px] w-[36px] shrink-0 rounded border flex items-center justify-center font-medium">
+                        行程
+                    </div>
 
-                {/* 后面的日期跟随下面横向滚动 */}
-                <div
-                    ref={headerScrollRef}
-                    className="flex-1 overflow-x-hidden"
-                >
-                    <div className="h-[35px] min-w-max flex gap-1 items-center font-medium">
-                        {header.slice(1).map((n, index) => {
-                            const i = index + 1;
-                            const curDt = pullToZero(startTime, i - 1);
+                    {/* 后面的日期跟随下面横向滚动 */}
+                    <div
+                        ref={headerScrollRef}
+                        className="flex-1 overflow-x-hidden"
+                    >
+                        <div className="h-[35px] min-w-max flex gap-1 items-center font-medium">
+                            {header.slice(1).map((n, index) => {
+                                const i = index + 1;
+                                const curDt = pullToZero(startTime, i - 1);
 
-                            const holiday = holidays.find(
-                                (h) =>
-                                    pullToZero(h.date).getTime() ===
-                                    curDt.getTime()
-                            );
+                                const holiday = holidays.find(
+                                    (h) =>
+                                        pullToZero(h.date).getTime() ===
+                                        curDt.getTime()
+                                );
 
-                            const isHoliday = Boolean(holiday);
+                                const isHoliday = Boolean(holiday);
 
-                            return (
-                                <div
-                                    key={n}
-                                    className={`
+                                return (
+                                    <div
+                                        key={n}
+                                        className={`
                                 h-full w-[166px] shrink-0
                                 border rounded
                                 flex flex-col items-center justify-center
                                 ${/土|日/.test(n)
-                                            ? "bg-red-50 text-red-500 border-red-200"
-                                            : ""}
+                                                ? "bg-red-50 text-red-500 border-red-200"
+                                                : ""}
                                 ${isHoliday
-                                            ? "bg-rose-100 text-rose-600 border-rose-300"
-                                            : ""}
+                                                ? "bg-rose-100 text-rose-600 border-rose-300"
+                                                : ""}
                             `}
-                                >
-                                    <div className="text-sm font-medium">
-                                        {n}
-                                    </div>
-
-                                    {isHoliday && (
-                                        <div className="max-w-full truncate px-1 text-[11px] leading-tight">
-                                            {holiday.name}
+                                    >
+                                        <div className="text-sm font-medium">
+                                            {n}
                                         </div>
-                                    )}
-                                </div>
-                            );
-                        })}
+
+                                        {isHoliday && (
+                                            <div className="max-w-full truncate px-1 text-[11px] leading-tight">
+                                                {holiday.name}
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
                     </div>
                 </div>
+                {selectedJourney &&
+                    journeyItems.map((item, itemIndex) => (
+                        <div key={item.id} className="flex gap-1">
+                            <div className="flex h-[35px] w-[36px] shrink-0 items-center justify-center rounded border font-medium">
+                                {item.icon}
+                            </div>
+
+                            <div className="flex-1 overflow-x-hidden"
+                                ref={(el) => {
+                                    journeyScrollRefs.current[itemIndex] = el;
+                                }}>
+                                <div className="flex h-[35px] min-w-max items-center gap-1 font-medium">
+                                    {item.blocks.map((block, index) => (
+                                        <div
+                                            key={index}
+                                            className={cn(
+                                                "h-full w-[166px] shrink-0 rounded border",
+                                                block
+                                                    ? "border-sky-200 bg-sky-50"
+                                                    : "border-transparent"
+                                            )}
+                                            onClick={() => detailJourneyHandle(block)}
+                                        >
+                                            {block && formatDateLocal(block.date, "MM/dd")}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    ))}
             </div>
             <div className="p-4 pt-1">
                 <div className="flex gap-1">
@@ -280,9 +378,17 @@ const Harvest = ({ userInfo, isUserReady }) => {
                     {/* 右侧滚动区（横向滚动） */}
                     <div ref={bodyScrollRef}
                         onScroll={(e) => {
-                            const fromEl = e.currentTarget;
-                            const toEl = headerScrollRef.current;
-                            toEl.scrollLeft = fromEl.scrollLeft;
+                            const scrollLeft = e.currentTarget.scrollLeft;
+
+                            if (headerScrollRef.current) {
+                                headerScrollRef.current.scrollLeft = scrollLeft;
+                            }
+
+                            journeyScrollRefs.current.forEach((el) => {
+                                if (el) {
+                                    el.scrollLeft = scrollLeft;
+                                }
+                            });
                         }}
                         className="overflow-x-auto flex-1">
                         <div
@@ -353,6 +459,12 @@ const Harvest = ({ userInfo, isUserReady }) => {
                                     setEmptyBlockAddOpen(false);
                                 }
                             } defaultValues={emptyBlockAddTarget} key={emptyBlockAddTarget?.startTime ?? "emptyBlockAddTarget"} />
+                            <FormHarvest openHarvestCtrl={emptyBlockJourneyAddOpen} setOpenHarvestCtrl={setEmptyBlockJourneyAddOpen} needPassCode={true} onSuccess={
+                                () => {
+                                    fetchList(startTime)
+                                    setEmptyBlockJourneyAddOpen(false);
+                                }
+                            } defaultValues={emptyBlockJourneyAddTarget} key={`JourneyAddTarget-${emptyBlockJourneyAddTarget?.journeyId ?? "emptyBlockJourneyAddTarget"}`} />
                         </div>
                     </div>
                 </div>
