@@ -67,7 +67,7 @@ const Harvest = ({ userInfo, isUserReady }) => {
 
     const headerScrollRef = useRef(null);
     const bodyScrollRef = useRef(null);
-    let journeyHarvests = [];
+    const [journeyHarvests, setJourneyHarvests] = useState([]);
     const fetchList = async () => {
         var startTime0 = pullToZero(startTime);
         var endTime = changeDay(startTime0, 7);
@@ -82,7 +82,9 @@ const Harvest = ({ userInfo, isUserReady }) => {
             }
         }).json();
         let dbList = response.list.filter(item => !item.journeyId);
-        journeyHarvests = response.list.filter(item => item.journeyId);
+        setJourneyHarvests(
+            response.list.filter((item) => item.journeyId)
+        );
         let dayStart = pullToZero(startTime)
         let allTimes = Array.from({ length: 24 * 7 }).map((_, i) => {
             return {
@@ -122,28 +124,35 @@ const Harvest = ({ userInfo, isUserReady }) => {
         ? pullToZero(parseLocalDate(selectedJourney.endDate))
         : null;
 
-    const blocks = selectedJourney
-        ? header.slice(1).map((_, index) => {
-            const date = pullToZero(startTime, index);
+    const getblocks = (journeyType) => {
+        let blocks = selectedJourney
+            ? header.slice(1).map((_, index) => {
+                const date = pullToZero(startTime, index);
 
-            const inRange =
-                date >= journeyStart &&
-                date <= journeyEnd;
+                const inRange =
+                    date >= journeyStart &&
+                    date <= journeyEnd;
 
-            return inRange
-                ? {
-                    date,
-                    // harvests: journeyHarvests.find((item) => {
-                    //     return (
-                    //         pullToZero(parseLocalDate(item.startTime)).getTime() ===
-                    //         date.getTime() &&
-                    //         item.journeyId === selectedJourney.id
-                    //     );
-                    // })?.harvests || [],
-                }
-                : null;
-        })
-        : [];
+                return inRange
+                    ? {
+                        date,
+                        harvest: journeyHarvests.find((item) => {
+                            return (
+                                pullToZero(item.startTime).getTime() ===
+                                date.getTime() &&
+                                item.journeyId === selectedJourney.id &&
+                                item.journeyType === journeyType
+                            );
+                        }) || null,
+                    }
+                    : null;
+            })
+            : []
+        if (blocks.every(block => block === null)) {
+            setSelectedJourney(null);
+        }
+        return blocks;
+    }
 
     const journeyItems = selectedJourney
         ? [
@@ -157,7 +166,7 @@ const Harvest = ({ userInfo, isUserReady }) => {
                         fill={["#7c3aed", "#ddd6fe"]}
                     />
                 ),
-                blocks,
+                blocks: getblocks("flight"),
             },
             {
                 id: "hotel",
@@ -169,7 +178,7 @@ const Harvest = ({ userInfo, isUserReady }) => {
                         fill={["#0369a1", "#bae6fd"]}
                     />
                 ),
-                blocks,
+                blocks: getblocks("hotel"),
             },
         ]
         : [];
@@ -198,6 +207,7 @@ const Harvest = ({ userInfo, isUserReady }) => {
         }
     }
     const detailJourneyHandle = (block, item) => {
+        if (!block) return;
         setEmptyBlockJourneyAddTarget({
             startTime: block.date,
             journeyId: selectedJourney.id,
@@ -357,14 +367,24 @@ const Harvest = ({ userInfo, isUserReady }) => {
                                         <div
                                             key={index}
                                             className={cn(
-                                                "h-full w-[166px] shrink-0 rounded border",
+                                                "flex h-full w-[166px] shrink-0 rounded border",
                                                 block
                                                     ? "border-sky-200 bg-sky-50"
                                                     : "border-transparent"
                                             )}
                                             onClick={() => detailJourneyHandle(block, item)}
                                         >
-                                            {block && formatDateLocal(block.date, "MM/dd")}
+                                            {/* 左侧正方形 */}
+                                            {block?.harvest?.garden && (<div className="h-full aspect-square flex-shrink-0">
+                                                <img
+                                                    src={block?.harvest?.garden?.pics?.[0]}
+                                                    className="w-full h-full object-cover rounded-l"
+                                                    alt=""
+                                                />
+                                            </div>)}
+                                            <div className="flex-1 flex items-center justify-center px-1 line-clamp-2 leading-tight">
+                                                {block?.harvest?.title ?? ""}
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
