@@ -10,6 +10,7 @@ import ky from "ky";
 import {
     Hotel,
     Airplane,
+    Notes
 } from "@icon-park/react";
 import Datepicker from "@/components/datepicker";
 import {
@@ -29,6 +30,7 @@ import FormJourney from "../form/FormJourney";
 import MoreOpMenu from "@/app/money/garden/_component/list/harvest/MoreOpMenu";
 import useLongPress from "@/hooks/useLongPress";
 import HarvestDetail from "@/app/money/garden/_component/detail/HarvestDetail";
+import JourneyDetail from "@/app/money/garden/_component/detail/JourneyDetail";
 
 import * as holiday_jp from "@holiday-jp/holiday_jp";
 import { useCallback } from "react";
@@ -50,6 +52,8 @@ const Harvest = ({ userInfo, isUserReady }) => {
     const [emptyBlockJourneyAddOpen, setEmptyBlockJourneyAddOpen] = useState(false);
     const [emptyBlockJourneyAddTarget, setEmptyBlockJourneyAddTarget] = useState(false);
     const [detailOpen, setDetailOpen] = useState(false);
+    const [detailJourneyOpen, setDetailJourneyOpen] = useState(false);
+    const [detailJourneyTarget, setDetailJourneyTarget] = useState(null);
     const [holidays, setHolidays] = useState([]);
     const [redPointDates, setRedPointDates] = useState([]);
     const [journeys, setJourneys] = useState([]);
@@ -157,6 +161,18 @@ const Harvest = ({ userInfo, isUserReady }) => {
     const journeyItems = selectedJourney
         ? [
             {
+                id: "memo",
+                icon: (
+                    <Notes
+                        theme="two-tone"
+                        size="18"
+                        strokeWidth={3}
+                        fill={["#d97706", "#fef3c7"]}
+                    />
+                ),
+                blocks: getblocks("memo"),
+            },
+            {
                 id: "flight",
                 icon: (
                     <Airplane
@@ -208,12 +224,17 @@ const Harvest = ({ userInfo, isUserReady }) => {
     }
     const detailJourneyHandle = (block, item) => {
         if (!block) return;
-        setEmptyBlockJourneyAddTarget({
-            startTime: block.date,
-            journeyId: selectedJourney.id,
-            journeyType: item.id
-        })
-        setEmptyBlockJourneyAddOpen(true);
+        if (block?.harvest) {
+            setDetailJourneyOpen(true);
+            setDetailJourneyTarget(block);
+        } else {
+            setEmptyBlockJourneyAddTarget({
+                startTime: block.date,
+                journeyId: selectedJourney.id,
+                journeyType: item.id
+            })
+            setEmptyBlockJourneyAddOpen(true);
+        }
     }
 
     const handleMonthChange = useCallback(async (start, end) => {
@@ -496,6 +517,11 @@ const Harvest = ({ userInfo, isUserReady }) => {
                                     setEmptyBlockJourneyAddOpen(false);
                                 }
                             } defaultValues={emptyBlockJourneyAddTarget} key={`JourneyAddTarget-${emptyBlockJourneyAddTarget?.journeyId ?? "emptyBlockJourneyAddTarget"}`} />
+                            <JourneyDetail open={detailJourneyOpen} onOpenChange={setDetailJourneyOpen} target={detailJourneyTarget} onSuccess={
+                                () => {
+
+                                }
+                            } />
                         </div>
                     </div>
                 </div>
