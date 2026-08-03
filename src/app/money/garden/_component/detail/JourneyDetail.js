@@ -18,6 +18,7 @@ import { formatDateLocal } from "@/app/utils/date";
 import {
   Hotel,
   Airplane,
+  Notes
 } from "@icon-park/react";
 
 const JourneyDetail = ({ open, onOpenChange, target, onSuccess }) => {
