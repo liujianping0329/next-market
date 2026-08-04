@@ -22,6 +22,10 @@ import {
     parseLocalDate,
     changeHour,
 } from "@/app/utils/date";
+import {
+    Pencil,
+    Trash2,
+} from "lucide-react";
 
 import FormHarvest from "../form/FormHarvest";
 import FormHarvestJourney from "../form/FormHarvestJourney";
@@ -36,6 +40,7 @@ import * as holiday_jp from "@holiday-jp/holiday_jp";
 import { useCallback } from "react";
 import { PlusCircle, Route } from "lucide-react";
 import { cn } from "@/lib/utils";
+import ActionButton from "@/components/ActionButton";
 
 const Harvest = ({ userInfo, isUserReady }) => {
 
@@ -59,6 +64,8 @@ const Harvest = ({ userInfo, isUserReady }) => {
     const [journeys, setJourneys] = useState([]);
     const [selectedJourney, setSelectedJourney] = useState(null);
     const journeyScrollRefs = useRef([]);
+    const [updateJourneyTarget, setUpdateJourneyTarget] = useState(null);
+    const [updateJourneyOpen, setUpdateJourneyOpen] = useState(false);
 
     const timeConst = Array.from({ length: 14 }).map((_, i) => i + 8);     // 1-12 冻结列
     const rest = Array.from({ length: 98 }).map((_, i) => i + 1);           // 13+ 右侧滚动区
@@ -112,6 +119,13 @@ const Harvest = ({ userInfo, isUserReady }) => {
 
         ky.get('/api/journey/list').json().then((data) => {
             setJourneys(data.list);
+            setSelectedJourney((prev) => {
+                if (!prev) return null;
+
+                const latestJourney =
+                    data.list.find((item) => item.id === prev.id) ?? null;
+                return latestJourney;
+            });
         });
     }
 
@@ -251,6 +265,9 @@ const Harvest = ({ userInfo, isUserReady }) => {
         setRedPointDates(sumInfo.map((item) => new Date(item.startTime)));
     }, [userInfo?.planet?.id, userInfo?.id]);
 
+    const selectedIndex = journeys.findIndex(
+        (item) => item.id === selectedJourney?.id
+    );
     return (
         <>
             <div id="toolBar" className="mx-2.5 mt-2 flex items-center justify-between rounded-md border bg-muted/40 px-2.5 py-2">
@@ -315,6 +332,37 @@ const Harvest = ({ userInfo, isUserReady }) => {
                             )
                         })}
                     </div>
+
+                    {selectedJourney && (
+                        <div className="relative mt-1 rounded-lg border bg-background p-2 shadow-sm">
+                            {/* 上方三角 */}
+                            <div
+                                className="
+        absolute -top-2 left-6
+        h-4 w-4 rotate-45
+        border-l border-t bg-background
+      "
+                                style={{
+                                    left: `${20 + selectedIndex * 70}px`,
+                                }}
+                            />
+
+                            <div className="relative flex items-center justify-between">
+                                <span className="pl-1 truncate text-sm font-medium">
+                                    {selectedJourney.title}
+                                </span>
+
+                                <div className="flex gap-1">
+                                    <ActionButton icon={Pencil} onClick={() => {
+                                        console.log("selectedJourney", selectedJourney);
+                                        setUpdateJourneyTarget(selectedJourney);
+                                        setUpdateJourneyOpen(true);
+                                    }} />
+                                    <ActionButton icon={Trash2} onClick={() => deleteHandle(item)} />
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div >
             <div className="p-4 py-2 sticky top-0 z-30 bg-background border-b flex flex-col gap-1">
@@ -522,6 +570,11 @@ const Harvest = ({ userInfo, isUserReady }) => {
 
                                 }
                             } />
+                            <FormJourney openCtrl={updateJourneyOpen} setOpenCtrl={setUpdateJourneyOpen} defaultValues={updateJourneyTarget} onSuccess={
+                                () => {
+                                    fetchList(startTime)
+                                }
+                            } key={`UpdateTarget-${updateJourneyTarget?.id ?? "updateJourneyTarget"}-${editVer}`} />
                         </div>
                     </div>
                 </div>

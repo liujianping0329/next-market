@@ -67,7 +67,7 @@ const FormComponent = ({ trigger, openCtrl, setOpenCtrl, onSuccess, defaultValue
                     title: values.title
                 }
             }).json();
-            onSuccess();
+            onSuccess({ startDate: formatDateLocal(values.dateRange.from) });
             setOpenCtrl ? setOpenCtrl(false) : setOpen(false);
             form.reset();
         } catch (error) {
