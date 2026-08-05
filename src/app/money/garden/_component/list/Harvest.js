@@ -126,6 +126,7 @@ const Harvest = ({ userInfo, isUserReady }) => {
                     data.list.find((item) => item.id === prev.id) ?? null;
                 return latestJourney;
             });
+            setEditVer(prev => prev + 1);
         });
     }
 
@@ -348,14 +349,25 @@ const Harvest = ({ userInfo, isUserReady }) => {
                             />
 
                             <div className="relative flex items-center justify-between">
-                                <span className="pl-1 truncate text-sm font-medium">
-                                    {selectedJourney.title}
-                                </span>
+                                <div className="flex items-baseline gap-1">
+                                    <span className="pl-1 truncate items-center text-sm font-medium">
+                                        {selectedJourney.title}
+                                    </span>
+                                    <span className="pl-2 shrink-0 text-xs text-muted-foreground">
+                                        {formatDateLocal(
+                                            parseLocalDate(selectedJourney.startDate),
+                                            "MM/dd"
+                                        )}
+                                        {" ～ "}
+                                        {formatDateLocal(
+                                            parseLocalDate(selectedJourney.endDate),
+                                            "MM/dd"
+                                        )}
+                                    </span>
+                                </div>
 
                                 <div className="flex gap-1">
                                     <ActionButton icon={Pencil} onClick={() => {
-                                        console.log("selectedJourney", selectedJourney);
-                                        setUpdateJourneyTarget(selectedJourney);
                                         setUpdateJourneyOpen(true);
                                     }} />
                                     <ActionButton icon={Trash2} onClick={() => deleteHandle(item)} />
@@ -570,11 +582,12 @@ const Harvest = ({ userInfo, isUserReady }) => {
 
                                 }
                             } />
-                            <FormJourney openCtrl={updateJourneyOpen} setOpenCtrl={setUpdateJourneyOpen} defaultValues={updateJourneyTarget} onSuccess={
-                                () => {
+                            <FormJourney openCtrl={updateJourneyOpen} setOpenCtrl={setUpdateJourneyOpen} defaultValues={selectedJourney} onSuccess={
+                                (updatedJourney) => {
                                     fetchList(startTime)
+                                    setStartTime(updatedJourney.startDate)
                                 }
-                            } key={`UpdateTarget-${updateJourneyTarget?.id ?? "updateJourneyTarget"}-${editVer}`} />
+                            } key={`UpdateTarget-${selectedJourney?.id ?? "updateJourneyTarget"}-${editVer}`} />
                         </div>
                     </div>
                 </div>
