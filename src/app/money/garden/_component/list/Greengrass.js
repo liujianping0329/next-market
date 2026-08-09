@@ -215,8 +215,8 @@ const Greengrass = ({ userInfo }) => {
           </Badge>))}
       </div> */}
       <Dialog open={luckyOpen} onOpenChange={setLuckyOpen}>
-        <DialogContent className="max-w-sm w-full max-h-[90dvh] overflow-y-auto p-0">
-          <DialogHeader className="px-4 pt-4">
+        <DialogContent className="max-w-sm w-full max-h-[90dvh] overflow-hidden p-0 flex flex-col">
+          <DialogHeader className="px-4 pt-4 shrink-0">
             <DialogTitle>抽卡结果</DialogTitle>
           </DialogHeader>
           {luckyLoading && (
@@ -226,7 +226,7 @@ const Greengrass = ({ userInfo }) => {
             </div>
           )}
           {luckyId && (
-            <div className={luckyLoading ? "hidden" : ""}>
+            <div className={`${luckyLoading ? "hidden" : ""} flex-1 overflow-y-auto`}>
               <GreengrassDetail
                 id={luckyId}
                 showToolbar={false}
