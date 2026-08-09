@@ -43,7 +43,7 @@ import {
 } from "lucide-react";
 
 
-const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips, userFront, scrollTo }) => {
+const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips, userFront, scrollTo, onReady }) => {
   const router = useRouter()
   const [detail, setDetail] = useState(null)
   const [copied, setCopied] = useState(false)
@@ -61,7 +61,8 @@ const GreengrassDetail = ({ id, showToolbar, showRemarkbar, cssTips, userFront, 
     console.log(response.detail);
     setDetail(response.detail);
     setCate2s(response.cate2s);
-    setEditVer(prev => prev + 1)
+    setEditVer(prev => prev + 1);
+    onReady?.();
   }
 
   useEffect(() => {

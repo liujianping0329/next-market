@@ -8,11 +8,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 import { formatDistanceToNow } from "date-fns";
 import { zhCN } from "date-fns/locale";
 import ky from "ky";
-import { MapPin } from "lucide-react";
+import { MapPin, Shuffle } from "lucide-react";
 import Link from "next/link";
 import {
   useEffect,
@@ -30,6 +36,8 @@ import {
 } from "react-icons/si";
 import { Search } from "lucide-react"
 import { Input } from "@/components/ui/input"
+import GreengrassDetail from "@/app/money/garden/greengrass/_component/detail/GreengrassDetail";
+import { LoadingFour } from "@icon-park/react";
 
 const Greengrass = ({ userInfo }) => {
   const [expanded, setExpanded] = useState(false);
@@ -40,6 +48,9 @@ const Greengrass = ({ userInfo }) => {
   const pathname = usePathname();
   const [keyword, setKeyword] = useState("");
   const [gardenLabels, setGardenLabels] = useState([]);
+  const [luckyId, setLuckyId] = useState(null);
+  const [luckyOpen, setLuckyOpen] = useState(false);
+  const [luckyLoading, setLuckyLoading] = useState(false);
 
   const router = useRouter()
 
@@ -148,7 +159,7 @@ const Greengrass = ({ userInfo }) => {
             /> */}
           </span>
 
-          <div className="flex justify-between items-center">
+          <div className="flex items-center gap-2">
             <div className="flex items-center gap-2 rounded-md border border-input bg-background px-3">
               <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
 
@@ -160,6 +171,20 @@ const Greengrass = ({ userInfo }) => {
               />
             </div>
 
+            <Button
+              size="sm"
+              variant="outline"
+                onClick={() => {
+                  if (!filteredList.length) return;
+                  const picked = filteredList[Math.floor(Math.random() * filteredList.length)];
+                  setLuckyId(picked.id);
+                  setLuckyLoading(true);
+                  setLuckyOpen(true);
+                }}
+            >
+              <Shuffle className="h-4 w-4 mr-1" />
+              抽卡
+            </Button>
 
             <FormGarden trigger={
               <Button size="sm" variant="outline">新增记录</Button>
@@ -189,6 +214,31 @@ const Greengrass = ({ userInfo }) => {
             {cate.label}
           </Badge>))}
       </div> */}
+      <Dialog open={luckyOpen} onOpenChange={setLuckyOpen}>
+        <DialogContent className="max-w-sm w-full max-h-[90dvh] overflow-y-auto p-0">
+          <DialogHeader className="px-4 pt-4">
+            <DialogTitle>抽卡结果</DialogTitle>
+          </DialogHeader>
+          {luckyLoading && (
+            <div className="flex flex-col items-center justify-center py-16 gap-3 text-muted-foreground">
+              <LoadingFour className="animate-spin" size={48} strokeWidth={3} />
+              <span className="text-sm">正在抽取...</span>
+            </div>
+          )}
+          {luckyId && (
+            <div className={luckyLoading ? "hidden" : ""}>
+              <GreengrassDetail
+                id={luckyId}
+                showToolbar={false}
+                showRemarkbar={false}
+                cssTips={{ ImageCarousel: { ratio: 16 / 9 } }}
+                onReady={() => setLuckyLoading(false)}
+              />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
       <div id="cardContainer" className="p-4 space-y-4 min-h-[100dvh]">
         {filteredList.map((item, index) => {
 
