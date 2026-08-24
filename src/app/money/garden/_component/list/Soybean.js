@@ -16,6 +16,8 @@ import {
 import { pickColor } from "@/app/utils/color";
 
 import FolderOpBar from "./soy/FolderOpBar";
+import { LinkOne, Copy } from "@icon-park/react";
+import { toast } from "sonner";
 
 const Soybean = ({ userInfo }) => {
     const [list, setList] = useState([]);
@@ -164,14 +166,53 @@ const Soybean = ({ userInfo }) => {
                                         <div className="h-5 w-5 rounded-full border border-gray-400" />
                                     );
                                 }
+
+                                const urlMatch = item.title.match(/https?:\/\/[^\s]+/);
+                                const url = urlMatch?.[0] ?? null;
+                                const displayTitle = item.title.replace(/https?:\/\/[^\s]+/, "").trim();
                                 return (
-                                    <div key={item.id} onClick={() => !syncing && toggleOptimistic(item, folder)}
-                                        className="flex items-center gap-3 px-4 py-3 cursor-pointer transition">
-                                        {icon}
-                                        <span className={`text-sm transition ${pendingDelete ? "text-gray-400 line-through" : favorite ? "" : ""}`}>
-                                            {item.title}
-                                        </span>
-                                    </div>)
+                                    <div
+                                        key={item.id}
+                                        className="flex px-4 py-3 transition"
+                                    >
+                                        {/* 基础显示区 */}
+                                        <div
+                                            onClick={() => !syncing && toggleOptimistic(item, folder)}
+                                            className="flex flex-1 min-w-0 items-start gap-3 cursor-pointer"
+                                        >
+                                            <div className="shrink-0 w-5 h-5">
+                                                {icon}
+                                            </div>
+
+                                            <span
+                                                className={`min-w-0 text-sm whitespace-normal break-words transition ${pendingDelete ? "text-gray-400 line-through" : ""
+                                                    }`}
+                                            >
+                                                {displayTitle}
+                                            </span>
+                                        </div>
+
+                                        {/* 简易操作区 */}
+                                        <div className="shrink-0 flex items-start gap-3 mr-1">
+                                            {url && (
+                                                <LinkOne
+                                                    size={20}
+                                                    className="cursor-pointer text-muted-foreground hover:text-foreground"
+                                                    onClick={() => window.open(url, "_blank")}
+                                                />
+                                            )}
+
+                                            <Copy
+                                                size={20}
+                                                className="cursor-pointer text-muted-foreground hover:text-foreground"
+                                                onClick={async () => {
+                                                    await navigator.clipboard.writeText(displayTitle);
+                                                    toast.success("复制成功");
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                )
                             })}
                         </div>
                     )

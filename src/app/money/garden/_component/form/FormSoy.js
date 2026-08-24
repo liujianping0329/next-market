@@ -135,7 +135,7 @@ const FormSoy = ({ trigger, onSuccess, defaultValues = null }) => {
                                             <FormItem>
                                                 <FormLabel>每行对应一条记录</FormLabel>
                                                 <FormControl>
-                                                    <Textarea {...field} className="min-h-[120px] resize-none" />
+                                                    <Textarea {...field} className="min-h-[120px] max-h-[520px] resize-none" />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
