@@ -17,6 +17,7 @@ import {
 import SpendItems from "../_component/list/SpendItems";
 import LocationItems from "../_component/list/LocationItems";
 import GardenCate from "../_component/list/GardenCate";
+import QuestionItems from "../_component/list/QuestionItems";
 
 const configs = [{
     name: "夏荣园", value: "garden", isDefault: false, children:
@@ -27,12 +28,20 @@ const configs = [{
         ]
 },
 {
-    name: "冬藏园", value: "granary", isDefault: true, children:
+    name: "冬藏园", value: "granary", isDefault: false, children:
         [
             {
                 name: "位置", value: "locationItems"
             }, {
                 name: "固定支出项目", value: "spendItems"
+            }
+        ]
+},
+{
+    name: "AI", value: "ai", isDefault: true, children:
+        [
+            {
+                name: "问答", value: "questionItems"
             }
         ]
 }];
@@ -119,6 +128,7 @@ const MngLeaderUI = ({ }) => {
             {configsChildSel === "spendItems" && userInfo && <SpendItems userInfo={userInfo} />}
             {configsChildSel === "locationItems" && userInfo && <LocationItems userInfo={userInfo} />}
             {configsChildSel === "gardenCate" && userInfo && <GardenCate userInfo={userInfo} />}
+            {configsChildSel === "questionItems" && userInfo && <QuestionItems userInfo={userInfo} />}
         </>
     );
 }
