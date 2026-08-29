@@ -31,6 +31,8 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import supabase from "@/app/utils/database";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 import { Textarea } from "@/components/ui/textarea";
 const FormComponent = ({ trigger, openCtrl, setOpenCtrl, onSuccess, defaultValues = null }) => {
@@ -40,8 +42,7 @@ const FormComponent = ({ trigger, openCtrl, setOpenCtrl, onSuccess, defaultValue
     const [userId, setUserId] = useState(null);
     const form = useForm({
         defaultValues: {
-            title: defaultValues?.title || "",
-            answer: defaultValues?.answer || ""
+            title: defaultValues?.title || ""
         }
     });
 
@@ -49,7 +50,7 @@ const FormComponent = ({ trigger, openCtrl, setOpenCtrl, onSuccess, defaultValue
         setIsLoad(true);
 
         try {
-            const response = await ky.post('/api/ai_question/upsert', {
+            const response = await ky.post('/api/ai_question/upsertWithAI', {
                 json: {
                     ...(defaultValues?.id && { id: defaultValues.id }),
                     ...values
@@ -90,26 +91,39 @@ const FormComponent = ({ trigger, openCtrl, setOpenCtrl, onSuccess, defaultValue
                                                 <FormMessage />
                                             </FormItem>
                                         )} />
-                                    <FormField name="answer" control={form.control}
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                {/* <FormLabel>内容</FormLabel> */}
-                                                <FormControl>
-                                                    <Textarea {...field} className="min-h-[120px] resize-none"
-                                                        onFocus={(e) => {
-                                                            setTimeout(() => {
-                                                                const scroller = e.target.closest("[data-scroll]")
-                                                                scroller?.scrollTo({ top: scroller.scrollHeight, behavior: "smooth" })
-                                                            }, 350)
-                                                        }}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )} />
                                 </FieldGroup>
                             </form>
                         </Form>
+                        {defaultValues?.answer && (
+
+                            <div className="mt-4 p-4 bg-gray-100 rounded-md min-h-[400px] max-h-[550px] overflow-y-auto">
+                                <ReactMarkdown remarkPlugins={[remarkGfm]}
+                                    components={{
+                                        p: ({ children }) => (
+                                            <p className="mb-2 leading-6">
+                                                {children}
+                                            </p>
+                                        ),
+                                        table: ({ children }) => (
+                                            <table className="w-full border-collapse my-3">
+                                                {children}
+                                            </table>
+                                        ),
+                                        th: ({ children }) => (
+                                            <th className="border px-2 py-1 text-left bg-gray-200">
+                                                {children}
+                                            </th>
+                                        ),
+                                        td: ({ children }) => (
+                                            <td className="border px-2 py-1">
+                                                {children}
+                                            </td>
+                                        ),
+                                    }}>
+                                    {defaultValues.answer}
+                                </ReactMarkdown>
+                            </div>
+                        )}
                     </div>
                     <DialogFooter>
                         <DialogClose asChild>

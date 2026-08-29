@@ -77,7 +77,8 @@ const QuestionItems = ({ userInfo }) => {
                 </div>
               </div>
 
-              <div className="mt-2 line-clamp-1 text-gray-500 flex gap-2 justify-end ">
+              <div className="mt-2 line-clamp-1 text-gray-500 flex gap-2 justify-between ">
+                <span>token:   {item.token}  </span>
                 <span>创建于:   {item.answer_update_at?.slice(0, 10)}  </span>
               </div>
             </div>
