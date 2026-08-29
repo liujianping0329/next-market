@@ -76,10 +76,11 @@ const QuestionItems = ({ userInfo }) => {
                   <ActionButton icon={Trash2} onClick={() => deleteHandle(item)} />
                 </div>
               </div>
-              <div className="mt-2 line-clamp-1 text-sm text-gray-600 bg-gray-100 border border-gray-200 rounded-lg px-3 py-2">
-                {item.remark}
-              </div>
-
+              {item?.remark && (
+                <div className="mt-2 line-clamp-1 text-sm text-gray-600 bg-gray-100 border border-gray-200 rounded-lg px-3 py-2">
+                  {item.remark}
+                </div>
+              )}
               <div className="mt-2 line-clamp-1 text-gray-500 flex gap-2 justify-between ">
                 <span>token:   {item.token}  </span>
                 <span>创建于: {item.answer_update_at

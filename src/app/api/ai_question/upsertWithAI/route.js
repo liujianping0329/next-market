@@ -13,6 +13,7 @@ export async function POST(request, context) {
     requestBody.answer = aiResult.answer;
     requestBody.answer_update_at = new Date();
     requestBody.token = aiResult.token;
+    requestBody.remark = null;
     const { data, error } = await supabase.from('ai_question').upsert(requestBody).select();
     return NextResponse.json({ id: data[0].id });
 }
