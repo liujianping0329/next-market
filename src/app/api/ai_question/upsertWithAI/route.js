@@ -6,7 +6,7 @@ export async function POST(request, context) {
     const requestBody = await request.json();
     const aiResult = await ky.get(`${process.env.SPRING_AI_URL}/data`, {
         searchParams: {
-            question: requestBody.question,
+            question: requestBody.title,
         },
         timeout: 180000
     }).json();

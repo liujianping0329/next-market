@@ -47,16 +47,26 @@ const FormComponent = ({ trigger, openCtrl, setOpenCtrl, onSuccess, defaultValue
         }
     });
 
-    const onSubmit = async (values) => {
+    const onSubmit = async (values, event) => {
         setIsLoad(true);
-
+        const action = event?.nativeEvent?.submitter?.value;
         try {
-            const response = await ky.post('/api/ai_question/upsertWithAI', {
-                json: {
-                    ...(defaultValues?.id && { id: defaultValues.id }),
-                    ...values
-                }
-            }).json();
+            let response = {};
+            if (action === "save") {
+                response = await ky.post('/api/ai_question/upsert', {
+                    json: {
+                        ...(defaultValues?.id && { id: defaultValues.id }),
+                        ...values
+                    }
+                }).json();
+            } else {
+                response = await ky.post('/api/ai_question/upsertWithAI', {
+                    json: {
+                        ...(defaultValues?.id && { id: defaultValues.id }),
+                        ...values
+                    }
+                }).json();
+            }
             onSuccess();
             setOpenCtrl ? setOpenCtrl(false) : setOpen(false);
             form.reset();
@@ -146,12 +156,27 @@ const FormComponent = ({ trigger, openCtrl, setOpenCtrl, onSuccess, defaultValue
                         )}
                     </div>
                     <DialogFooter>
-                        <DialogClose asChild>
-                            <Button variant="outline">关闭</Button>
-                        </DialogClose>
-                        <Button type="submit" form="form" disabled={isLoad}>
-                            {isLoad && <Spinner />}保存并生成答案
-                        </Button>
+                        {defaultValues?.id ? (<>
+                            <DialogClose asChild>
+                                <Button variant="outline">关闭</Button>
+                            </DialogClose>
+                            <div className="grid grid-cols-[49%_2%_49%] justify-between">
+                                <Button type="submit" form="form" disabled={isLoad} value="regenerate">
+                                    {isLoad && <Spinner />}保存并重新生成答案
+                                </Button>
+                                <div></div>
+                                <Button type="submit" form="form" disabled={isLoad} value="save">
+                                    {isLoad && <Spinner />}仅保存
+                                </Button>
+                            </div>
+                        </>) : (<>
+                            <DialogClose asChild>
+                                <Button variant="outline">关闭</Button>
+                            </DialogClose>
+                            <Button type="submit" form="form" disabled={isLoad}>
+                                {isLoad && <Spinner />}保存并生成答案
+                            </Button>
+                        </>)}
                     </DialogFooter>
                 </DialogContent>
 
