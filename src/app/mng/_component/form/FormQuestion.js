@@ -42,7 +42,8 @@ const FormComponent = ({ trigger, openCtrl, setOpenCtrl, onSuccess, defaultValue
     const [userId, setUserId] = useState(null);
     const form = useForm({
         defaultValues: {
-            title: defaultValues?.title || ""
+            title: defaultValues?.title || "",
+            ...(defaultValues?.id && { remark: defaultValues.remark || "" }),
         }
     });
 
@@ -72,7 +73,7 @@ const FormComponent = ({ trigger, openCtrl, setOpenCtrl, onSuccess, defaultValue
         <>
             <Dialog open={openCtrl ?? open} onOpenChange={setOpenCtrl ?? setOpen}>
                 {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
-                <DialogContent>
+                <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
                     <DialogHeader>
                         <DialogTitle>{defaultValues?.id ? "修改" : "新增"}</DialogTitle>
                     </DialogHeader>
@@ -91,12 +92,31 @@ const FormComponent = ({ trigger, openCtrl, setOpenCtrl, onSuccess, defaultValue
                                                 <FormMessage />
                                             </FormItem>
                                         )} />
+                                    {defaultValues?.id && (
+                                        <FormField name="remark" control={form.control}
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel>反馈</FormLabel>
+                                                    <FormControl>
+                                                        <Textarea {...field} className="min-h-[60px] resize-none"
+                                                            onFocus={(e) => {
+                                                                setTimeout(() => {
+                                                                    const scroller = e.target.closest("[data-scroll]")
+                                                                    scroller?.scrollTo({ top: scroller.scrollHeight, behavior: "smooth" })
+                                                                }, 350)
+                                                            }}
+                                                        />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )} />
+                                    )}
                                 </FieldGroup>
                             </form>
                         </Form>
                         {defaultValues?.answer && (
 
-                            <div className="mt-4 p-4 bg-gray-100 rounded-md min-h-[400px] max-h-[550px] overflow-y-auto">
+                            <div className="mt-4 p-4 bg-gray-100 rounded-md min-h-[300px] max-h-[400px] overflow-y-auto">
                                 <ReactMarkdown remarkPlugins={[remarkGfm]}
                                     components={{
                                         p: ({ children }) => (
@@ -130,7 +150,7 @@ const FormComponent = ({ trigger, openCtrl, setOpenCtrl, onSuccess, defaultValue
                             <Button variant="outline">关闭</Button>
                         </DialogClose>
                         <Button type="submit" form="form" disabled={isLoad}>
-                            {isLoad && <Spinner />}保存
+                            {isLoad && <Spinner />}保存并生成答案
                         </Button>
                     </DialogFooter>
                 </DialogContent>

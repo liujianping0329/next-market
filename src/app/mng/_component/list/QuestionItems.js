@@ -79,7 +79,15 @@ const QuestionItems = ({ userInfo }) => {
 
               <div className="mt-2 line-clamp-1 text-gray-500 flex gap-2 justify-between ">
                 <span>token:   {item.token}  </span>
-                <span>创建于:   {item.answer_update_at?.slice(0, 10)}  </span>
+                <span>创建于: {item.answer_update_at
+                  ? new Date(item.answer_update_at).toLocaleString("zh-CN", {
+                    month: "2-digit",
+                    day: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: false,
+                  })
+                  : ""}  </span>
               </div>
             </div>
           )
