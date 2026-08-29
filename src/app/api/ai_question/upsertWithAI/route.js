@@ -8,7 +8,7 @@ export async function POST(request, context) {
         searchParams: {
             question: requestBody.title,
         },
-        timeout: 180000
+        timeout: false
     }).json();
     requestBody.answer = aiResult.answer;
     requestBody.answer_update_at = new Date();
