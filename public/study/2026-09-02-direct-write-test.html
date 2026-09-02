@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2026-09-02｜Agent 架构学习测试页</title>
+  <style>
+    :root{--bg:#f5f6f8;--card:#fff;--text:#1f2937;--muted:#6b7280;--border:#e5e7eb;--soft:#f3f4f6;}
+    *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",Arial,sans-serif;line-height:1.7}
+    .container{width:min(960px,calc(100% - 32px));margin:36px auto 64px}.hero,.card{background:var(--card);border:1px solid var(--border);border-radius:18px;box-shadow:0 8px 24px rgba(15,23,42,.04)}
+    .hero{padding:30px;margin-bottom:20px}.hero h1{margin:0 0 8px;font-size:28px}.hero p{margin:0;color:var(--muted)}
+    .card{padding:24px;margin-top:16px}.card h2{margin:0 0 12px;font-size:20px}.flow{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.step{padding:8px 12px;border-radius:999px;background:var(--soft);font-weight:600;font-size:14px}
+    .note{margin-top:14px;padding:14px 16px;border-radius:12px;background:var(--soft)} code{background:#111827;color:#f9fafb;padding:2px 6px;border-radius:6px}.footer{text-align:center;color:var(--muted);font-size:13px;margin-top:28px}
+  </style>
+</head>
+<body>
+  <main class="container">
+    <section class="hero">
+      <h1>2026-09-02｜Agent 架构学习测试页</h1>
+      <p>这是 ChatGPT 直接写入 GitHub 仓库 <code>public/study</code> 的测试文件。</p>
+    </section>
+
+    <section class="card">
+      <h2>Agent 常见架构</h2>
+      <div class="flow">
+        <span class="step">Profile</span>
+        <span class="step">Planning</span>
+        <span class="step">Memory</span>
+        <span class="step">Tools</span>
+        <span class="step">Action</span>
+        <span class="step">Observation</span>
+        <span class="step">Orchestration</span>
+      </div>
+      <div class="note">
+        <strong>核心理解：</strong>Agent 不只是一次 LLM 调用，而是围绕“目标、计划、工具执行、观察结果、继续决策”形成循环。
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>和 Spring AI 项目的对应关系</h2>
+      <p><strong>Tools：</strong>例如 DatabaseTools、检索工具、SQL 执行工具。</p>
+      <p><strong>Action：</strong>模型发起 Tool Calling，并实际执行方法。</p>
+      <p><strong>Observation：</strong>工具执行结果返回模型，模型再决定下一步。</p>
+      <p><strong>Orchestration：</strong>由 Tool Calling Loop / Advisor / Agent 层负责串联多轮调用。</p>
+      <p><strong>Memory / Planning：</strong>如果项目还没有显式的长期记忆与任务拆解，这两部分通常还需要补充。</p>
+    </section>
+
+    <section class="card">
+      <h2>本次测试目的</h2>
+      <p>如果你能在 GitHub 里直接看到这个文件，就说明以后每天 10:00 的学习 HTML 可以不经过“下载附件”，直接提交到仓库。</p>
+    </section>
+
+    <div class="footer">Direct write test · 2026-09-02</div>
+  </main>
+</body>
+</html>
