@@ -1,241 +1,243 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Java 后端八股文学习计划</title>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Java 后端 + AI 面试学习计划</title>
   <style>
-    :root{
-      --bg:#f5f6f8;
-      --card:#ffffff;
-      --text:#1f2937;
-      --muted:#6b7280;
-      --border:#e5e7eb;
-      --soft:#f3f4f6;
-      --accent:#111827;
+    :root {
+      --bg: #f5f6f8;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --soft: #f3f4f6;
+      --accent: #111827;
     }
 
-    *{
-      box-sizing:border-box;
+    * {
+      box-sizing: border-box;
     }
 
-    body{
-      margin:0;
-      background:var(--bg);
-      color:var(--text);
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",Arial,sans-serif;
-      line-height:1.6;
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      line-height: 1.6;
     }
 
-    a{
-      color:inherit;
-      text-decoration:none;
+    a {
+      color: inherit;
+      text-decoration: none;
     }
 
-    .container{
-      width:min(1000px, calc(100% - 32px));
-      margin:36px auto 64px;
+    .container {
+      width: min(1000px, calc(100% - 32px));
+      margin: 36px auto 64px;
     }
 
-    .hero{
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius:20px;
-      padding:34px;
-      box-shadow:0 10px 28px rgba(15,23,42,.04);
-      margin-bottom:24px;
+    .hero {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 34px;
+      box-shadow: 0 10px 28px rgba(15, 23, 42, .04);
+      margin-bottom: 24px;
     }
 
-    .hero h1{
-      margin:0;
-      font-size:30px;
-      line-height:1.25;
+    .hero h1 {
+      margin: 0;
+      font-size: 30px;
+      line-height: 1.25;
     }
 
-    .hero p{
-      margin:10px 0 0;
-      color:var(--muted);
+    .hero p {
+      margin: 10px 0 0;
+      color: var(--muted);
     }
 
-    .stats{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
-      gap:12px;
-      margin-top:22px;
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-top: 22px;
     }
 
-    .stat{
-      background:var(--soft);
-      border-radius:14px;
-      padding:14px 16px;
+    .stat {
+      background: var(--soft);
+      border-radius: 14px;
+      padding: 14px 16px;
     }
 
-    .stat .label{
-      color:var(--muted);
-      font-size:13px;
+    .stat .label {
+      color: var(--muted);
+      font-size: 13px;
     }
 
-    .stat .value{
-      font-size:20px;
-      font-weight:700;
-      margin-top:3px;
+    .stat .value {
+      font-size: 20px;
+      font-weight: 700;
+      margin-top: 3px;
     }
 
-    .section-title{
-      margin:30px 0 14px;
-      font-size:20px;
+    .section-title {
+      margin: 30px 0 14px;
+      font-size: 20px;
     }
 
-    .list{
-      display:grid;
-      gap:14px;
+    .list {
+      display: grid;
+      gap: 14px;
     }
 
-    .day-card{
-      display:block;
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius:16px;
-      padding:20px 22px;
-      transition:.18s ease;
-      box-shadow:0 6px 18px rgba(15,23,42,.025);
+    .day-card {
+      display: block;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 22px;
+      transition: .18s ease;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, .025);
     }
 
-    .day-card:hover{
-      transform:translateY(-2px);
-      box-shadow:0 10px 24px rgba(15,23,42,.06);
-      border-color:#cbd5e1;
+    .day-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(15, 23, 42, .06);
+      border-color: #cbd5e1;
     }
 
-    .top{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:16px;
+    .top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
     }
 
-    .day-title{
-      font-size:18px;
-      font-weight:700;
-      margin:0;
+    .day-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin: 0;
     }
 
-    .date{
-      color:var(--muted);
-      font-size:13px;
-      white-space:nowrap;
+    .date {
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
     }
 
-    .desc{
-      color:#4b5563;
-      margin:8px 0 0;
-      font-size:14px;
+    .desc {
+      color: #4b5563;
+      margin: 8px 0 0;
+      font-size: 14px;
     }
 
-    .tags{
-      display:flex;
-      flex-wrap:wrap;
-      gap:7px;
-      margin-top:13px;
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 13px;
     }
 
-    .tag{
-      font-size:12px;
-      color:#374151;
-      background:var(--soft);
-      border-radius:999px;
-      padding:4px 9px;
+    .tag {
+      font-size: 12px;
+      color: #374151;
+      background: var(--soft);
+      border-radius: 999px;
+      padding: 4px 9px;
     }
 
-    .footer{
-      text-align:center;
-      color:var(--muted);
-      font-size:13px;
-      margin-top:34px;
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 34px;
     }
 
-    @media (max-width:600px){
-      .container{
-        width:min(100% - 20px, 1000px);
-        margin-top:20px;
+    @media (max-width:600px) {
+      .container {
+        width: min(100% - 20px, 1000px);
+        margin-top: 20px;
       }
 
-      .hero{
-        padding:24px 20px;
+      .hero {
+        padding: 24px 20px;
       }
 
-      .hero h1{
-        font-size:25px;
+      .hero h1 {
+        font-size: 25px;
       }
 
-      .day-card{
-        padding:18px;
+      .day-card {
+        padding: 18px;
       }
 
-      .top{
-        display:block;
+      .top {
+        display: block;
       }
 
-      .date{
-        display:block;
-        margin-top:5px;
+      .date {
+        display: block;
+        margin-top: 5px;
       }
     }
   </style>
 </head>
+
 <body>
   <main class="container">
-
     <section class="hero">
-      <h1>Java 后端八股文学习计划</h1>
-      <p>每天控制在适合消化的学习量，先理解，再追问，第二天复习。</p>
-
+      <h1>Java 后端 + AI 面试学习计划</h1>
+      <p>每天先复习，再学习新知识；Java 后端与 AI 应用开发并行推进。</p>
       <div class="stats">
         <div class="stat">
           <div class="label">当前进度</div>
-          <div class="value">Day 1</div>
+          <div class="value">正式 Day 3</div>
         </div>
-
         <div class="stat">
-          <div class="label">累计学习</div>
-          <div class="value">3 题</div>
+          <div class="label">累计正式学习</div>
+          <div class="value">15 个正式知识点</div>
         </div>
-
         <div class="stat">
-          <div class="label">单次时长</div>
-          <div class="value">约 20 分钟</div>
+          <div class="label">学习方式</div>
+          <div class="value">复习 + 5 个新知识</div>
         </div>
       </div>
     </section>
-
     <h2 class="section-title">学习记录</h2>
-
-    <section class="list">
-
+    <section class="list"><a class="day-card" href="./2026-09-02.html">
+        <div class="top">
+          <h3 class="day-title">正式 Day 3｜Java 集合、并发与 Agent 架构</h3><span class="date">2026-09-02</span>
+        </div>
+        <p class="desc">HashMap / TreeMap、ConcurrentHashMap、Java 泛型、Agent 完整架构与企业 RAG 权限隔离。</p>
+        <div class="tags"><span class="tag">TreeMap</span><span class="tag">ConcurrentHashMap</span><span
+            class="tag">泛型</span><span class="tag">Agent</span><span class="tag">Spring AI</span><span
+            class="tag">RAG</span></div>
+      </a><a class="day-card" href="./java_ai_study_2026-08-31.html">
+        <div class="top">
+          <h3 class="day-title">正式 Day 1｜String、HashMap 与 Agent</h3><span class="date">2026-08-31</span>
+        </div>
+        <p class="desc">String 不可变性与 Compact Strings、HashMap 冲突与树化、Java 接口、Agent 与 Spring AI、AI 应用开发基础。</p>
+        <div class="tags"><span class="tag">String</span><span class="tag">HashMap</span><span
+            class="tag">Interface</span><span class="tag">Agent</span><span class="tag">Spring AI</span></div>
+      </a>
       <a class="day-card" href="./java_backend_day1_jvm.html">
         <div class="top">
-          <h3 class="day-title">Day 1｜JVM 基础入门</h3>
+          <h3 class="day-title">样例｜JVM 基础入门</h3>
           <span class="date">2026-08-30</span>
         </div>
-
-        <p class="desc">
-          JVM 基础、方法区 / 永久代 / 元空间、类加载与双亲委派。
-        </p>
-
-        <div class="tags">
+        <p class="desc">样例学习页：JVM 基础、方法区 / 永久代 / 元空间、类加载与双亲委派；不计入正式学习进度。</p>
+        <div class="tags"><span class="tag">样例</span>
           <span class="tag">JVM</span>
           <span class="tag">Metaspace</span>
           <span class="tag">ClassLoader</span>
           <span class="tag">双亲委派</span>
         </div>
       </a>
-
     </section>
-
-    <div class="footer">
-      Java 后端高频面试题学习记录
-    </div>
-
+    <div class="footer">Java 后端 + AI 面试高频知识学习记录</div>
   </main>
 </body>
+
 </html>

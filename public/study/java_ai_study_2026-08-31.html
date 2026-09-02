@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>正式 Day 1｜Java 集合基础与 AI Agent｜2026-08-31</title>
+  <style>
+    :root{
+      --bg:#f6f7f9; --card:#ffffff; --text:#1f2937; --muted:#6b7280;
+      --border:#e5e7eb; --soft:#f3f4f6; --code:#0f172a; --codeText:#e5e7eb;
+      --good:#ecfdf5; --warn:#fff7ed; --ai:#eff6ff; --review:#f5f3ff;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",Arial,sans-serif;
+      line-height:1.72}
+    .container{width:min(980px,calc(100% - 32px));margin:32px auto 64px}
+    .hero,.card{background:var(--card);border:1px solid var(--border);border-radius:18px;
+      box-shadow:0 8px 24px rgba(15,23,42,.04)}
+    .hero{padding:34px;margin-bottom:22px}
+    .hero h1{margin:0 0 10px;font-size:30px;line-height:1.3}
+    .sub,.mini,.source{color:var(--muted)}
+    .meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+    .tag{display:inline-block;padding:5px 10px;border-radius:999px;background:var(--soft);font-size:13px;color:#374151}
+    .card{padding:28px;margin:18px 0}
+    h2{margin:0 0 18px;font-size:23px}
+    h3{margin:24px 0 10px;font-size:18px}
+    p{margin:9px 0}
+    ul,ol{padding-left:22px}
+    .source{font-size:13px;border-left:3px solid #d1d5db;padding-left:10px;margin:12px 0 18px}
+    pre{background:var(--code);color:var(--codeText);border-radius:12px;padding:16px;overflow:auto;line-height:1.55;font-size:14px;white-space:pre-wrap}
+    code{font-family:Consolas,Monaco,monospace}
+    .inline{background:var(--soft);border-radius:6px;padding:2px 6px;font-family:Consolas,Monaco,monospace;font-size:.95em}
+    .box{border-radius:12px;padding:14px 16px;margin:14px 0;border:1px solid var(--border)}
+    .good{background:var(--good)} .warn{background:var(--warn)} .ai{background:var(--ai)} .review{background:var(--review)}
+    .answer{border-left:4px solid #111827;background:#fafafa;padding:14px 16px;border-radius:0 10px 10px 0;margin-top:12px}
+    .summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+    .summary-grid .box{margin:0}
+    table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}
+    th,td{border:1px solid var(--border);padding:10px 12px;text-align:left;vertical-align:top}
+    th{background:var(--soft)}
+    .footer{color:var(--muted);text-align:center;font-size:13px;margin-top:26px}
+    @media (max-width:600px){.container{width:min(100% - 20px,980px);margin-top:20px}.hero{padding:24px 20px}.hero h1{font-size:25px}.card{padding:20px}}
+  </style>
+</head>
+<body>
+<div class="container">
+  <section class="hero">
+    <h1>正式 Day 1｜Java 集合基础与 AI Agent</h1>
+    <div class="sub">2026-08-31｜后端 + AI 面试正式学习复盘</div>
+    <div class="meta">
+      <span class="tag">正式 Day 1</span><span class="tag">5 个新知识点</span>
+      <span class="tag">String</span><span class="tag">HashMap</span>
+      <span class="tag">Interface</span><span class="tag">Agent</span><span class="tag">Spring AI</span>
+    </div>
+    <div class="box good"><strong>今日主线：</strong>
+      String 不可变性 → HashMap Key → table / bucket / 链表 → 哈希冲突 → 树化；
+      同时建立 Agent 与 Spring AI Tool Calling 的整体认识。
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>昨日最后问题回顾｜JVM Stack 到底是什么？</h2>
+    <div class="box review"><strong>昨日最后学习追问：</strong>“这个好像没讲到”——对应昨日图中出现但未正式展开的 Stack（JVM 虚拟机栈）。</div>
+    <p>JVM Stack 是线程私有的运行时内存区域。每个 Java 线程都有自己的虚拟机栈；每调用一个 Java 方法，通常会创建一个栈帧压入当前线程的栈，方法结束后再弹出。</p>
+    <pre><code>线程 A
+└── JVM Stack
+    ├── methodC() 栈帧  ← 当前执行
+    ├── methodB() 栈帧
+    └── methodA() 栈帧
+
+methodC() 返回
+        ↓
+methodC 栈帧弹出
+        ↓
+继续执行 methodB()</code></pre>
+    <p>一个栈帧通常包含：局部变量表、操作数栈、动态链接、方法返回相关信息。</p>
+    <pre><code>public void test() {
+    int age = 20;
+    User user = new User();
+}
+
+当前线程 Stack
+└── test() 栈帧
+    ├── age = 20
+    └── user = 对象引用 ─────────┐
+                                │
+Heap                            │
+└── new User() 对象 ◄───────────┘</code></pre>
+    <div class="box warn"><strong>易错点：</strong>不要说“对象都在 Stack”。基础面试模型里，对象实例主要在 Heap，局部变量和对象引用位于当前方法栈帧中。</div>
+    <div class="answer"><strong>面试口述版：</strong>
+      JVM 虚拟机栈是线程私有的，每个线程都有自己的栈。Java 方法调用时通常会创建栈帧，保存局部变量表、操作数栈、动态链接和返回信息等；方法调用时入栈，方法结束后出栈。递归过深导致栈帧持续累积时，可能出现 StackOverflowError。
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>1. String / StringBuffer / StringBuilder</h2>
+    <div class="source">出处：《后端高频面试题大集合》→ JAVASE 核心 → 第 1 题：String/StringBuffer 与 StringBuilder 的区别和使用场景。</div>
+    <h3>原资料内容</h3>
+    <ul><li>String 不可变。</li><li>StringBuilder、StringBuffer 可变。</li><li>StringBuilder 通常效率更高；StringBuffer 提供同步保证。</li></ul>
+    <h3>当天纠错 / 补充｜Java 9 Compact Strings</h3>
+    <div class="box warn">Java 9+ 的 String 引入 Compact Strings，核心内部表示从 Java 8 常见的 <span class="inline">char[]</span> 转为 <span class="inline">byte[] + coder</span>。</div>
+    <table><thead><tr><th>字符串</th><th>典型内部编码</th><th>存储理解</th></tr></thead><tbody>
+      <tr><td>"Hello"</td><td>LATIN1</td><td>约 1 byte / 字符</td></tr>
+      <tr><td>"你好"</td><td>UTF16</td><td>约 2 bytes / UTF-16 code unit</td></tr>
+      <tr><td>"Hello你好"</td><td>UTF16</td><td>整个 String 使用 UTF16 表示</td></tr>
+    </tbody></table>
+    <h3>今日追问｜String 不是可以通过 += 改值吗？</h3>
+    <p><strong>纠正：</strong><span class="inline">+=</span> 没有修改原 String 对象，而是生成新 String，然后让变量重新指向新对象。</p>
+    <pre><code>String key = "abc";
+
+key ─────► "abc"
+
+key += "def";
+
+             "abc"       （旧对象没改）
+key ─────► "abcdef"      （变量改指向）</code></pre>
+    <div class="answer"><strong>面试口述版：</strong>
+      String 是不可变对象，StringBuilder 和 StringBuffer 是可变字符串。频繁拼接通常优先 StringBuilder；StringBuffer 用于确有多线程共享可变字符串的场景。Java 9 开始 String 引入 Compact Strings，内部主要是 byte[] 加 coder。String 的 += 不是原地修改，而是生成新 String 后重新赋值。
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>2. HashMap：数组 + 链表 + 红黑树</h2>
+    <div class="source">出处：《后端高频面试题大集合》→ JAVASE 核心 → 第 2 题：HashMap 底层是数组+链表+红黑树，为什么用这几类结构？</div>
+    <h3>原资料内容</h3>
+    <ul><li>数组负责通过 hash 快速定位 bucket。</li><li>链表用于处理哈希冲突。</li><li>链表过长时可转红黑树，避免查询退化。</li></ul>
+    <h3>当天纠错 / 补充｜并非达到 8 就一定树化</h3>
+    <pre><code>TREEIFY_THRESHOLD     = 8
+UNTREEIFY_THRESHOLD   = 6
+MIN_TREEIFY_CAPACITY  = 64</code></pre>
+    <p>当桶内节点达到树化阈值时，还要看 <span class="inline">table.length</span>。容量不足 64 时通常优先扩容。</p>
+    <h3>今日追问①｜这里说的是哪里的容量？</h3>
+    <table><thead><tr><th>概念</th><th>含义</th></tr></thead><tbody>
+      <tr><td>capacity</td><td>底层 table 数组长度，例如 16 / 32 / 64</td></tr>
+      <tr><td>size</td><td>HashMap 当前实际键值对数量</td></tr>
+      <tr><td>桶内链表长度</td><td>某一个 bucket 中挂了多少冲突节点</td></tr>
+    </tbody></table>
+    <h3>今日追问②｜它是自动分配的吗？使用时好像不用管？</h3>
+    <p>是。普通业务代码中 HashMap 会自动初始化、扩容、处理链表和树化。通常只需要正常使用 put/get。</p>
+    <pre><code>new HashMap&lt;&gt;()
+  ↓
+第一次 put
+  ↓
+初始化 table
+  ↓
+元素增加
+  ↓
+达到扩容条件
+  ↓
+resize
+  ↓
+16 → 32 → 64 → 128 → ...</code></pre>
+    <h3>今日追问③｜Key 不一样，也可能装在同一个链表上？</h3>
+    <div class="box good"><strong>是。</strong>这就是 Hash Collision（哈希冲突）：不同 Key 最终可能落到同一个 bucket。</div>
+    <pre><code>"AAA" ── hash/index ──┐
+                      ├──► table[5]
+"BBB" ── hash/index ──┘
+
+table[5]
+  ├── Node("AAA", 100)
+  └── Node("BBB", 200)</code></pre>
+    <p>get 时先通过 hash 定位 bucket，再通过节点 hash 与 equals() 最终确认具体 Key。</p>
+    <div class="box warn"><strong>易错点：</strong>hashCode/hash 用于快速缩小范围；equals() 用于最终判断逻辑 Key 是否相等。</div>
+    <h3>为什么可变对象做 Key 危险？</h3>
+    <pre><code>User key = new User("Tom");
+map.put(key, "value");
+
+key.setName("Jerry"); // 假设 name 参与 hashCode()
+
+// 对象仍在旧 bucket，新的 hash 却可能指向另一个 bucket
+map.get(key); // 可能找不到</code></pre>
+    <div class="answer"><strong>面试口述版：</strong>
+      JDK 8 HashMap 主要由数组、链表和红黑树组成。数组负责通过 hash 快速定位 bucket；不同 Key 可能落到同一个 bucket，因此需要链表或树保存冲突节点。链表达到树化阈值后也不是无条件树化，当 table 容量不足 64 时通常会优先扩容。
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>3. Java 接口：多继承与方法实现</h2>
+    <div class="source">出处：《后端高频面试题大集合》→ JAVASE 核心 → 第 3 题：java 接口是否支持多继承？接口里面是否可以有方法实现。</div>
+    <p>Java 类只支持单继承，但接口可以多继承，一个类也可以实现多个接口。Java 8 开始接口可以定义 default 和 static 方法；Java 9 开始还可以定义 private 方法。</p>
+    <pre><code>interface A {
+    default void hello() {
+        log();
+    }
+
+    private void log() {
+        System.out.println("log");
+    }
+}</code></pre>
+    <div class="answer"><strong>面试口述版：</strong>
+      Java 的类只支持单继承，但接口支持多继承，一个类也可以实现多个接口。Java 8 开始接口可以定义 default 和 static 方法；Java 9 开始还可以定义 private 方法。若多个接口提供冲突的 default 方法，实现类需要显式覆盖。
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>4. Agent 是什么？如何映射到 Spring AI？</h2>
+    <div class="source">出处：《AI应用开发面试题 / Agent / RAG》→ 1.1.1“你对 Agent 了解多少呢？”</div>
+    <h3>原资料内容</h3>
+    <pre><code>Agent
+=
+LLM
++ Perception
++ Memory
++ Planning
++ Tool Use
++ Action</code></pre>
+    <h3>Spring AI 化改写</h3>
+    <table><thead><tr><th>Agent 概念</th><th>Java / Spring AI 对应理解</th></tr></thead><tbody>
+      <tr><td>LLM</td><td>ChatModel / ChatClient</td></tr>
+      <tr><td>Tool Use</td><td>@Tool / Tool Calling</td></tr>
+      <tr><td>Memory</td><td>Chat Memory / 持久化会话状态</td></tr>
+      <tr><td>RAG</td><td>Embedding + VectorStore + Advisor</td></tr>
+      <tr><td>Observation</td><td>工具执行结果重新提供给模型</td></tr>
+      <tr><td>Orchestration</td><td>Spring 服务层 / Workflow / Agent 控制循环</td></tr>
+    </tbody></table>
+    <pre><code>@Component
+public class DatabaseTools {
+
+    @Tool(description = "查询业务数据库")
+    public String query(String sql) {
+        return "...";
+    }
+}
+
+chatClient.prompt()
+    .user(question)
+    .tools(databaseTools)
+    .call()
+    .content();</code></pre>
+    <div class="box warn"><strong>当天强调：</strong>用了 Tool Calling 不等于已经实现完整复杂 Agent。成熟 Agent 往往还需要状态、规划、多步循环、失败恢复、权限、退出条件和可观测性。</div>
+    <div class="answer"><strong>面试口述版：</strong>
+      Agent 是以 LLM 为核心、能够围绕目标感知环境、规划决策、调用工具并根据执行结果继续迭代的 AI 系统。在 Spring AI 中，可以通过 ChatClient、Tool Calling、Chat Memory、VectorStore 等能力组合出 Agent 工作流。
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>5. AI 大模型应用开发 vs 底层模型开发</h2>
+    <div class="source">出处：《AI大模型面试题-基础篇》→ 第 1 题：请说明 AI 大模型应用开发和底层区别，市场需求占比。</div>
+    <h3>原资料内容</h3>
+    <table><thead><tr><th>方向</th><th>核心工作</th></tr></thead><tbody>
+      <tr><td>AI 应用开发</td><td>企业知识库、智能客服、AI 产品、业务系统集成等</td></tr>
+      <tr><td>底层模型开发</td><td>模型算法、训练、数学、论文、模型原理与推理优化等</td></tr>
+    </tbody></table>
+    <h3>当天纠错｜不要死背“90% / 10%”</h3>
+    <div class="box warn">原资料给出的 90% / 10% 缺少足够严谨、固定的统计口径，不建议作为精确事实背诵。更稳妥地说：应用层岗位覆盖面通常更广，底层模型训练和算法研究岗位相对少但门槛更高。</div>
+    <pre><code>Next.js
+   ↓
+Spring Boot
+   ↓
+Spring AI
+   ├── ChatClient
+   ├── Prompt
+   ├── RAG
+   ├── VectorStore
+   ├── Tool Calling
+   ├── Memory
+   └── Agent
+          ↓
+数据库 / API / 企业资料 / 业务系统</code></pre>
+    <div class="answer"><strong>面试口述版：</strong>
+      底层模型开发主要关注模型架构、训练、微调和推理优化；AI 应用开发则是在现有模型能力上解决真实业务问题，例如结合 Spring AI、RAG、向量数据库、Tool Calling、Agent 以及企业数据库和微服务构建产品。
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>今日追问链｜从 String 串到 HashMap</h2>
+    <div class="summary-grid">
+      <div class="box"><strong>① String +=</strong><br>变量换指向，不是原对象内容被修改。</div>
+      <div class="box"><strong>② HashMap Key</strong><br>Map 保存 put 当时的 Key 对象引用。</div>
+      <div class="box"><strong>③ capacity</strong><br>指底层 table 数组长度。</div>
+      <div class="box"><strong>④ 自动扩容</strong><br>HashMap 内部自动管理 resize 和树化。</div>
+      <div class="box"><strong>⑤ 哈希冲突</strong><br>不同 Key 可能落在同一个 bucket。</div>
+      <div class="box"><strong>⑥ 不可变 Key</strong><br>避免 hashCode 改变后仍留在旧 bucket。</div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>明日优先复习</h2>
+    <ol>
+      <li>为什么 String 的 += 不代表 String 是可变对象？</li>
+      <li>为什么 String 适合作为 HashMap Key？</li>
+      <li>HashMap 的 capacity、size、桶内链表长度分别是什么？</li>
+      <li>两个不同 Key 为什么可能进入同一个 bucket？get 时如何找到正确 Key？</li>
+      <li>链表达到 8 后是否一定树化？为什么还要看 table 容量？</li>
+      <li>Agent 和单纯的 LLM / Tool Calling 有什么区别？</li>
+    </ol>
+  </section>
+
+  <section class="card">
+    <h2>放入 public/study 的建议</h2>
+    <p><strong>文件名：</strong><span class="inline">java_ai_study_2026-08-31.html</span></p>
+    <p><strong>Index 标题：</strong>正式 Day 1｜String、HashMap 与 Agent</p>
+  </section>
+
+  <div class="footer">Java 后端 + AI 面试学习记录｜2026-08-31</div>
+</div>
+</body>
+</html>
