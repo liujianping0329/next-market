@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>正式 Day 4｜泛型通配符、Agent 工作模式与 AI 需求文档</title>
+<style>
+:root{--bg:#f5f6f8;--card:#fff;--text:#1f2937;--muted:#6b7280;--border:#e5e7eb;--soft:#f3f4f6;--code:#0f172a;--codeText:#e5e7eb;--good:#ecfdf5;--warn:#fff7ed;--ai:#eff6ff}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",Arial,sans-serif;line-height:1.7}.container{width:min(1000px,calc(100% - 32px));margin:36px auto 64px}.hero,.card{background:var(--card);border:1px solid var(--border);box-shadow:0 10px 28px rgba(15,23,42,.04)}.hero{border-radius:20px;padding:34px;margin-bottom:24px}.hero h1{margin:0;font-size:30px}.sub,.source,.footer{color:var(--muted)}.meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}.tag{font-size:12px;background:var(--soft);border-radius:999px;padding:4px 9px}.card{border-radius:16px;padding:26px 28px;margin-bottom:18px}h2{margin:0 0 14px;font-size:21px}h3{margin:24px 0 10px;font-size:18px}.source{font-size:13px;border-left:3px solid #d1d5db;padding-left:10px;margin:12px 0 18px}pre{background:var(--code);color:var(--codeText);border-radius:12px;padding:16px;overflow:auto;white-space:pre-wrap}.box{border-radius:12px;padding:14px 16px;margin:14px 0;border:1px solid var(--border)}.good{background:var(--good)}.warn{background:var(--warn)}.ai{background:var(--ai)}.answer{border-left:4px solid #111827;background:#fafafa;padding:14px 16px;border-radius:0 10px 10px 0;margin-top:12px}table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}th,td{border:1px solid var(--border);padding:10px 12px;text-align:left;vertical-align:top}th{background:var(--soft)}details{margin:12px 0;border:1px solid var(--border);border-radius:12px;padding:12px 14px;background:#fafafa}summary{cursor:pointer;font-weight:700}.footer{text-align:center;font-size:13px;margin-top:30px}@media(max-width:600px){.container{width:min(100% - 20px,1000px);margin-top:20px}.hero{padding:24px 20px}.card{padding:20px}}
+</style></head><body><main class="container">
+<section class="hero"><h1>正式 Day 4｜泛型通配符、Agent 工作模式与 AI 需求文档</h1><div class="sub">2026-09-03｜约 20 分钟：昨日复习 + 3 个新知识点</div><div class="meta"><span class="tag">Java 泛型</span><span class="tag">PECS</span><span class="tag">ReAct</span><span class="tag">Reflection</span><span class="tag">Spring AI</span><span class="tag">PRD</span></div></section>
+
+<section class="card"><h2>① 前一天复习｜先凭记忆回答，再展开答案</h2><div class="source">复习来源：2026-09-02 正式 Day 3。今天没有实时收到口述回答，因此不虚构“已掌握/遗忘”等评分；答案折叠，建议先口述再打开。</div>
+<h3>复习题 1｜ConcurrentHashMap 为什么不能只回答“分段锁”？</h3><p>请先回答：JDK 7 与 JDK 8+ 的核心实现差异是什么？为什么它通常比 Hashtable 并发性能更好？</p><details><summary>答完后展开：纠错 + 面试口述版</summary><p><strong>纠错：</strong>“分段锁”主要对应 JDK 7。JDK 8+ 取消 Segment 主体结构，使用 Node 数组，并结合 CAS、synchronized 等控制局部更新。</p><div class="answer"><strong>面试口述版：</strong>Hashtable 同步粒度较粗；ConcurrentHashMap 在 JDK 7 使用 Segment 分段锁，JDK 8+ 改为 Node 数组加 CAS 和 synchronized 控制局部更新，因此竞争范围更小、并发度更高。</div></details>
+<h3>复习题 2｜Java 泛型最核心的价值是什么？</h3><p>请先回答：泛型解决什么问题？什么是类型擦除？为什么 List&lt;String&gt; 不是 List&lt;Object&gt; 的子类型？</p><details><summary>答完后展开：纠错 + 面试口述版</summary><p>泛型的核心价值是<strong>编译期类型安全</strong>，同时减少强转、提高 API 可读性和复用性。Java 普通泛型主要通过类型擦除实现。</p><div class="answer"><strong>面试口述版：</strong>Java 泛型是参数化类型，把很多类型错误从运行期提前到编译期。它主要通过类型擦除实现，所以很多具体泛型参数不会以普通 Class 形式保留在运行时。</div></details>
+<h3>复习题 3｜完整 Agent 架构有哪些核心组成？</h3><p>请先口述：Profile、Planning、Memory、Tools、Action、Observation、Orchestration 各负责什么？</p><details><summary>答完后展开：Spring AI 对照</summary><pre><code>Profile        → System Prompt
+Planning       → 任务拆解 / Workflow
+Memory         → ChatMemory
+Tools          → @Tool / ToolCallback
+Action         → ToolCallingManager 执行
+Observation    → Tool Result 回给模型
+Orchestration  → ToolCallingAdvisor + 业务 Workflow</code></pre><div class="answer"><strong>面试口述版：</strong>完整 Agent 不只是 LLM 加工具，还包括角色、规划、记忆、行动、观察和编排。Spring AI 能提供 ChatClient、ChatMemory、Tool Calling、VectorStore、Advisors 等基础能力，复杂流程仍需 Java 服务层编排。</div></details>
+<h3>间隔复习｜约 3 天前：HashMap 什么时候树化？</h3><div class="source">《后端高频面试题大集合》JAVASE 核心，第 2 题｜HashMap 数组 + 链表 + 红黑树。</div><p>请先回答：链表达到 8 个节点是不是一定立刻树化？</p><details><summary>答完后展开</summary><p>不是。JDK 8 中除了链表长度阈值，还要看 table 容量；容量不足 64 时通常优先扩容。常见常量：TREEIFY_THRESHOLD=8，UNTREEIFY_THRESHOLD=6，MIN_TREEIFY_CAPACITY=64。</p></details></section>
+
+<section class="card"><h2>② 当天新知识 1｜Java 泛型常见通配符</h2><div class="source">原资料：《后端高频面试题大集合》JAVASE 核心，案例 10｜“说下 java 泛型常见的通配符有哪些”｜PDF 约第 8 页。原资料列出 ?、extends、super；其中示例语法存在不严谨之处。</div>
+<h3>概念</h3><table><tr><th>写法</th><th>含义</th><th>典型用途</th></tr><tr><td>List&lt;?&gt;</td><td>未知类型</td><td>只关心“这是某种 List”</td></tr><tr><td>List&lt;? extends Number&gt;</td><td>Number 或其子类</td><td>主要读取</td></tr><tr><td>List&lt;? super Integer&gt;</td><td>Integer 或其父类</td><td>主要写入 Integer</td></tr></table>
+<h3>原理 / 为什么</h3><p>Java 泛型是<strong>不协变</strong>的：即使 Integer extends Number，也不能把 List&lt;Integer&gt; 直接赋给 List&lt;Number&gt;。通配符用来描述“可接受的一组泛型类型”。</p>
+<pre><code>List&lt;Integer&gt; ints = List.of(1,2,3);
+List&lt;? extends Number&gt; nums = ints; // OK
+
+Number n = nums.get(0);  // 可安全读取
+// nums.add(1);          // 编译不允许：实际类型可能是 Double</code></pre>
+<h3>AI补充/纠错｜PECS</h3><div class="box warn"><strong>原资料纠错：</strong>泛型下界语法是 <code>? super A</code>，不是 <code>T supers A</code>。另外 <code>T extends A</code> 属于“类型参数上界”，和通配符 <code>? extends A</code> 概念相关但不是同一种语法。</div><p>高频口诀：<strong>PECS = Producer Extends, Consumer Super</strong>。</p><pre><code>// 从 src 读取 T：Producer → extends
+static &lt;T&gt; void copy(List&lt;? extends T&gt; src,
+                     List&lt;? super T&gt; dest) {
+    for (T x : src) dest.add(x);
+}</code></pre>
+<h3>实际项目怎么用</h3><p>公共组件、集合工具类、框架 API 中很常见。你写业务 CRUD 时不一定天天手写，但看 Spring / JDK API 时必须能读懂。</p>
+<h3>常见坑</h3><ul><li><code>? extends T</code> 不是“完全不能写”，但通常不能安全写入具体 T；null 除外。</li><li><code>? super T</code> 读取时只能安全当 Object 使用。</li><li>不要把 <code>&lt;T extends A&gt;</code> 与 <code>&lt;? extends A&gt;</code> 混为一谈。</li></ul>
+<div class="answer"><strong>面试口述版：</strong>Java 泛型常见通配符有无界通配符 ?、上界 ? extends T 和下界 ? super T。上界适合从集合中读取，下一般用于向集合写入，因此常用 PECS 记忆：Producer Extends、Consumer Super。</div>
+<h3>可能追问</h3><p>为什么 List&lt;Integer&gt; 不是 List&lt;Number&gt;？? 和 Object 有什么区别？泛型方法的 T 和通配符 ? 有什么区别？</p></section>
+
+<section class="card"><h2>③ 当天新知识 2｜Agent 的工作模式有哪些？</h2><div class="source">原资料：《AI应用开发面试题 / Agent / RAG》1.1.4｜“Agent 的工作模式都有什么？”｜PDF 第 3～4 页。原资料包括 ToolsCallingAgent、ReAct、Reflection、PlanAndSolve、Multi-Agent、Human-in-the-Loop。</div>
+<h3>概念</h3><table><tr><th>模式</th><th>核心</th><th>适合</th></tr><tr><td>Tool Calling</td><td>模型直接选工具</td><td>简单单步任务</td></tr><tr><td>ReAct</td><td>推理→行动→观察循环</td><td>动态多步任务</td></tr><tr><td>Reflection</td><td>生成后自检再修正</td><td>高准确性任务</td></tr><tr><td>Plan-and-Solve</td><td>先计划后执行</td><td>步骤明确的复杂任务</td></tr><tr><td>Multi-Agent</td><td>多个专业 Agent 协作</td><td>复杂分工</td></tr><tr><td>Human-in-the-Loop</td><td>关键节点人工批准</td><td>高风险动作</td></tr></table>
+<h3>原理 / 为什么</h3><p>不是所有任务都应该上最复杂 Agent。复杂度越高，通常意味着更多模型调用、更高延迟、更多状态管理和更难调试。应从最简单可用模式开始。</p>
+<h3>AI补充/纠错｜Spring AI 视角</h3><p>Spring AI 2.0 的 Tool Calling Loop 由 ChatClient 中的 <strong>ToolCallingAdvisor</strong> 驱动，ToolCallingManager 执行工具。这能很好承载 Tool Calling / 部分 ReAct 风格循环，但 Reflection、全局 Planning、Multi-Agent、人工审批仍通常需要额外的 Java Workflow / 状态控制。</p>
+<pre><code>String answer = chatClient.prompt()
+    .user("查询订单并判断是否需要人工审批")
+    .tools(orderTools)
+    .call()
+    .content();
+
+// 高风险动作：业务层仍应做显式权限/审批控制，
+// 不应只因为模型请求 Tool 就直接执行。</code></pre>
+<div class="box ai"><strong>版本确认：</strong>Spring AI 2.0 官方文档将 Tool Calling Loop 作为 ChatClient Advisor Chain 的一等组件；模型只“请求”工具，真正执行由应用程序负责。</div>
+<h3>实际项目怎么用</h3><p>数据库查询助手可以先从 Tool Calling 开始；需要连续查多张表再归因时可引入 ReAct/Planning；涉及退款、发邮件、改生产数据时应加入 Human-in-the-Loop。</p>
+<h3>常见坑</h3><ul><li>Tool Calling ≠ 完整 Agent。</li><li>Multi-Agent 不是越多越高级，通信与状态一致性成本很高。</li><li>不要让模型绕过业务权限直接执行高风险 Tool。</li></ul>
+<div class="answer"><strong>面试口述版：</strong>Agent 常见模式有 Tool Calling、ReAct、Reflection、Plan-and-Solve、Multi-Agent 和 Human-in-the-Loop。选型原则是从简单模式开始，只有任务确实需要多步规划、自我校验或多人协作时再增加复杂度。在 Spring AI 中 ToolCallingAdvisor 能承载标准工具循环，复杂规划与审批通常由 Java 服务层继续编排。</div>
+<h3>可能追问</h3><p>ReAct 与普通 Tool Calling 区别？什么时候应该用 Planning？如何防止 Agent 无限循环？什么时候必须 Human-in-the-Loop？</p></section>
+
+<section class="card"><h2>④ 当天新知识 3｜为什么技术人员也要会写产品需求文档（PRD）？</h2><div class="source">原资料：《AI大模型面试题-基础篇》第 4 题｜“作为技术人员，为什么需要掌握产品需求文档的编写？”｜PDF 第 3～4 页。</div>
+<h3>概念</h3><p>PRD 不是“产品经理专属文档”，它用于把<strong>业务目标、用户场景、功能范围、约束和验收标准</strong>变成研发可执行的共同语言。</p>
+<h3>原资料内容</h3><ul><li>技术人员更了解实现复杂度和可行性。</li><li>能更准确评估技术风险与需求优先级。</li><li>AI 项目还要考虑模型性能与限制、数据安全与隐私、训练/部署资源。</li></ul>
+<h3>AI补充/纠错｜AI 项目的 PRD 要比普通 CRUD 多写什么？</h3><table><tr><th>普通功能常写</th><th>AI 功能额外必须明确</th></tr><tr><td>用户、流程、字段、权限、验收条件</td><td>模型能力边界 / 不保证事项</td></tr><tr><td>接口与异常流程</td><td>幻觉容忍度、人工兜底</td></tr><tr><td>性能要求</td><td>延迟、Token/调用成本预算</td></tr><tr><td>数据权限</td><td>RAG 数据源、ACL、敏感数据处理</td></tr><tr><td>成功标准</td><td>准确率/召回率/任务成功率/人工接管率等评估指标</td></tr></table>
+<h3>实际项目怎么用</h3><p>以“自然语言查数据库”功能为例，PRD 不应该只写“用户输入问题，AI 返回数据”，还要明确：允许查哪些表、是否只读、最大返回行数、敏感字段如何脱敏、SQL 失败怎么处理、模型无法确认时是否拒答、执行前是否需要二次确认。</p>
+<pre><code>需求：AI 查询数据库
+
+必须明确：
+1. 只允许 SELECT
+2. 表/字段白名单
+3. 用户权限映射
+4. 最大查询行数 / 超时
+5. SQL 审计日志
+6. 不确定时禁止执行
+7. 高风险查询需要人工确认</code></pre>
+<h3>常见坑</h3><ul><li>PRD 只写 Happy Path，不写失败和降级。</li><li>把“回答准确”写成模糊目标，却没有可测指标。</li><li>忽略 AI 的概率性，把它当传统确定性 API。</li></ul>
+<div class="answer"><strong>面试口述版：</strong>技术人员掌握 PRD 能更早识别可行性、技术风险和边界条件，减少产品与研发之间的信息损耗。AI 项目尤其需要技术人员参与，因为除了普通功能需求，还必须明确模型能力边界、数据隐私、RAG 权限、幻觉兜底、延迟成本以及可量化的效果指标。</div>
+<h3>可能追问</h3><p>AI 功能如何定义验收标准？准确率怎么评估？PRD 和技术方案的边界是什么？如何写降级与人工兜底？</p></section>
+
+<section class="card"><h2>⑤ 今日正式进度</h2><p>《后端高频面试题大集合》：#1～#10<br>《AI应用开发面试题 / Agent / RAG》：1.1.1～1.1.4<br>《AI大模型面试题-基础篇》：#1～#4</p><div class="box good"><strong>今日重点：</strong>PECS、ConcurrentHashMap 版本差异、Agent 模式选型、Spring AI ToolCallingAdvisor、AI PRD 的模型边界与验收指标。</div></section>
+<div class="footer">Java 后端 + AI 面试知识学习记录｜2026-09-03</div>
+</main></body></html>
