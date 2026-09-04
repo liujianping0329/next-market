@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>正式 Day 5｜反射、注解、代理与 Agent 设计范式</title>
+<style>
+:root{--bg:#f5f6f8;--card:#fff;--text:#1f2937;--muted:#6b7280;--border:#e5e7eb;--soft:#f3f4f6;--code:#0f172a;--codeText:#e5e7eb;--good:#ecfdf5;--warn:#fff7ed;--ai:#eff6ff}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",Arial,sans-serif;line-height:1.7}.container{width:min(1000px,calc(100% - 32px));margin:36px auto 64px}.hero,.card{background:var(--card);border:1px solid var(--border);box-shadow:0 10px 28px rgba(15,23,42,.04)}.hero{border-radius:20px;padding:34px;margin-bottom:24px}.hero h1{margin:0;font-size:30px}.sub,.source,.footer{color:var(--muted)}.meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}.tag{font-size:12px;background:var(--soft);border-radius:999px;padding:4px 9px}.card{border-radius:16px;padding:26px 28px;margin-bottom:18px}h2{margin:0 0 14px;font-size:21px}h3{margin:24px 0 10px;font-size:18px}h4{margin:18px 0 8px}.source{font-size:13px;border-left:3px solid #d1d5db;padding-left:10px;margin:12px 0 18px}pre{background:var(--code);color:var(--codeText);border-radius:12px;padding:16px;overflow:auto;white-space:pre-wrap}code{font-family:Consolas,Monaco,monospace}.box{border-radius:12px;padding:14px 16px;margin:14px 0;border:1px solid var(--border)}.good{background:var(--good)}.warn{background:var(--warn)}.ai{background:var(--ai)}.answer{border-left:4px solid #111827;background:#fafafa;padding:14px 16px;border-radius:0 10px 10px 0;margin-top:12px}table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}th,td{border:1px solid var(--border);padding:10px 12px;text-align:left;vertical-align:top}th{background:var(--soft)}details{margin:12px 0;border:1px solid var(--border);border-radius:12px;padding:12px 14px;background:#fafafa}summary{cursor:pointer;font-weight:700}.footer{text-align:center;font-size:13px;margin-top:30px}@media(max-width:600px){.container{width:min(100% - 20px,1000px);margin-top:20px}.hero{padding:24px 20px}.card{padding:20px}}
+</style></head><body><main class="container">
+<section class="hero"><h1>正式 Day 5｜反射、注解、代理与 Agent 设计范式</h1><div class="sub">2026-09-04｜前一天复习 + 固定 5 道新题</div><div class="meta"><span class="tag">Reflection</span><span class="tag">Annotation</span><span class="tag">Proxy</span><span class="tag">Spring AOP</span><span class="tag">Agent Pattern</span><span class="tag">AI Deployment</span></div><div class="box good"><strong>正式进度推进：</strong>后端 #11～#13 + Agent/RAG 1.1.5 + AI基础 #5。今天重点把 Java 反射→注解→动态代理串成一条 Spring 底层理解链，同时区分 Agent“工作模式”和“设计范式”。</div></section>
+
+<section class="card"><h2>① 前一天复习｜先凭记忆回答</h2><div class="source">复习来源：2026-09-03 正式 Day 4。由于本次是一次性学习输出，未实时收到用户口述回答，不虚构“已掌握/遗忘”等评分；完整答案放在折叠区，建议先口述再展开。</div>
+<h3>复习 1｜? extends 与 ? super 怎么区分？</h3><p>先回答：为什么 <code>List&lt;? extends Number&gt;</code> 主要用于读取，而 <code>List&lt;? super Integer&gt;</code> 适合写入 Integer？PECS 是什么？</p><details><summary>答完后展开：纠错 + 口述版</summary><p><strong>纠错：</strong><code>? extends T</code> 表示实际元素类型是 T 或其子类，读取时至少能当 T；但编译器不知道具体是哪种子类，所以不能安全写入具体 T。<code>? super T</code> 表示实际类型是 T 或其父类，因此写入 T 一定安全。</p><div class="answer"><strong>面试口述版：</strong>PECS 是 Producer Extends、Consumer Super。只从集合读取 T 时用 ? extends T；需要向集合写入 T 时用 ? super T。</div></details>
+<h3>复习 2｜Agent 工作模式怎么选？</h3><p>先回答：Tool Calling、ReAct、Reflection、Plan-and-Solve、Multi-Agent、Human-in-the-Loop 分别适合什么任务？</p><details><summary>答完后展开</summary><pre><code>简单工具查询      → Tool Calling
+动态多步任务      → ReAct
+结果需要自检      → Reflection
+步骤较明确复杂任务 → Plan-and-Solve
+专业角色分工      → Multi-Agent
+高风险动作        → Human-in-the-Loop</code></pre><div class="answer"><strong>口述版：</strong>Agent 模式应从最简单可用方案开始，复杂度越高，模型调用次数、延迟、状态管理和调试成本通常越高。</div></details>
+<h3>复习 3｜AI 项目的 PRD 为什么比普通 CRUD 更强调边界？</h3><p>先回答：除了功能列表，一个生产级 AI PRD 至少还要写清哪些非功能与风险要求？</p><details><summary>答完后展开</summary><p>至少包含：模型能力边界、幻觉兜底、数据权限/隐私、延迟与成本、失败策略、人工接管条件、准确率/召回率/任务成功率等验收指标。对 SQL Agent 还应明确只读、白名单、超时、最大返回行数、审计和敏感字段规则。</p></details>
+<h3>间隔复习｜约 3 天前：capacity 和 size</h3><p>先回答：ArrayList 的 capacity 与 size 分别是什么？HashMap 的 capacity 又是什么？</p><details><summary>答完后展开</summary><p>ArrayList capacity 是底层 elementData[] 长度，size 是实际元素个数；HashMap capacity 是 table[] 的长度，size 是实际键值对数量。</p></details>
+<h3>间隔复习｜约 3 天前：hashCode 与 equals</h3><p>先回答：为什么 hashCode 相同不等于 equals 相同？</p><details><summary>答完后展开</summary><p>哈希冲突允许不同对象拥有相同 hashCode。HashMap 用 hash 缩小 bucket 范围，再用 equals 最终确认 Key；equals 为 true 时 hashCode 必须相同，反之不成立。</p></details></section>
+
+<section class="card"><h2>② 新题 1｜Java 反射技术和常见 API</h2><div class="source"><strong>原资料：</strong>《后端高频面试题大集合》JAVASE 核心，第 11 题“介绍 java 反射技术和常见的一些 API”｜PDF 第 9～11 页。原资料强调 Class、Constructor、Method、Field。</div>
+<h3>概念</h3><p>反射就是程序在<strong>运行时</strong>获取类结构并动态创建对象、读取字段、调用方法的机制。核心入口是 <code>Class&lt;?&gt;</code>。</p>
+<pre><code>Class&lt;UserService&gt; clazz = UserService.class;
+Method method = clazz.getDeclaredMethod("findById", Long.class);
+Object result = method.invoke(userService, 1L);</code></pre>
+<h3>原理</h3><pre><code>UserService.java
+   ↓ javac
+UserService.class
+   ↓ JVM 加载
+Class&lt;UserService&gt;
+   ↓
+Constructor / Method / Field 元数据
+   ↓
+运行时动态操作</code></pre>
+<h3>为什么需要</h3><p>框架无法在编译时写死所有业务类。Spring IOC、依赖注入、AOP、ORM、序列化等都需要在运行时读取类型、注解、构造器或方法元数据。</p>
+<h3>实际项目怎么用</h3><p>你通常不会在 CRUD 里大量直接写反射，而是<strong>通过 Spring 间接使用</strong>：扫描 Bean、读取 <code>@Component</code>/<code>@Autowired</code>、创建对象、执行 AOP 代理、Mapper/序列化框架字段映射等。</p>
+<h3>AI补充/纠错</h3><div class="box warn"><strong>版本纠错 1：</strong>原资料列出的 <code>Class.newInstance()</code> 已从 Java 9 起标记 Deprecated。现代代码优先 <code>clazz.getDeclaredConstructor().newInstance()</code>。<br><strong>版本纠错 2：</strong>Java 9+ 模块系统下，<code>setAccessible(true)</code> 不是“任何 private 都能无条件突破”；跨模块访问可能受 exports/opens 限制并抛出 <code>InaccessibleObjectException</code>。</div>
+<pre><code>Constructor&lt;UserService&gt; c = clazz.getDeclaredConstructor();
+UserService service = c.newInstance();</code></pre>
+<h3>常见坑</h3><ul><li><code>getMethods()</code> 包含继承来的 public 方法；<code>getDeclaredMethods()</code> 只看当前类声明的方法，不要求 public。</li><li>反射会降低类型检查的直观性，异常处理也更复杂，不应为了“高级”而滥用。</li><li>“反射一定非常慢”也过于绝对；框架常会缓存元数据，但直接调用仍通常比反射更简单、高效。</li></ul>
+<div class="answer"><strong>面试口述版：</strong>Java 反射是在运行时通过 Class 对象获取构造器、方法、字段等元数据，并动态创建对象或调用成员。Spring 的 Bean 扫描、依赖注入、AOP、ORM 等大量使用反射。现代 Java 中创建反射对象应优先使用 getDeclaredConstructor().newInstance()，而不是已经废弃的 Class.newInstance()。</div>
+<h3>可能追问</h3><p>Class 对象在哪里产生？getMethods 和 getDeclaredMethods 区别？反射和注解怎么配合？为什么 Spring 需要反射？</p></section>
+
+<section class="card"><h2>③ 新题 2｜Java 自带注解与元注解</h2><div class="source"><strong>原资料：</strong>《后端高频面试题大集合》JAVASE 核心，第 12 题“有了解过哪些 java 自带的注解，什么是元注解”｜PDF 第 11～12 页。</div>
+<h3>概念</h3><p>注解是附加在类、方法、字段等程序元素上的元数据，本身通常不直接执行逻辑，而是由编译器、框架或运行时工具解析。</p>
+<table><tr><th>常见标准注解</th><th>作用</th></tr><tr><td>@Override</td><td>声明重写父类/接口方法，编译器检查</td></tr><tr><td>@Deprecated</td><td>标记 API 已废弃</td></tr><tr><td>@SuppressWarnings</td><td>抑制指定编译警告</td></tr></table>
+<h3>什么是元注解</h3><p>元注解就是<strong>修饰注解的注解</strong>。</p><table><tr><th>元注解</th><th>作用</th></tr><tr><td>@Target</td><td>允许注解出现在哪些程序元素</td></tr><tr><td>@Retention</td><td>SOURCE / CLASS / RUNTIME 保留策略</td></tr><tr><td>@Documented</td><td>是否进入 Javadoc</td></tr><tr><td>@Inherited</td><td>类上的注解是否可被子类继承</td></tr><tr><td>@Repeatable</td><td>允许同一注解重复使用（Java 8+）</td></tr></table>
+<h3>原理 / 为什么</h3><pre><code>@Retention(RUNTIME)
+@Target(METHOD)
+public @interface Audit {
+    String value();
+}
+
+@Audit("refund")
+public void refund() { ... }
+
+// 运行时由 Spring/AOP/反射读取 @Audit 决定增强逻辑</code></pre>
+<h3>AI补充/纠错</h3><div class="box warn"><strong>原资料有内部矛盾：</strong>资料一处写“Java 内置 4 种元注解”，但同页又列出了 <code>@Repeatable</code>。更准确地说，现代 Java 常见标准元注解至少包括 Target、Retention、Documented、Inherited，以及 Java 8 引入的 Repeatable。</div>
+<h3>实际项目怎么用</h3><p>Spring 中 <code>@Component</code>、<code>@Service</code>、<code>@Transactional</code>、<code>@RequestMapping</code> 等都建立在注解元数据解析之上。你也可以用“自定义注解 + AOP”实现审计、权限、幂等、日志等横切能力。</p>
+<h3>常见坑</h3><ul><li><code>RetentionPolicy.RUNTIME</code> 才能在运行时通过反射读取。</li><li><code>@Inherited</code> 主要针对类级注解的继承，不等于方法注解自动继承。</li><li>注解只是元数据，真正功能来自解析它的编译器/框架/代码。</li></ul>
+<div class="answer"><strong>面试口述版：</strong>注解是附加在代码元素上的元数据，常见标准注解有 Override、Deprecated、SuppressWarnings。元注解是用来定义注解行为的注解，比如 Target 决定可修饰位置，Retention 决定保留到源码、字节码还是运行时。Spring 大量通过运行时注解配合反射和 AOP 实现框架功能。</div>
+<h3>可能追问</h3><p>SOURCE/CLASS/RUNTIME 区别？自定义注解如何生效？@Inherited 对方法有效吗？Spring 如何找到带某注解的方法？</p></section>
+
+<section class="card"><h2>④ 新题 3｜静态代理与动态代理</h2><div class="source"><strong>原资料：</strong>《后端高频面试题大集合》JAVASE 核心，第 13 题“日常开发中有没有用过代理模式，说下动态和静态代理”｜PDF 第 13～14 页。</div>
+<h3>概念</h3><p>代理模式是在客户端与真实对象之间加入代理对象，用来控制访问或在调用前后增加横切逻辑。</p>
+<pre><code>Client → Proxy → Target
+             ↑
+       日志 / 事务 / 权限 / 缓存</code></pre>
+<h3>静态代理</h3><p>代理类在运行前已经存在，通常代理类与目标类实现同一接口，代理持有目标对象。</p>
+<pre><code>class OrderServiceProxy implements OrderService {
+    private final OrderService target;
+    public void create() {
+        logBefore();
+        target.create();
+        logAfter();
+    }
+}</code></pre>
+<h3>动态代理</h3><p>运行时生成代理，不需要为每个目标类手写完整代理类。JDK 动态代理基于接口与 <code>InvocationHandler</code>；类代理通常可使用 CGLIB 一类字节码生成方案。</p>
+<pre><code>OrderService proxy = (OrderService) Proxy.newProxyInstance(
+    OrderService.class.getClassLoader(),
+    new Class[]{OrderService.class},
+    (p, method, args) -> {
+        System.out.println("before");
+        Object result = method.invoke(target, args);
+        System.out.println("after");
+        return result;
+    });</code></pre>
+<h3>为什么</h3><p>代理把事务、日志、权限、监控等逻辑从业务类中抽离，符合关注点分离和开闭原则。</p>
+<h3>实际项目怎么用｜Spring AOP</h3><pre><code>@Transactional
+public void pay() { ... }
+
+调用者
+  ↓
+Spring Proxy
+  ↓ 开事务
+Target.pay()
+  ↓
+提交 / 回滚</code></pre>
+<p>Spring AOP 的核心实现就与代理机制密切相关：能够使用接口代理时可采用 JDK 动态代理；需要代理具体类时可采用基于子类的代理方式。</p>
+<h3>AI补充/纠错</h3><div class="box warn"><strong>纠错：</strong>把“动态代理 = 反射”说成完全等号不够准确。JDK 动态代理的 InvocationHandler 确实大量使用反射 Method 调用；CGLIB 则核心是运行时生成目标类的子类字节码。二者都属于运行时代理，但实现机制不同。</div>
+<h3>常见坑</h3><ul><li>JDK 动态代理要求从接口维度代理。</li><li>基于子类的代理无法覆盖 final 类/final 方法等不可继承/重写结构。</li><li>Spring AOP 中同一个类内部的 <code>this.method()</code> 自调用可能绕过代理，因此 <code>@Transactional</code> 等增强可能不生效。</li></ul>
+<div class="answer"><strong>面试口述版：</strong>静态代理的代理类在运行前已经确定，优点直观但类多时维护成本高；动态代理在运行时创建代理对象，JDK 动态代理基于接口和 InvocationHandler，CGLIB 类方案通过生成目标类子类实现。Spring AOP 会利用代理把事务、日志、权限等横切逻辑与业务代码解耦。</div>
+<h3>可能追问</h3><p>JDK Proxy 和 CGLIB 区别？为什么 @Transactional 自调用失效？AOP 为什么需要代理？final 方法为什么难以被类代理增强？</p></section>
+
+<section class="card"><h2>⑤ 新题 4｜Agent 的设计范式有哪些？</h2><div class="source"><strong>原资料：</strong>《AI应用开发面试题 / Agent / RAG》1.1.5“了解过 Agent 的设计范式吗？了解其他的 Agent 范式吗？”｜PDF 第 4～5 页。原资料列出 ReAct、Reflection、Tool Use、Planning、Multi-Agent Collaboration、Sequential Workflow、Human-in-the-Loop，并补充 LATS、Voyager、Generative Agents、Self-Discover、RAISE。</div>
+<h3>概念</h3><p>昨天的“工作模式”偏<strong>一个 Agent 怎么运行</strong>；今天的“设计范式”更偏<strong>整个 Agent 系统采用什么架构方法组织推理、工具、工作流和协作</strong>。</p>
+<table><tr><th>范式</th><th>核心</th><th>适用</th></tr><tr><td>ReAct</td><td>推理与行动交替</td><td>动态、多步任务</td></tr><tr><td>Reflection</td><td>Actor 输出后由 Critic 评估并迭代</td><td>高准确性任务</td></tr><tr><td>Tool Use</td><td>模型选择和组合外部能力</td><td>DB/API/搜索/文件</td></tr><tr><td>Planning</td><td>先生成全局计划再执行</td><td>复杂但可拆解任务</td></tr><tr><td>Multi-Agent</td><td>多个专业 Agent 分工</td><td>跨专业复杂任务</td></tr><tr><td>Sequential Workflow</td><td>预定义固定步骤流水线</td><td>确定性业务流程</td></tr><tr><td>Human-in-the-Loop</td><td>关键动作等待人工决定</td><td>金融/写库/审批等高风险操作</td></tr></table>
+<h3>原理 / 为什么</h3><p>Agent 并不是“自主程度越高越好”。生产系统通常需要在<strong>确定性、成本、延迟、可解释性与自主性</strong>之间做权衡。</p>
+<pre><code>固定流程多、规则清晰
+→ Sequential Workflow
+
+环境变化大、需要边查边判断
+→ ReAct
+
+高风险动作
+→ Human-in-the-Loop
+
+复杂跨角色任务
+→ Multi-Agent（确认真的有必要再上）</code></pre>
+<h3>Java / Spring AI 化</h3><p><strong>AI补充/纠错：</strong>这些是架构范式，不应假装 Spring AI 每个都有一个同名“一键模块”。Spring AI 2.0 当前明确提供 Tool Calling Loop（ChatClient + ToolCallingAdvisor + ToolCallingManager）作为 agentic 基础；Planning、Reflection、Multi-Agent、审批等更高层范式通常由 Spring Service、状态机、工作流或自定义 Advisor/编排实现。</p>
+<pre><code>// Tool Use 基础
+chatClient.prompt()
+    .user(task)
+    .tools(databaseTools, mailTools)
+    .call()
+    .content();
+
+// 高风险写操作
+if (plan.requiresWrite()) {
+    approvalService.requireHumanApproval(plan);
+}</code></pre>
+<div class="box ai"><strong>Spring AI 2.0 当前版本确认：</strong>ToolCallingAdvisor 是递归 Advisor，负责工具执行生命周期；DefaultChatClient 会自动注册它，ToolCallingManager 执行 Tool，直到模型返回不含 Tool Call 的响应。它是 Agentic AI 的基础，但不是全部 Agent 范式。</div>
+<h3>常见坑</h3><ul><li>把“范式名称”背成框架 API 名。</li><li>为了炫技过早引入 Multi-Agent，导致成本、状态一致性和调试复杂度暴涨。</li><li>固定确定性流程也全交给 LLM 自由规划，降低可靠性。</li></ul>
+<div class="answer"><strong>面试口述版：</strong>Agent 常见设计范式包括 ReAct、Reflection、Tool Use、Planning、Multi-Agent、Sequential Workflow 和 Human-in-the-Loop。选型核心不是越智能越好，而是根据任务确定性、风险、成本和动态性选择。Spring AI 能提供 Tool Calling、Memory、RAG、Advisor 等基础能力，更高层 Planning、Reflection 或 Multi-Agent 通常还要由 Java 业务层编排。</div>
+<h3>可能追问</h3><p>工作模式和设计范式区别？Sequential Workflow 为什么有时比 ReAct 更可靠？Multi-Agent 的通信和状态怎么管理？Human-in-the-Loop 应放在哪个节点？</p></section>
+
+<section class="card"><h2>⑥ 新题 5｜AI 智能云盘对硬件资源和部署有什么要求？</h2><div class="source"><strong>原资料：</strong>《AI大模型面试题-基础篇》第 5 题“在 AI 智能化云盘项目中，对硬件资源和部署有什么特殊要求？”｜PDF 第 4～5 页。原资料强调模型参数规模、算力、开发/生产差异、云算力和成本控制。</div>
+<h3>概念</h3><p>先区分两种完全不同的部署路线：</p>
+<table><tr><th>路线</th><th>你的应用服务器</th><th>主要算力压力</th></tr><tr><td>调用外部 LLM API</td><td>普通 CPU/内存即可承担 Spring Boot、RAG、业务逻辑</td><td>模型 GPU 在供应商侧</td></tr><tr><td>本地/私有化部署模型</td><td>除业务服务外，还要运行推理服务</td><td>GPU 显存、吞吐、并发成为核心约束</td></tr></table>
+<h3>原理 / 为什么</h3><p>LLM 的参数、KV Cache、上下文长度和并发会共同消耗显存。模型越大、上下文越长、同时请求越多，推理资源成本通常越高；量化可以降低显存，但可能影响精度、速度或硬件适配。</p>
+<h3>AI补充/纠错｜对 Spring AI 项目尤其重要</h3><div class="box warn"><strong>原资料容易让人误解成“做 AI 应用一定要自己准备 GPU”。这不对。</strong>如果你的 Spring Boot + Spring AI 主要调用 OpenAI、Azure、通义、Gemini 等外部模型 API，本地服务器并不需要为 LLM 推理配 GPU；你主要关注 API 延迟、限流、成本、网络稳定性与降级。GPU 主要在自托管模型、Embedding/Reranker 本地推理、训练/微调时才成为直接资源问题。</div>
+<h3>实际项目怎么用</h3><pre><code>方案 A：外部模型 API
+Next.js
+  ↓
+Spring Boot + Spring AI
+  ├─ DB / Redis
+  ├─ VectorStore
+  └─ HTTPS → 外部 LLM Provider
+
+方案 B：私有模型
+Spring Boot + Spring AI
+  ↓
+内部 Model Serving
+  ↓
+GPU Server / Cluster</code></pre>
+<p>AI 云盘还要单独规划：对象存储（MinIO/OSS/S3）、文档解析任务、Embedding 批处理、Vector DB、缓存、异步队列，以及日志/监控。大文件解析和向量化最好异步化，避免 Web 请求长期占用线程。</p>
+<h3>成本控制</h3><ul><li>开发环境可用小模型/API 小额度，不要照搬生产规格。</li><li>外部 API：关注 Token、缓存、上下文裁剪、模型分级路由。</li><li>自托管：关注 GPU 利用率、量化、批处理、并发和弹性伸缩。</li><li>RAG：Embedding 不必每次重复生成，文档变更时增量更新。</li></ul>
+<h3>常见坑</h3><ul><li>把“应用开发服务器配置”和“模型推理服务器配置”混为一谈。</li><li>只算 GPU，不算向量库、对象存储、网络和文档处理成本。</li><li>上传文件后同步完成解析+Embedding，导致接口超时。</li></ul>
+<div class="answer"><strong>面试口述版：</strong>AI 项目的硬件要求首先取决于模型是调用外部 API 还是私有化部署。调用 API 时，Spring Boot 应用本身通常不需要 GPU，重点是网络、限流、Token 成本和可靠性；如果自托管模型，则需要根据模型大小、量化、上下文和并发评估 GPU 显存与吞吐。AI 云盘还要规划对象存储、文档解析、Embedding、VectorStore 和异步任务资源，开发与生产应采用不同规格并持续做成本优化。</div>
+<h3>可能追问</h3><p>什么时候值得私有化部署？为什么上下文长度会影响显存？Embedding 是否需要 GPU？如何降低 Token 与推理成本？如何设计文件异步向量化？</p></section>
+
+<section class="card"><h2>⑦ 今日知识链与正式进度</h2><pre><code>反射 Reflection
+   ↓ 读取元数据
+注解 Annotation
+   ↓ 标记增强规则
+动态代理 Proxy
+   ↓
+Spring AOP / @Transactional / 审计 / 权限
+
+Agent：
+工作模式（昨天） → 设计范式（今天） → 更高层系统编排
+
+AI 部署：
+外部 API ≠ 必须自备 GPU
+私有模型 → 才需要重点做 GPU 推理容量规划</code></pre><div class="box good"><strong>正式进度：</strong><br>《后端高频面试题大集合》：#1～#13<br>《AI应用开发面试题 / Agent / RAG》：1.1.1～1.1.5<br>《AI大模型面试题-基础篇》：#1～#5</div></section>
+
+<section class="card"><h2>⑧ 下次优先复习</h2><ol><li>反射中的 Class、Constructor、Method、Field 分别是什么？Class.newInstance 为什么不推荐？</li><li>@Retention 的三种策略分别是什么？为什么 Spring 运行时注解通常需要 RUNTIME？</li><li>JDK 动态代理和 CGLIB 类代理的核心区别？为什么 @Transactional 自调用可能失效？</li><li>Agent 工作模式与设计范式有什么区别？</li><li>为什么“AI 项目需要 GPU”不是一个无条件成立的说法？</li></ol></section>
+
+<div class="footer">Java 后端 + AI 面试知识学习记录｜2026-09-04</div>
+</main></body></html>
