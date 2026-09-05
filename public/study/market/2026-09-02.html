@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2026-09-02｜每日市场追踪</title>
+  <style>
+    :root{--bg:#f5f6f8;--card:#fff;--text:#1f2937;--muted:#6b7280;--border:#e5e7eb;--soft:#f3f4f6;--good:#166534;--bad:#b91c1c;}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",Arial,sans-serif;line-height:1.65}
+    .container{width:min(980px,calc(100% - 32px));margin:36px auto 64px}.hero,.card{background:var(--card);border:1px solid var(--border);border-radius:18px;box-shadow:0 8px 24px rgba(15,23,42,.04)}
+    .hero{padding:30px;margin-bottom:20px}.hero h1{margin:0 0 8px;font-size:28px}.hero p{margin:0;color:var(--muted)}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}.card{padding:22px}.card h2{margin:0 0 14px;font-size:20px}
+    .metric{display:flex;justify-content:space-between;gap:16px;padding:9px 0;border-bottom:1px solid var(--border)}.metric:last-child{border-bottom:0}.label{color:var(--muted)}.value{font-weight:700;text-align:right}.neg{color:var(--bad)}.pos{color:var(--good)}
+    .note{margin-top:16px;padding:14px 16px;border-radius:12px;background:var(--soft)}ul{margin:8px 0 0 20px}.sources a{color:#2563eb;text-decoration:none;word-break:break-all}.footer{text-align:center;color:var(--muted);font-size:13px;margin-top:28px}
+  </style>
+</head>
+<body>
+  <main class="container">
+    <section class="hero">
+      <h1>2026-09-02｜每日市场追踪</h1>
+      <p>归档日期按日本时间。市场数据对应美国 2026-09-01 正常交易时段收盘。</p>
+    </section>
+
+    <section class="grid">
+      <article class="card">
+        <h2>S&amp;P 500</h2>
+        <div class="metric"><span class="label">最新收盘</span><span class="value">7,631.47</span></div>
+        <div class="metric"><span class="label">上一交易日</span><span class="value">7,686.14</span></div>
+        <div class="metric"><span class="label">单日变化</span><span class="value neg">-0.71%</span></div>
+        <div class="metric"><span class="label">固定基准（2026-05-27）</span><span class="value">7,520.36</span></div>
+        <div class="metric"><span class="label">最新值较基准涨跌幅</span><span class="value pos">+1.48%</span></div>
+        <div class="metric"><span class="label">追踪高点</span><span class="value">7,798.99</span></div>
+        <div class="metric"><span class="label">较追踪高点回撤</span><span class="value neg">-2.15%</span></div>
+      </article>
+
+      <article class="card">
+        <h2>QQQ</h2>
+        <div class="metric"><span class="label">最新收盘</span><span class="value">$707.64</span></div>
+        <div class="metric"><span class="label">上一交易日</span><span class="value">$716.76</span></div>
+        <div class="metric"><span class="label">单日变化</span><span class="value neg">-1.27%</span></div>
+        <div class="metric"><span class="label">固定基准（2026-05-27）</span><span class="value">$729.45</span></div>
+        <div class="metric"><span class="label">最新值较基准涨跌幅</span><span class="value neg">-2.99%</span></div>
+        <div class="metric"><span class="label">追踪高点</span><span class="value">$745.34</span></div>
+        <div class="metric"><span class="label">较追踪高点回撤</span><span class="value neg">-5.06%</span></div>
+      </article>
+    </section>
+
+    <section class="card" style="margin-top:16px">
+      <h2>今日结论</h2>
+      <ul>
+        <li>S&amp;P 500 从追踪高点回撤约 2.15%，仍高于 2026-05-27 固定基准约 1.48%。</li>
+        <li>QQQ 从追踪高点回撤约 5.06%，且已经低于固定基准约 2.99%；科技成长方向的回撤明显大于大盘。</li>
+        <li>9 月 1 日美股走弱，主要压力来自油价上升与美债收益率走高，市场重新担忧通胀与利率压力。</li>
+      </ul>
+      <div class="note"><strong>风险提示：</strong>QQQ 已超过 5% 回撤阈值。5% 只是观察阈值，不代表止跌位置；若长端利率继续上行或油价维持高位，高估值科技股仍可能出现进一步波动。</div>
+    </section>
+
+    <section class="card sources" style="margin-top:16px">
+      <h2>数据来源</h2>
+      <ul>
+        <li>AP：2026-09-01 S&amp;P 500 收盘 7,631.47，单日 -0.7%。</li>
+        <li>Yahoo Finance / StockAnalysis：QQQ 2026-09-01 收盘 $707.64，上一交易日 $716.76。</li>
+        <li>Yahoo Finance：2026-05-27 固定基准，S&amp;P 500 = 7,520.36，QQQ = $729.45。</li>
+        <li>StatMuse：追踪区间内最高收盘，S&amp;P 500 = 7,798.99（2026-08-13），QQQ = $745.34（2026-06-02）。</li>
+      </ul>
+    </section>
+
+    <div class="footer">Market tracking archive · Japan date 2026-09-02</div>
+  </main>
+</body>
+</html>

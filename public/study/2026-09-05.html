@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>正式 Day 6｜Java 锁、ReentrantLock 与 Agent 推理模式</title>
+<style>
+:root{--bg:#f5f6f8;--card:#fff;--text:#1f2937;--muted:#6b7280;--border:#e5e7eb;--soft:#f3f4f6;--code:#0f172a;--codeText:#e5e7eb;--good:#ecfdf5;--warn:#fff7ed;--ai:#eff6ff}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",Arial,sans-serif;line-height:1.7}.container{width:min(1000px,calc(100% - 32px));margin:36px auto 64px}.hero,.card{background:var(--card);border:1px solid var(--border);box-shadow:0 10px 28px rgba(15,23,42,.04)}.hero{border-radius:20px;padding:34px;margin-bottom:24px}.hero h1{margin:0;font-size:30px}.sub,.source,.footer{color:var(--muted)}.meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}.tag{font-size:12px;background:var(--soft);border-radius:999px;padding:4px 9px}.card{border-radius:16px;padding:26px 28px;margin-bottom:18px}h2{margin:0 0 14px;font-size:21px}h3{margin:24px 0 10px;font-size:18px}h4{margin:18px 0 8px}.source{font-size:13px;border-left:3px solid #d1d5db;padding-left:10px;margin:12px 0 18px}pre{background:var(--code);color:var(--codeText);border-radius:12px;padding:16px;overflow:auto;white-space:pre-wrap}code{font-family:Consolas,Monaco,monospace}.box{border-radius:12px;padding:14px 16px;margin:14px 0;border:1px solid var(--border)}.good{background:var(--good)}.warn{background:var(--warn)}.ai{background:var(--ai)}.answer{border-left:4px solid #111827;background:#fafafa;padding:14px 16px;border-radius:0 10px 10px 0;margin-top:12px}table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}th,td{border:1px solid var(--border);padding:10px 12px;text-align:left;vertical-align:top}th{background:var(--soft)}details{margin:12px 0;border:1px solid var(--border);border-radius:12px;padding:12px 14px;background:#fafafa}summary{cursor:pointer;font-weight:700}.footer{text-align:center;font-size:13px;margin-top:30px}@media(max-width:600px){.container{width:min(100% - 20px,1000px);margin-top:20px}.hero{padding:24px 20px}.card{padding:20px}}
+</style></head><body><main class="container">
+<section class="hero"><h1>正式 Day 6｜Java 锁、ReentrantLock 与 Agent 推理模式</h1><div class="sub">2026-09-05｜前一天复习 + 固定 5 道新题</div><div class="meta"><span class="tag">JUC</span><span class="tag">Lock</span><span class="tag">ReentrantLock</span><span class="tag">synchronized</span><span class="tag">Agent Reasoning</span><span class="tag">Spring AI</span><span class="tag">AI Architecture</span></div><div class="box good"><strong>正式进度推进：</strong>后端正式 #14～#16（原资料 JUC #1～#3）+ Agent/RAG 1.1.6 + AI基础 #6。今天开始进入 Java 并发核心，同时把 Agent 的推理模式真正落到“如何选模式”和 Spring AI 工程映射。</div></section>
+
+<section class="card"><h2>① 前一天复习｜先凭记忆回答</h2><div class="source">复习来源：2026-09-04 正式 Day 5。今天没有收到实时口述答案，因此不虚构“已掌握/遗忘”等评分；答案继续放在折叠区，建议先口述 20～30 秒再展开。</div>
+<h3>复习 1｜反射：Class.newInstance() 为什么不再推荐？</h3><p>先回答：现代 Java 通过反射创建对象推荐什么写法？<code>getMethods()</code> 和 <code>getDeclaredMethods()</code> 有什么区别？</p><details><summary>答完后展开：纠错 + 口述版</summary><p><code>Class.newInstance()</code> 从 Java 9 起已 Deprecated，推荐 <code>clazz.getDeclaredConstructor().newInstance()</code>。<code>getMethods()</code> 返回 public 方法并包含继承的方法；<code>getDeclaredMethods()</code> 返回当前类声明的方法，不要求 public，但不包含继承来的方法。</p><div class="answer"><strong>面试口述版：</strong>反射通过 Class 获取构造器、方法、字段等运行时元数据。现代 Java 反射创建对象推荐 getDeclaredConstructor().newInstance()；Java 9+ 模块系统也限制了任意深反射访问。</div></details>
+<h3>复习 2｜元注解：Retention 为什么最容易被追问？</h3><p>先回答：SOURCE、CLASS、RUNTIME 有什么区别？如果要通过 Spring/AOP 在运行时读取自定义注解应该选哪个？</p><details><summary>答完后展开</summary><p><code>RetentionPolicy.RUNTIME</code> 会保留到 JVM 运行期，才能通过反射读取。SOURCE 只存在源码阶段，CLASS 会进字节码但运行期不保证可反射获取。</p></details>
+<h3>复习 3｜代理：JDK 动态代理和类代理的核心差别？</h3><p>先回答：JDK 动态代理对目标对象有什么要求？Spring AOP 为什么和 <code>@Transactional</code> 有关系？</p><details><summary>答完后展开</summary><p>JDK 动态代理基于接口；类代理通过生成目标类子类实现增强。Spring AOP 常通过代理拦截 Bean 方法，在调用前后织入事务、日志、权限等逻辑；因此同类内部自调用可能绕过代理。</p></details>
+<h3>复习 4｜Agent 设计范式</h3><p>先回答：ReAct、Reflection、Planning、Sequential Workflow、Multi-Agent、Human-in-the-Loop 分别解决什么问题？</p><details><summary>答完后展开</summary><p>ReAct 解决动态推理+行动；Reflection 做自检修正；Planning 先全局拆任务；Sequential Workflow 强确定性流水线；Multi-Agent 做角色分工；Human-in-the-Loop 用于高风险审批节点。</p></details>
+<h3>复习 5｜外部 LLM API 与 GPU</h3><p>先回答：Spring Boot 调 OpenAI/通义/Anthropic 等外部模型 API 时，自己的应用服务器是否必须有 GPU？什么时候 GPU 才成为直接资源需求？</p><details><summary>答完后展开</summary><p>调用外部模型 API 时，推理算力由模型供应商承担，Spring Boot 服务器通常不需要 GPU。自托管 LLM、本地 Embedding/Reranker、模型训练/微调等场景才需要直接评估 GPU/显存。</p></details>
+<h3>间隔复习｜约 3 天前：HashMap 什么时候树化？</h3><p>先回答：一个 bucket 链表长度达到 8 时，是不是一定马上转红黑树？</p><details><summary>答完后展开</summary><p>不是。JDK 8 中还要看 table capacity；当容量小于 64 时通常优先扩容，达到最小树化容量后才考虑树化。常见常量：TREEIFY_THRESHOLD=8，UNTREEIFY_THRESHOLD=6，MIN_TREEIFY_CAPACITY=64。</p></details></section>
+
+<section class="card"><h2>② 新题 1｜Java 并发中常见的锁有哪些？</h2><div class="source"><strong>原资料：</strong>《后端高频面试题大集合》JUC 并发编程，第 1 题“你知道多少种并发编程常见的锁”｜PDF 第 15～16 页。正式总进度记为后端 #14。</div>
+<h3>概念</h3><p>这题不是让你背“锁类名大全”，而是考察你能否从不同<strong>维度</strong>理解并发控制：悲观/乐观、公平/非公平、独享/共享、可重入/不可重入、自旋，以及锁粒度设计。</p>
+<table><tr><th>分类维度</th><th>概念</th><th>Java 示例</th></tr><tr><td>悲观 / 乐观</td><td>先锁住再操作 / 先操作并在更新时检测冲突</td><td>synchronized、ReentrantLock / CAS、版本号</td></tr><tr><td>公平 / 非公平</td><td>尽量按排队顺序获取 / 允许新线程插队竞争</td><td>ReentrantLock(true/false)</td></tr><tr><td>独享 / 共享</td><td>同一时刻一个线程 / 多线程可共享读</td><td>写锁 / ReentrantReadWriteLock.ReadLock</td></tr><tr><td>可重入</td><td>同一线程持锁后可再次进入同一锁保护区</td><td>synchronized、ReentrantLock</td></tr><tr><td>自旋</td><td>不立即阻塞，短时间循环等待状态变化</td><td>CAS 重试等</td></tr></table>
+<h3>原理</h3><pre><code>悲观：先取得互斥权 → 再修改
+乐观：读取旧值 → CAS/版本比较 → 成功则更新，失败则重试或放弃
+
+公平：队列前驱优先
+非公平：新线程可先尝试抢锁，失败再进入/遵循等待队列</code></pre>
+<h3>为什么</h3><p>不同冲突概率、临界区长度和吞吐目标需要不同策略。竞争激烈且写多时，阻塞式互斥可能更稳；临界区很短、冲突低时，CAS/自旋可能减少线程挂起与唤醒成本。</p>
+<h3>实际项目怎么用</h3><pre><code>private final ReentrantReadWriteLock rw = new ReentrantReadWriteLock();
+
+rw.readLock().lock();
+try {
+    return cache.get(key);
+} finally {
+    rw.readLock().unlock();
+}</code></pre>
+<h3>AI补充/纠错</h3><div class="box warn"><strong>纠错 1：</strong>“悲观锁适合写多、乐观锁适合读多”只能作为粗略经验，真正要看冲突概率和临界区成本。<br><strong>纠错 2：</strong>“分段锁”更准确地说是<strong>锁粒度设计思想</strong>，而不是 Java 中一个具体 Lock 类型。原资料把 ConcurrentHashMap 与分段锁绑定，需要加版本条件：这是 JDK 7 的典型 Segment 设计，JDK 8+ 已改变。</div>
+<h3>常见坑</h3><ul><li>CAS 严格说是原子操作机制，不是一个 Lock 对象。</li><li>自旋不是越久越好，竞争时间长时会白白烧 CPU。</li><li>公平性通常会牺牲一部分吞吐量。</li></ul>
+<div class="answer"><strong>面试口述版：</strong>Java 的锁可以从多个维度理解，比如悲观/乐观、公平/非公平、独享/共享、可重入和自旋。synchronized、ReentrantLock 属于典型悲观互斥；CAS 是乐观并发控制基础。锁的选择要看冲突概率、临界区长度和吞吐目标，而不是机械地选某一种。</div>
+<h3>可能追问</h3><p>CAS 的 ABA 问题是什么？自旋什么时候更合适？公平锁为什么通常吞吐低？读写锁适合什么场景？</p></section>
+
+<section class="card"><h2>③ 新题 2｜ReentrantLock 是公平锁还是非公平锁？为什么默认这样设计？</h2><div class="source"><strong>原资料：</strong>《后端高频面试题大集合》JUC 并发编程，第 2 题“ReentrantLock是公平锁还是非公平锁，为什么这样设计”｜PDF 第 16～17 页。正式总进度记为后端 #15。</div>
+<h3>概念</h3><p>ReentrantLock 两种都支持：</p><pre><code>new ReentrantLock();      // 默认非公平
+new ReentrantLock(false); // 非公平
+new ReentrantLock(true);  // 公平</code></pre>
+<h3>原理</h3><p>底层基于 AQS。公平模式获取锁前会检查等待队列前面是否已有线程；非公平模式允许新线程先直接尝试 CAS 抢占，抢不到再进入 AQS 排队。</p>
+<pre><code>公平：   先看队列 → 前面有人就排队 → 尽量先来先得
+非公平： 新线程先抢一次 → 成功就直接进入 → 失败再排队</code></pre>
+<h3>为什么默认非公平？</h3><p>因为刚释放锁时，正在运行的线程或新到线程若能直接取得锁，可以减少线程挂起、唤醒和上下文切换的机会，通常能获得更高吞吐。</p>
+<h3>实际项目怎么用</h3><p>普通业务优先默认非公平；如果业务对“长期等待/饥饿”特别敏感，比如需要更强排队公平性的调度场景，再考虑公平锁。</p>
+<h3>AI补充/纠错</h3><div class="box warn"><strong>重要纠错：</strong>原资料把“非公平锁”写成“随机获取”并不准确。非公平不是随机，而是<strong>允许 barging（插队竞争）</strong>。另外，非公平锁也不是“完全没有阻塞和恢复步骤”；抢锁失败后仍会进入 AQS 队列并可能阻塞。</div>
+<h3>常见坑</h3><ul><li>公平锁不是绝对严格实时顺序保证，它是基于同步队列的公平获取策略。</li><li><code>tryLock()</code> 的语义与普通 <code>lock()</code> 公平策略要区分。</li><li>公平 ≠ 性能更好；一般恰恰相反。</li></ul>
+<div class="answer"><strong>面试口述版：</strong>ReentrantLock 既支持公平也支持非公平，通过构造参数选择，默认是非公平。公平模式会优先尊重 AQS 等待队列；非公平模式允许新线程先尝试抢锁，因此减少一部分线程切换成本，通常吞吐更高，所以被设计为默认。</div>
+<h3>可能追问</h3><p>AQS 是什么？hasQueuedPredecessors() 做什么？ReentrantLock 和 synchronized 怎么选？</p></section>
+
+<section class="card"><h2>④ 新题 3｜什么是对象锁和类锁？</h2><div class="source"><strong>原资料：</strong>《后端高频面试题大集合》JUC 并发编程，第 3 题“说下什么是对象锁和类锁，使用场景有什么差异点”｜PDF 第 18 页起。正式总进度记为后端 #16。</div>
+<h3>概念</h3><p><strong>对象锁</strong>锁的是某个实例对象的 monitor；<strong>类锁</strong>锁的是该类对应的 <code>Class</code> 对象。</p>
+<pre><code>public synchronized void instanceMethod() {
+    // 等价于 synchronized(this)
+}
+
+public static synchronized void staticMethod() {
+    // 锁的是 MyService.class
+}
+
+synchronized (MyService.class) {
+    // 类锁
+}</code></pre>
+<h3>原理</h3><pre><code>new MyService() -> 实例 A monitor
+new MyService() -> 实例 B monitor
+MyService.class -> Class 对象 monitor
+
+A 的对象锁 与 B 的对象锁：不同
+对象锁 与 类锁：也不同</code></pre>
+<h3>为什么</h3><p>同步范围取决于共享资源范围。如果状态属于单个实例，只需要对象级互斥；如果多个实例共同访问 static 全局状态，则需要围绕 Class/static 共享资源同步。</p>
+<h3>实际项目怎么用</h3><pre><code>class SequenceService {
+    private int localSeq;
+    private static int globalSeq;
+
+    public synchronized int nextLocal() {
+        return ++localSeq;
+    }
+
+    public static synchronized int nextGlobal() {
+        return ++globalSeq;
+    }
+}</code></pre>
+<h3>AI补充/纠错</h3><div class="box ai"><strong>关键补充：</strong>同一个类里的 <code>synchronized</code> 实例方法和 <code>static synchronized</code> 方法并不会互相阻塞，因为锁对象分别是 <code>this</code> 和 <code>Class</code> 对象。</div>
+<h3>常见坑</h3><ul><li>不要说“一个类只有一把 synchronized 锁”。锁对象是谁取决于 synchronized 作用目标。</li><li>锁住错误对象会导致看似加锁但仍存在数据竞争。</li><li>锁范围过大容易造成不必要串行化。</li></ul>
+<div class="answer"><strong>面试口述版：</strong>对象锁是某个实例对象上的 monitor，实例 synchronized 方法默认锁 this，不同实例之间通常不互斥；类锁是 Class 对象上的 monitor，static synchronized 方法锁的是 Xxx.class，因此同一类所有实例共享这把类锁。选择哪种取决于被保护的数据是实例级还是类级共享。</div>
+<h3>可能追问</h3><p>两个不同实例的 synchronized 方法会互斥吗？static synchronized 和 synchronized(this) 会互斥吗？synchronized 的锁升级是什么？</p></section>
+
+<section class="card"><h2>⑤ 新题 4｜Agent 推理模式如何差异化设计与选择？</h2><div class="source"><strong>原资料：</strong>《AI应用开发面试题 / Agent / RAG》1.1.6“Agent 推理模式、推理模式的差异化设计、推理模式的选择机制”｜PDF 第 5～6 页。</div>
+<h3>原资料内容</h3><p>原资料按 Direct、CoT、ReAct、Plan-and-Solve、ToT、Reflexion 等模式比较推理深度、工具依赖、成本和容错，并给出决策逻辑。</p>
+<table><tr><th>模式</th><th>适合任务</th><th>主要代价</th></tr><tr><td>Direct</td><td>简单事实/格式转换</td><td>最便宜、能力有限</td></tr><tr><td>CoT 类分步推理</td><td>无需外部工具的复杂分析</td><td>更多推理 Token</td></tr><tr><td>ReAct</td><td>边判断边查工具、环境动态变化</td><td>多轮模型+工具调用</td></tr><tr><td>Plan-and-Solve</td><td>步骤较明确的复杂长任务</td><td>规划错误会影响后续</td></tr><tr><td>Reflexion</td><td>结果需要额外审查、自修正</td><td>再次调用模型，延迟更高</td></tr><tr><td>ToT / 搜索式</td><td>需要探索多个候选路径</td><td>成本最高、工程复杂</td></tr></table>
+<h3>选择机制</h3><pre><code>任务简单？ → Direct
+需要外部实时信息？ → ReAct / Tool Calling
+步骤明确且较长？ → Plan-and-Solve
+输出需要严格自检？ → Reflection/Reflexion
+需要探索多条方案？ → ToT/搜索式
+
+实际常见：Planning 做全局 + Tool/ReAct 做局部执行</code></pre>
+<h3>Spring AI / Java 化</h3><p>Spring AI 2.0 的 <code>ToolCallingAdvisor</code> 可以负责标准的递归 Tool Calling Loop，<code>ToolCallingManager</code> 执行工具。复杂 Planning、Reflection、ToT 并不是一个开关自动获得，通常要用 Java Service、状态对象、Advisor 或工作流显式组织。</p>
+<pre><code>// Tool Calling 基础
+String answer = chatClient.prompt()
+    .user("分析本月订单下降原因")
+    .tools(orderTools)
+    .call()
+    .content();
+
+// 更复杂模式通常要额外定义：
+// planner -> plan -> executor -> validator -> retry/finish</code></pre>
+<h3>AI补充/纠错</h3><div class="box warn"><strong>纠错：</strong>不要把“推理深度 Direct &lt; CoT &lt; ReAct &lt; Plan-and-Solve &lt; ToT”当成严格数学排序，它只是帮助选型的启发式比较。不同模型和任务下效果并不单调。<br><strong>工程补充：</strong>生产系统不应依赖或要求暴露模型内部完整 Chain-of-Thought；面试时讲高层“分步推理/计划/行动/观察”即可。</div>
+<h3>常见坑</h3><ul><li>能一次答完的问题硬套 Agent Loop，只会增加成本和延迟。</li><li>Tool 很多但描述模糊，会降低选择准确率。</li><li>Plan 不是不可变；复杂任务最好允许重规划。</li><li>Reflection 需要明确验收标准，否则容易“自我感觉良好”。</li></ul>
+<div class="answer"><strong>面试口述版：</strong>Agent 推理模式要按任务复杂度、是否依赖外部工具、步骤是否明确、准确性要求和成本预算选型。简单任务 Direct；需要动态工具交互用 ReAct/Tool Calling；长任务可先 Planning 再执行；高准确性场景增加 Reflection。Spring AI 可直接支持 Tool Calling Loop，而 Planning、Reflection 等通常要由 Java 业务层继续编排。</div>
+<h3>可能追问</h3><p>如何避免 Agent Loop 无限循环？什么时候应该从 ReAct 升级到 Planning？怎么评估 Reflection 是否真的提升质量？</p></section>
+
+<section class="card"><h2>⑥ 新题 5｜AI 智能云盘的技术栈架构怎么设计？</h2><div class="source"><strong>原资料：</strong>《AI大模型面试题-基础篇》第 6 题“请简述AI智能化云盘项目的技术栈架构，并说明为什么选择这些技术”｜PDF 第 5 页。</div>
+<h3>原资料内容</h3><p>原资料给出 Java 后端 + Python AI 服务的组合：JDK21、Spring Boot 3.x、MyBatis-Plus、MySQL、Redis、Kafka/RabbitMQ、MinIO/OSS；AI 使用 FastAPI + LangChain + Milvus；前端 Vue3，部署 Docker/Jenkins 等。</p>
+<h3>AI补充/纠错｜Java / Spring AI 优先架构</h3><p><strong>Python 服务不是必选项。</strong>如果主要工作是调用外部 LLM、RAG、Tool Calling、MCP、业务数据库集成，完全可以由 Spring Boot + Spring AI 直接承担。</p>
+<pre><code>Web / Next.js / Vue
+        ↓
+Spring Boot 3.x / Java 21
+├─ Auth / ACL
+├─ File API
+├─ Business Service
+├─ MyBatis / jOOQ
+├─ Redis
+├─ Kafka / RabbitMQ（异步任务）
+└─ Spring AI
+   ├─ ChatClient
+   ├─ EmbeddingModel
+   ├─ VectorStore
+   ├─ RAG Advisor
+   ├─ @Tool / ToolCallback
+   └─ MCP（按需）
+        ↓
+PostgreSQL/MySQL + PGvector/Milvus
+Object Storage: S3 / OSS / MinIO
+        ↓
+External LLM API 或自托管模型</code></pre>
+<h3>为什么这样选</h3><table><tr><th>技术</th><th>价值</th></tr><tr><td>Spring Boot</td><td>成熟企业后端生态、权限、事务、微服务集成</td></tr><tr><td>Spring AI</td><td>统一 ChatModel、Tool Calling、RAG、Embedding 等 AI 应用抽象</td></tr><tr><td>对象存储</td><td>文件本体与数据库元数据分离，适合大文件</td></tr><tr><td>VectorStore</td><td>语义检索私有文档 Chunk</td></tr><tr><td>Redis</td><td>会话、缓存、限流、短期状态</td></tr><tr><td>MQ</td><td>文件解析/Embedding 等耗时任务异步化</td></tr></table>
+<h3>实际项目流程</h3><pre><code>上传 PDF
+  ↓
+文件存对象存储 + DB 记录 metadata/ACL
+  ↓
+异步解析任务
+  ↓
+Chunk → Embedding → VectorStore
+  ↓
+用户提问
+  ↓
+ACL Filter + 向量检索
+  ↓
+RAG Context
+  ↓
+ChatClient
+  ↓
+带来源回答</code></pre>
+<h3>什么时候保留 Python？</h3><p>如果需要自研模型推理、PyTorch/Transformers、复杂 OCR/CV、训练/微调，Python 服务非常合理。Java 与 Python 可以通过 HTTP/gRPC/MQ 解耦；但“用了 AI 就必须 FastAPI + LangChain”是不准确的。</p>
+<h3>常见坑</h3><ul><li>把文件二进制直接塞关系型数据库而不考虑对象存储。</li><li>Embedding 同步堵住上传请求。</li><li>只做向量相似度，不做 ACL 权限过滤。</li><li>把所有文档全文塞给模型，成本和上下文都不可控。</li><li>调用外部模型 API 却误以为应用服务器必须配 GPU。</li></ul>
+<div class="answer"><strong>面试口述版：</strong>AI 云盘可以采用 Spring Boot + Spring AI 作为主应用层，关系库保存业务元数据和权限，对象存储保存文件，Redis 做缓存/会话，MQ 异步处理解析和 Embedding，VectorStore 做语义检索，Spring AI 负责 RAG、Tool Calling 和模型接入。如果是自研模型或深度学习任务，再拆 Python 服务。核心不是堆技术，而是把文件、权限、异步处理、向量检索和模型能力分层。</div>
+<h3>可能追问</h3><p>为什么文件解析要异步？PGvector 和 Milvus 怎么选？权限如何进入向量检索？外部模型与私有部署怎么切换？</p></section>
+
+<section class="card"><h2>⑦ 今日正式进度</h2><div class="box good"><strong>《后端高频面试题大集合》：</strong>正式 #1～#16，其中今日原资料进入 JUC #1～#3。<br><strong>《AI应用开发面试题 / Agent / RAG》：</strong>1.1.1～1.1.6。<br><strong>《AI大模型面试题-基础篇》：</strong>#1～#6。</div><p>下一次优先复习：锁分类的“维度而非类名”、ReentrantLock 非公平锁的 barging、对象锁/类锁锁对象、Agent 推理模式选型，以及 Spring AI 技术栈中 Python 服务何时是可选而非必选。</p></section>
+<div class="footer">Java 后端 + AI 面试知识学习记录｜2026-09-05</div></main></body></html>

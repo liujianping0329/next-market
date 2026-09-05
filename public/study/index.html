@@ -43,7 +43,7 @@
       border: 1px solid var(--border);
       border-radius: 20px;
       padding: 34px;
-      box-shadow: 0 10px 28px rgba(15, 23, 42, .04);
+      box-shadow: 0 10px 28px rgba(15,23,42,.04);
       margin-bottom: 24px;
     }
 
@@ -99,12 +99,12 @@
       border-radius: 16px;
       padding: 20px 22px;
       transition: .18s ease;
-      box-shadow: 0 6px 18px rgba(15, 23, 42, .025);
+      box-shadow: 0 6px 18px rgba(15,23,42,.025);
     }
 
     .day-card:hover {
       transform: translateY(-2px);
-      box-shadow: 0 10px 24px rgba(15, 23, 42, .06);
+      box-shadow: 0 10px 24px rgba(15,23,42,.06);
       border-color: #cbd5e1;
     }
 
@@ -193,42 +193,120 @@
       <div class="stats">
         <div class="stat">
           <div class="label">当前进度</div>
-          <div class="value">正式 Day 3</div>
+          <div class="value">正式 Day 6</div>
         </div>
         <div class="stat">
-          <div class="label">累计正式学习</div>
-          <div class="value">15 个正式知识点</div>
+          <div class="label">正式新知识</div>
+          <div class="value">后端 #16 / Agent 1.1.6 / AI基础 #6</div>
         </div>
         <div class="stat">
           <div class="label">学习方式</div>
-          <div class="value">复习 + 5 个新知识</div>
+          <div class="value">复习 + 固定 5 道新题</div>
         </div>
       </div>
     </section>
+
     <h2 class="section-title">学习记录</h2>
-    <section class="list"><a class="day-card" href="./2026-09-02.html">
+    <section class="list">
+      <a class="day-card" href="./2026-09-05.html">
         <div class="top">
-          <h3 class="day-title">正式 Day 3｜Java 集合、并发与 Agent 架构</h3><span class="date">2026-09-02</span>
+          <h3 class="day-title">正式 Day 6｜Java 锁、ReentrantLock 与 Agent 推理模式</h3>
+          <span class="date">2026-09-05</span>
+        </div>
+        <p class="desc">JUC 常见锁分类、ReentrantLock 公平/非公平机制、对象锁与类锁、Agent 推理模式选型，以及 Spring AI 化的智能云盘技术栈。</p>
+        <div class="tags">
+          <span class="tag">JUC</span>
+          <span class="tag">Lock</span>
+          <span class="tag">ReentrantLock</span>
+          <span class="tag">synchronized</span>
+          <span class="tag">Agent Reasoning</span>
+          <span class="tag">Spring AI</span>
+        </div>
+      </a>
+
+      <a class="day-card" href="./2026-09-04.html">
+        <div class="top">
+          <h3 class="day-title">正式 Day 5｜反射、注解、代理与 Agent 设计范式</h3>
+          <span class="date">2026-09-04</span>
+        </div>
+        <p class="desc">Java 反射、标准注解与元注解、静态/动态代理与 Spring AOP、Agent 七大设计范式，以及 AI 模型 API 与私有部署的硬件资源差异。</p>
+        <div class="tags">
+          <span class="tag">Reflection</span>
+          <span class="tag">Annotation</span>
+          <span class="tag">Proxy</span>
+          <span class="tag">Spring AOP</span>
+          <span class="tag">Agent Pattern</span>
+          <span class="tag">Deployment</span>
+        </div>
+      </a>
+
+      <a class="day-card" href="./2026-09-03.html">
+        <div class="top">
+          <h3 class="day-title">正式 Day 4｜泛型通配符、Agent 工作模式与 AI 需求文档</h3>
+          <span class="date">2026-09-03</span>
+        </div>
+        <p class="desc">PECS 与泛型边界、Agent 模式选型、Spring AI Tool Calling，以及 AI 项目 PRD 的边界、风险和验收指标。</p>
+        <div class="tags">
+          <span class="tag">泛型</span>
+          <span class="tag">PECS</span>
+          <span class="tag">ReAct</span>
+          <span class="tag">Spring AI</span>
+          <span class="tag">PRD</span>
+        </div>
+      </a>
+
+      <a class="day-card" href="./2026-09-02.html">
+        <div class="top">
+          <h3 class="day-title">正式 Day 3｜Java 集合、并发与 Agent 架构</h3>
+          <span class="date">2026-09-02</span>
         </div>
         <p class="desc">HashMap / TreeMap、ConcurrentHashMap、Java 泛型、Agent 完整架构与企业 RAG 权限隔离。</p>
-        <div class="tags"><span class="tag">TreeMap</span><span class="tag">ConcurrentHashMap</span><span
-            class="tag">泛型</span><span class="tag">Agent</span><span class="tag">Spring AI</span><span
-            class="tag">RAG</span></div>
-      </a><a class="day-card" href="./java_ai_study_2026-08-31.html">
+        <div class="tags">
+          <span class="tag">TreeMap</span>
+          <span class="tag">ConcurrentHashMap</span>
+          <span class="tag">泛型</span>
+          <span class="tag">Agent</span>
+          <span class="tag">Spring AI</span>
+          <span class="tag">RAG</span>
+        </div>
+      </a>
+
+      <a class="day-card" href="./java_ai_review_2026-09-01.html">
         <div class="top">
-          <h3 class="day-title">正式 Day 1｜String、HashMap 与 Agent</h3><span class="date">2026-08-31</span>
+          <h3 class="day-title">正式 Day 2｜前一日学习复习</h3>
+          <span class="date">2026-09-01</span>
+        </div>
+        <p class="desc">对前一日 Java 后端与 AI 学习内容进行复习、纠错与面试口述整理。</p>
+        <div class="tags">
+          <span class="tag">复习</span>
+          <span class="tag">Java</span>
+          <span class="tag">AI</span>
+        </div>
+      </a>
+
+      <a class="day-card" href="./java_ai_study_2026-08-31.html">
+        <div class="top">
+          <h3 class="day-title">正式 Day 1｜String、HashMap 与 Agent</h3>
+          <span class="date">2026-08-31</span>
         </div>
         <p class="desc">String 不可变性与 Compact Strings、HashMap 冲突与树化、Java 接口、Agent 与 Spring AI、AI 应用开发基础。</p>
-        <div class="tags"><span class="tag">String</span><span class="tag">HashMap</span><span
-            class="tag">Interface</span><span class="tag">Agent</span><span class="tag">Spring AI</span></div>
+        <div class="tags">
+          <span class="tag">String</span>
+          <span class="tag">HashMap</span>
+          <span class="tag">Interface</span>
+          <span class="tag">Agent</span>
+          <span class="tag">Spring AI</span>
+        </div>
       </a>
+
       <a class="day-card" href="./java_backend_day1_jvm.html">
         <div class="top">
           <h3 class="day-title">样例｜JVM 基础入门</h3>
           <span class="date">2026-08-30</span>
         </div>
         <p class="desc">样例学习页：JVM 基础、方法区 / 永久代 / 元空间、类加载与双亲委派；不计入正式学习进度。</p>
-        <div class="tags"><span class="tag">样例</span>
+        <div class="tags">
+          <span class="tag">样例</span>
           <span class="tag">JVM</span>
           <span class="tag">Metaspace</span>
           <span class="tag">ClassLoader</span>
@@ -236,6 +314,7 @@
         </div>
       </a>
     </section>
+
     <div class="footer">Java 后端 + AI 面试高频知识学习记录</div>
   </main>
 </body>
