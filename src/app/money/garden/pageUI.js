@@ -18,8 +18,7 @@ import {
     ShieldCheck,
     Satellite,
     PenTool,
-    User,
-    MapPin
+    User
 } from "lucide-react";
 import ActionButton from "@/components/ActionButton";
 import {
@@ -40,6 +39,7 @@ import { useLocationStore } from "@/app/money/garden/_store/locationStore";
 import ky from "ky";
 import VoiceRecordDialog from "@/components/VoiceRecordDialog";
 import { Spinner } from "@/components/ui/spinner";
+import { Local, Helpcenter } from "@icon-park/react";
 
 export const revalidate = 0;
 
@@ -75,7 +75,7 @@ const GardenUI = ({ }) => {
                 const latitude = Number(position.coords.latitude.toFixed(8));
                 const longitude = Number(position.coords.longitude.toFixed(8));
 
-                const response = await ky.post('/api/location/getCur', { json: { lat: latitude, lng: longitude } }).json();
+                const response = await ky.post('/api/location/getCur', { json: { lat: latitude, lng: longitude, planetId: user?.planetId } }).json();
                 setNearestLocation(response.nearestLocation);
                 setLocationInfoStore(response.nearestLocation);
                 setIsGettingLocation(false);
@@ -120,10 +120,15 @@ const GardenUI = ({ }) => {
         } = supabase.auth.onAuthStateChange((_event, session) => {
             syncUser(session);
         });
-        getLocation();
 
         return () => subscription.unsubscribe();
     }, [])
+
+    useEffect(() => {
+        if (!isUserReady) return;
+
+        getLocation();
+    }, [isUserReady]);
 
     // useEffect(() => {
     //     const tabFromUrl = searchParams.get("tab");
@@ -183,8 +188,15 @@ const GardenUI = ({ }) => {
                 </Button> */}
                 <div className="flex items-center gap-3 shrink-0">
                     <div className="flex justify-end">
-                        <p className="flex items-center gap-1 text-sm whitespace-nowrap">
-                            <MapPin className="h-4 w-4 shrink-0" />
+                        <p
+                            className={`flex items-center gap-1 text-sm whitespace-nowrap ${nearestLocation?.status === 2 ? "text-red-500" : ""
+                                }`}
+                        >
+                            {nearestLocation?.status === 2 ? (
+                                <Helpcenter size={20} className="shrink-0 text-red-500" />
+                            ) : (
+                                <Local size={20} className="shrink-0" />
+                            )}
 
                             {isGettingLocation ? (
                                 <span className="inline-flex items-center gap-1">

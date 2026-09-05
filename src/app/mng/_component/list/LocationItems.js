@@ -15,6 +15,7 @@ import {
   Pencil,
   Trash2,
 } from "lucide-react";
+import { Caution, Local } from "@icon-park/react";
 
 
 const LocationItems = ({ userInfo }) => {
@@ -25,10 +26,9 @@ const LocationItems = ({ userInfo }) => {
   const [updateTarget, setUpdateTarget] = useState(null)
 
   const fetchList = async () => {
-    const response = await ky.post('/api/location/list/match', {
+    const response = await ky.post('/api/location/list/mng', {
       json: {
-        planetId: userInfo.planet.id,
-        status: 1
+        planetId: userInfo.planet.id
       }
     }).json();
     setList(response.list);
@@ -74,9 +74,33 @@ const LocationItems = ({ userInfo }) => {
 
               <div className="flex items-start justify-between gap-2">
                 <div className="flex min-w-0 items-center gap-2">
-                  <span className="min-w-0 truncate text-base font-semibold text-gray-900">
-                    {item.name}
+                  {item.status === 2 && (
+                    <Caution
+                      size={18}
+                      theme="filled"
+                      className="shrink-0 text-red-500"
+                    />
+                  )}
+
+                  <span
+                    className={`min-w-0 truncate text-base font-semibold ${item.status === 2 ? "text-red-500" : "text-gray-900"
+                      }`}
+                  >
+                    {item.status === 2 && "(请完善)"}{item.name}
                   </span>
+
+                  {item.status === 2 && <button
+                    type="button"
+                    className="shrink-0 text-gray-400 transition hover:text-blue-500 pl-1"
+                    onClick={() =>
+                      window.open(
+                        `https://www.google.com/maps?q=${item.lat},${item.lng}`,
+                        "_blank"
+                      )
+                    }
+                  >
+                    <Local size={17} />
+                  </button>}
                 </div>
 
                 <div className="flex shrink-0 items-center gap-1">
