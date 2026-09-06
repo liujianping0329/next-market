@@ -40,7 +40,7 @@ import ky from "ky";
 import VoiceRecordDialog from "@/components/VoiceRecordDialog";
 import { Spinner } from "@/components/ui/spinner";
 import { Local, Helpcenter } from "@icon-park/react";
-import { FileCode, RankingList } from "@icon-park/react";
+import { FileCode, RankingList, PreviewOpen } from "@icon-park/react";
 
 export const revalidate = 0;
 
@@ -225,6 +225,12 @@ const GardenUI = ({ }) => {
                                     <Link href="/news" className="flex items-center gap-2">
                                         <PenTool className="h-4 w-4" />
                                         <span>妙笔生花</span>
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                    <Link href="/user_func/album" className="flex items-center gap-2">
+                                        <PreviewOpen className="h-4 w-4" />
+                                        <span>观物知微</span>
                                     </Link>
                                 </DropdownMenuItem>
                             </DropdownMenuGroup>
