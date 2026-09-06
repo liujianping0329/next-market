@@ -19,7 +19,7 @@ import { Local, Helpcenter } from "@icon-park/react";
 import { Spinner } from "@/components/ui/spinner";
 import { useLocationStore } from "@/app/money/garden/_store/locationStore";
 
-const Header = ({ }) => {
+const Header = ({ children }) => {
 
     const userInfoStore = useUserStore(state => state.userInfo);
     const locationInfoStore = useLocationStore(state => state.locationInfo);
@@ -83,16 +83,7 @@ const Header = ({ }) => {
                             <span>返回</span>
                         </Link>
                     </Button>}
-
-                    <Button variant="outline" className="p-3">
-                        <MessageSquarePlus className="h-4 w-4" />
-                        <span>新建议题</span>
-                    </Button>
-
-                    <Button variant="outline" className={cn("p-3")}>
-                        <Orbit className="h-4 w-4" />
-                        <span>星海回响</span>
-                    </Button>
+                    {children}
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
                     <div className="flex justify-end">
