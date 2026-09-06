@@ -27,7 +27,7 @@ import {
     AvatarImage,
 } from "@/components/ui/avatar";
 import { useGranaryStore } from "@/app/money/garden/_store/granaryStore";
-const Granary = ({ userInfo, isUserReady }) => {
+const Granary = ({ userInfo, isUserReady, onNewLocationUpdate }) => {
     const [cash, setCash] = useState(null);
     const [userTemplate, setUserTemplate] = useState(null);
     const [spendCate, setSpendCate] = useState(null);
@@ -116,8 +116,9 @@ const Granary = ({ userInfo, isUserReady }) => {
                                     <ReceiptText className="h-4 w-4" />
                                     <span>记支出</span>
                                 </Button>
-                            } onSuccess={() => {
+                            } onSuccess={(newLocation) => {
                                 fetchData();
+                                onNewLocationUpdate?.(newLocation);
                             }} cash={cash} spendCate={spendCate} />}
 
                             {/* <FormSoy trigger={ */}

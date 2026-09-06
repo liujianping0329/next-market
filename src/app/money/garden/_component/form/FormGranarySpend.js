@@ -70,6 +70,7 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
 
     const userInfoStore = useUserStore(state => state.userInfo);
     const locationInfoStore = useLocationStore(state => state.locationInfo);
+    const setLocationInfoStore = useLocationStore(state => state.setLocationInfo);
 
     const form = useForm({
         defaultValues: {
@@ -78,7 +79,11 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
             title: defaultValues?.title || "",
             amount: defaultValues?.amount || "",
             cashType: defaultValues?.cashType || "jpy",
+            ...(locationInfoStore?.status === 2 && !defaultValues?.id
+                ? { newLocationName: locationInfoStore?.name }
+                : {}),
         }
+
     });
 
     useEffect(() => {
@@ -105,7 +110,7 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
 
     const onSubmit = async (values) => {
         setIsLoadGranarySpend(true);
-        await ky.post('/api/spend/upsert', {
+        const response = await ky.post('/api/spend/upsert/withLocation', {
             json: {
                 ...(defaultValues?.id && { id: defaultValues.id }),
                 date: formatDateLocal(values.date),
@@ -117,11 +122,15 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
                 userId,
                 planetId: userInfoStore?.planetId,
                 ...(locationInfoStore?.id && { locationId: locationInfoStore?.id }),
+                ...(locationInfoStore?.id && locationInfoStore?.status === 2 && !defaultValues?.id && { newLocationName: values.newLocationName }),
             }
         }).json();
         setOpenGranarySpendCtrl ? setOpenGranarySpendCtrl(false) : setOpenGranarySpend(false);
         form.reset();
-        onSuccess();
+        if (response.updatedLocation) {
+            setLocationInfoStore(response.updatedLocation);
+        }
+        onSuccess(response.updatedLocation);
         setIsLoadGranarySpend(false);
     }
 
@@ -135,8 +144,8 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
                     </DialogHeader>
                     <div className="w-full">
                         <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} id="formGranarySpend" className="max-h-[70dvh] flex flex-col">
-                                <FieldGroup>
+                            <form onSubmit={form.handleSubmit(onSubmit)} id="formGranarySpend" className="max-h-[70dvh] flex flex-col gap-1">
+                                <FieldGroup className="flex flex-col gap-5">
                                     <FormField name="date" control={form.control}
                                         render={({ field }) => (
                                             <FormItem>
@@ -228,6 +237,17 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
                                                 </FormItem>
                                             )} />
                                     </div>
+                                    {locationInfoStore?.status === 2 && !defaultValues?.id && <FormField name="newLocationName" control={form.control}
+                                        render={({ field }) => (
+                                            <FormItem className="text-red-500">
+                                                <FormLabel>校正地点名称</FormLabel>
+                                                <FormControl>
+                                                    <Input {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )} />}
+
                                 </FieldGroup>
                             </form>
                         </Form>

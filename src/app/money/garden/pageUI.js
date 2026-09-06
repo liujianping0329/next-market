@@ -259,7 +259,7 @@ const GardenUI = ({ }) => {
             {tab === "Soybean" && <Soybean userInfo={user} isUserReady={isUserReady} />}
             {tab === "Greengrass" && <Greengrass userInfo={user} isUserReady={isUserReady} />}
             {tab === "Harvest" && <Harvest userInfo={user} isUserReady={isUserReady} />}
-            {tab === "Granary" && <Granary userInfo={user} isUserReady={isUserReady} />}
+            {tab === "Granary" && <Granary userInfo={user} isUserReady={isUserReady} onNewLocationUpdate={setNearestLocation} />}
             {isVoiceOpen && (
                 <VoiceRecordDialog
                     onClose={() => setIsVoiceOpen(false)}
