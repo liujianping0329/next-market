@@ -40,6 +40,7 @@ import ky from "ky";
 import VoiceRecordDialog from "@/components/VoiceRecordDialog";
 import { Spinner } from "@/components/ui/spinner";
 import { Local, Helpcenter } from "@icon-park/react";
+import { FileCode, RankingList } from "@icon-park/react";
 
 export const revalidate = 0;
 
@@ -250,21 +251,39 @@ const GardenUI = ({ }) => {
                             </DropdownMenuGroup>
                             <DropdownMenuSeparator />
                             <DropdownMenuGroup>
+                                <DropdownMenuItem>
+                                    <Link href="/study/index.html" className="flex items-center gap-2">
+                                        <FileCode className="h-4 w-4" />
+                                        <span>Java宝典</span>
+                                    </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                    <Link href="/study/market/index.html" className="flex items-center gap-2">
+                                        <RankingList className="h-4 w-4" />
+                                        <span>每日大观</span>
+                                    </Link>
+                                </DropdownMenuItem>
+                            </DropdownMenuGroup>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuGroup>
                                 <DropdownMenuItem variant="destructive" onClick={handleLogout}>注销</DropdownMenuItem>
                             </DropdownMenuGroup>
                         </DropdownMenuContent>
                     </DropdownMenu>) : <ActionButton icon={CircleUser} size="icon" onClick={handleLogin} />}
                 </div >
-            </div>
-            {tab === "Soybean" && <Soybean userInfo={user} isUserReady={isUserReady} />}
+            </div >
+            {tab === "Soybean" && <Soybean userInfo={user} isUserReady={isUserReady} />
+            }
             {tab === "Greengrass" && <Greengrass userInfo={user} isUserReady={isUserReady} />}
             {tab === "Harvest" && <Harvest userInfo={user} isUserReady={isUserReady} />}
             {tab === "Granary" && <Granary userInfo={user} isUserReady={isUserReady} onNewLocationUpdate={setNearestLocation} />}
-            {isVoiceOpen && (
-                <VoiceRecordDialog
-                    onClose={() => setIsVoiceOpen(false)}
-                />
-            )}
+            {
+                isVoiceOpen && (
+                    <VoiceRecordDialog
+                        onClose={() => setIsVoiceOpen(false)}
+                    />
+                )
+            }
         </>
     );
 }
