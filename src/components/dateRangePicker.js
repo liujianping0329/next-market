@@ -83,6 +83,7 @@ const DateRangePicker = ({ dateDf, onChange, dtFormat = "yyyy-MM-dd", onMonthCha
         </PopoverTrigger>
         <PopoverContent align="start" className="w-auto max-w-108 p-0">
           <Calendar mode="range" selected={dateDf} captionLayout="dropdown"
+            endMonth={new Date(2036, 11)}
             month={month}
             onMonthChange={setMonth}
             numberOfMonths={2}

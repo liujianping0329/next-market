@@ -32,12 +32,7 @@ const AlbumUI = ({ }) => {
                 />
                 <Button variant="outline" className="p-3" onClick={() => inputRef.current?.click()}>
                     <MessageSquarePlus className="h-4 w-4" />
-                    <span>新建议题</span>
-                </Button>
-
-                <Button variant="outline" className={cn("p-3")}>
-                    <Orbit className="h-4 w-4" />
-                    <span>星海回响</span>
+                    <span>新建图片</span>
                 </Button>
             </CommonHeader>
         </>

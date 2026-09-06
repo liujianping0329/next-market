@@ -49,6 +49,12 @@ const Datepicker = ({ dateDf, onChange, dtFormat = "yyyy-MM-dd", onMonthChange, 
     onMonthChange?.(start, end);
   }, [month, onMonthChange]);
 
+  useEffect(() => {
+    if (dateDf) {
+      setMonth(dateDf);
+    }
+  }, [dateDf]);
+
   return (
     <>
       <Popover open={open} onOpenChange={setOpen}>
@@ -57,6 +63,7 @@ const Datepicker = ({ dateDf, onChange, dtFormat = "yyyy-MM-dd", onMonthChange, 
         </PopoverTrigger>
         <PopoverContent align="start">
           <Calendar mode="single" selected={dateDf} captionLayout="dropdown"
+            endMonth={new Date(2036, 11)}
             month={month}
             onMonthChange={setMonth}
             modifiers={{

@@ -117,7 +117,12 @@ const Harvest = ({ userInfo, isUserReady }) => {
         setTimeList(allTimes);
         setEditVer(prev => prev + 1);
 
-        ky.get('/api/journey/list').json().then((data) => {
+        ky.post('/api/journey/list/match', {
+            json: {
+                ...(userInfo?.planetId ? { planetId: userInfo.planetId } : { userId: userInfo?.id }),
+                status: 1,
+            }
+        }).json().then((data) => {
             setJourneys(data.list);
             setSelectedJourney((prev) => {
                 if (!prev) return null;
@@ -285,6 +290,9 @@ const Harvest = ({ userInfo, isUserReady }) => {
                             <Button size="sm" variant="ghost" className="underline px-1" onClick={() => {
                                 setStartTime(pullToZero(startTime, 7));
                             }}>下周</Button>
+                            <Button size="sm" variant="ghost" className="underline px-1" onClick={() => {
+                                setStartTime(pullToZero(startTime, -7));
+                            }}>上周</Button>
                         </div>
                         <div className="flex items-center gap-2">
                             <FormJourney trigger={
@@ -370,7 +378,21 @@ const Harvest = ({ userInfo, isUserReady }) => {
                                     <ActionButton icon={Pencil} onClick={() => {
                                         setUpdateJourneyOpen(true);
                                     }} />
-                                    <ActionButton icon={Trash2} onClick={() => deleteHandle(item)} />
+                                    <ActionButton icon={Trash2} onClick={() => {
+                                        if (confirm("确定删除该旅程吗？")) {
+                                            ky.post('/api/journey/upsert',
+                                                {
+                                                    json: {
+                                                        id: selectedJourney.id,
+                                                        status: -1
+                                                    }
+                                                }
+                                            ).json().then(() => {
+                                                setSelectedJourney(null);
+                                                fetchList(startTime);
+                                            });
+                                        }
+                                    }} />
                                 </div>
                             </div>
                         </div>
