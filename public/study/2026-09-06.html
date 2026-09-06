@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>正式 Day 7｜死锁、ThreadLocal 与 Agent 框架生态</title>
+<style>
+:root{--bg:#f5f6f8;--card:#fff;--text:#1f2937;--muted:#6b7280;--border:#e5e7eb;--soft:#f3f4f6;--code:#0f172a;--codeText:#e5e7eb;--good:#ecfdf5;--warn:#fff7ed;--ai:#eff6ff}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",Arial,sans-serif;line-height:1.7}.container{width:min(1000px,calc(100% - 32px));margin:36px auto 64px}.hero,.card{background:var(--card);border:1px solid var(--border);box-shadow:0 10px 28px rgba(15,23,42,.04)}.hero{border-radius:20px;padding:34px;margin-bottom:24px}.hero h1{margin:0;font-size:30px}.sub,.source,.footer{color:var(--muted)}.meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}.tag{font-size:12px;background:var(--soft);border-radius:999px;padding:4px 9px}.card{border-radius:16px;padding:26px 28px;margin-bottom:18px}h2{margin:0 0 14px;font-size:21px}h3{margin:24px 0 10px;font-size:18px}h4{margin:18px 0 8px}.source{font-size:13px;border-left:3px solid #d1d5db;padding-left:10px;margin:12px 0 18px}pre{background:var(--code);color:var(--codeText);border-radius:12px;padding:16px;overflow:auto;white-space:pre-wrap}code{font-family:Consolas,Monaco,monospace}.box{border-radius:12px;padding:14px 16px;margin:14px 0;border:1px solid var(--border)}.good{background:var(--good)}.warn{background:var(--warn)}.ai{background:var(--ai)}.answer{border-left:4px solid #111827;background:#fafafa;padding:14px 16px;border-radius:0 10px 10px 0;margin-top:12px}table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}th,td{border:1px solid var(--border);padding:10px 12px;text-align:left;vertical-align:top}th{background:var(--soft)}details{margin:12px 0;border:1px solid var(--border);border-radius:12px;padding:12px 14px;background:#fafafa}summary{cursor:pointer;font-weight:700}.footer{text-align:center;font-size:13px;margin-top:30px}@media(max-width:600px){.container{width:min(100% - 20px,1000px);margin-top:20px}.hero{padding:24px 20px}.card{padding:20px}}
+</style></head><body><main class="container">
+<section class="hero"><h1>正式 Day 7｜死锁、ThreadLocal 与 Agent 框架生态</h1><div class="sub">2026-09-06｜前一天复习 + 固定 5 道新题</div><div class="meta"><span class="tag">Deadlock</span><span class="tag">ThreadLocal</span><span class="tag">ThreadLocalMap</span><span class="tag">Agent Framework</span><span class="tag">Spring AI</span><span class="tag">PRD</span></div><div class="box good"><strong>正式进度推进：</strong>后端正式 #17～#19（原资料 JUC #4～#6）+ Agent/RAG 1.1.7 + AI基础 #7。今天重点进入线上并发排障和 ThreadLocal 底层，同时把 Agent 市场生态按 2026 年现状做版本纠错。</div></section>
+
+<section class="card"><h2>① 前一天复习｜先凭记忆回答</h2><div class="source">复习来源：2026-09-05 正式 Day 6。自动学习任务无法等待实时口述，因此答案继续放进折叠区；建议每题先口述 20～30 秒再展开。没有收到用户回答时，不虚构“已掌握/遗忘”等评分。</div>
+<h3>复习 1｜Java 锁分类</h3><p>先回答：悲观/乐观、公平/非公平、独享/共享、可重入、自旋分别在描述锁的什么维度？CAS 为什么不能简单说成“一个锁对象”？</p><details><summary>答完后展开：纠错 + 口述版</summary><p>这些是不同分类维度。CAS 是 Compare-And-Set 原子操作机制，是乐观并发控制的重要基础，并不是一个 java.util.concurrent.locks.Lock 实例。</p><div class="answer"><strong>面试口述版：</strong>Java 并发锁要按多个维度理解，例如悲观乐观、公平非公平、独享共享、可重入和自旋。synchronized、ReentrantLock 是典型互斥锁，CAS 是乐观并发控制的重要原子机制，选择方案要看冲突概率和临界区成本。</div></details>
+<h3>复习 2｜ReentrantLock 公平还是非公平？</h3><p>先回答：默认是什么？为什么？“非公平”是不是随机抢锁？</p><details><summary>答完后展开</summary><p>两种都支持，默认非公平。非公平不是随机，而是允许新线程先尝试插队竞争；抢不到后仍会进入 AQS 等待逻辑。默认非公平通常能减少部分线程切换，提高吞吐。</p></details>
+<h3>复习 3｜对象锁和类锁</h3><p>先回答：<code>synchronized</code> 实例方法锁谁？<code>static synchronized</code> 锁谁？两个不同实例的 synchronized 实例方法一定互斥吗？</p><details><summary>答完后展开</summary><p>实例方法通常锁 this；静态同步方法锁对应 Class 对象。两个不同实例是两把不同对象锁，因此通常不会因为实例 synchronized 方法互斥；类锁则对该类所有实例共享。</p></details>
+<h3>复习 4｜Agent 推理模式如何选？</h3><p>先回答：什么场景偏向 Tool Calling/ReAct、Plan-and-Solve、Reflection？Spring AI 的 ToolCallingAdvisor 能自动覆盖哪些部分，不能自动覆盖哪些部分？</p><details><summary>答完后展开</summary><p>需要动态外部工具时偏向 Tool Calling/ReAct；长任务且步骤可规划时先 Plan；高准确性要求可加 Reflection。Spring AI 2.0 的 ToolCallingAdvisor 负责标准递归 Tool Calling Loop，但复杂 Planning、Reflection、审批和持久状态通常仍需业务层编排。</p></details>
+<h3>复习 5｜AI 云盘 Java 技术栈</h3><p>先回答：为什么做 AI 云盘不一定必须拆一个 FastAPI 服务？Spring Boot + Spring AI 可以直接承担哪些能力？</p><details><summary>答完后展开</summary><p>如果主要是外部 LLM、RAG、Embedding、VectorStore、Tool Calling、MCP 和企业系统集成，Spring Boot + Spring AI 可以直接作为主干。需要 PyTorch/Transformers、自研训练、复杂 CV/OCR 等 Python 生态时，再拆 Python 服务更合理。</p></details>
+<h3>间隔复习｜约 3 天前：PECS</h3><p>先回答：<code>? extends Number</code> 和 <code>? super Integer</code> 分别更适合读还是写？PECS 是什么？</p><details><summary>答完后展开</summary><p>Producer Extends，Consumer Super。<code>? extends T</code> 更适合把集合当 T 的生产者读取；<code>? super T</code> 可以安全写入 T 或 T 的子类对象。</p></details>
+<h3>间隔复习｜约 6～7 天前：String Compact Strings</h3><p>先回答：Java 9+ String 内部是否还是固定 <code>char[]</code>？为什么一个 String 不能一部分 LATIN1、一部分 UTF16？</p><details><summary>答完后展开</summary><p>Java 9+ 的 Compact Strings 典型实现使用 <code>byte[] value</code> + coder。一个 String 实例选择一种编码表示；只要内容不能全部用 LATIN1 表示，就整体使用 UTF16 形式，而不是一个字符串内部混合两种编码。</p></details></section>
+
+<section class="card"><h2>② 新题 1｜线上发生死锁，怎么排查和解决？</h2><div class="source"><strong>原资料：</strong>《后端高频面试题大集合》JUC 并发编程，第 4 题“线上里面发生了死锁，说下你的排查解决思路”｜PDF 第 19～20 页。正式总进度记为后端 #17。</div>
+<h3>概念</h3><p>死锁是多个线程互相持有对方需要的资源，并永久等待下去。原资料给出了经典四个必要条件：</p><table><tr><th>条件</th><th>含义</th></tr><tr><td>互斥</td><td>资源同时只能被一个执行者占用</td></tr><tr><td>请求并保持</td><td>持有已有资源的同时继续等待其他资源</td></tr><tr><td>不可抢占</td><td>资源不能被系统强行夺走，只能持有者释放</td></tr><tr><td>循环等待</td><td>线程之间形成 A 等 B、B 等 C、C 又等 A 的环</td></tr></table>
+<h3>原理</h3><pre><code>Thread-A                    Thread-B
+lock(order)                 lock(account)
+   ↓                           ↓
+等待 account  ←──────────→  等待 order
+
+形成等待环 → 两边都无法继续</code></pre>
+<h3>为什么线上排查要看线程栈</h3><p>死锁本质是线程之间的锁依赖关系，所以第一手证据通常是线程 dump。原资料推荐 <code>jps + jstack</code> 或 JConsole。</p><pre><code>jps -l
+jstack -l &lt;pid&gt; &gt; thread-dump.txt
+
+# 重点查：
+Found one Java-level deadlock
+waiting to lock
+locked &lt;...&gt;</code></pre>
+<h3>实际项目怎么用</h3><p>生产环境常见处理流程可以整理成：</p><pre><code>告警：请求卡住 / 线程池耗尽 / RT 飙升
+  ↓
+确认 JVM PID
+  ↓
+连续抓 2～3 次 thread dump
+  ↓
+定位 BLOCKED / waiting to lock
+  ↓
+画出锁依赖关系
+  ↓
+回到代码确认锁顺序
+  ↓
+修复 + 压测 + 回归</code></pre>
+<h3>AI补充/纠错</h3><div class="box warn"><strong>补充 1：</strong>线上不要只抓一次 dump；连续抓几份更容易区分“短暂竞争”和“持续死锁/卡死”。<br><strong>补充 2：</strong>预防死锁最常用的工程手段是统一锁顺序、缩小临界区、避免嵌套锁，以及在适合场景使用 <code>tryLock(timeout)</code> 让等待可超时退出。<br><strong>补充 3：</strong>JConsole 可以辅助观察，但服务端/容器环境里 <code>jstack</code>、<code>jcmd Thread.print</code>、JFR 等往往更实用。</div>
+<h3>常见坑</h3><ul><li>看到 BLOCKED 就直接说死锁；BLOCKED 可能只是正常锁竞争。</li><li>只“重启服务”而不保留现场 thread dump，导致根因永远找不到。</li><li>只修一个 synchronized，而不检查整体锁获取顺序。</li></ul>
+<div class="answer"><strong>面试口述版：</strong>线上怀疑死锁时，我先保留现场并抓多份线程 dump，用 jstack 或 jcmd 找到 BLOCKED 线程和锁持有/等待关系，确认是否形成循环等待。代码层面重点检查嵌套锁和锁顺序，通常通过统一加锁顺序、缩小锁范围、减少嵌套锁或使用带超时的 tryLock 解决，修复后再做并发压测和回归。</div>
+<h3>可能追问</h3><p>死锁四个必要条件？BLOCKED 和 WAITING 区别？如何用 jcmd/JFR 排查？数据库死锁和 Java 锁死锁有什么区别？</p></section>
+
+<section class="card"><h2>③ 新题 2｜ThreadLocal 是什么？什么场景会用？</h2><div class="source"><strong>原资料：</strong>《后端高频面试题大集合》JUC 并发编程，第 5 题“介绍下 ThreadLocal，一般什么场景下会使用”｜PDF 第 21～22 页。正式总进度记为后端 #18。</div>
+<h3>概念</h3><p>ThreadLocal 的核心不是“给共享变量加锁”，而是<strong>让同一个 ThreadLocal 在不同线程中看到各自独立的值</strong>，把共享问题转成线程隔离问题。</p>
+<pre><code>Thread A → ThreadLocal[user] = A-user
+Thread B → ThreadLocal[user] = B-user
+
+同一个 ThreadLocal 变量
+不同线程 → 不同 value</code></pre>
+<h3>原理</h3><p>ThreadLocal 本身更像访问入口/Key；真正的数据存在线程自己的 ThreadLocalMap 中。</p>
+<h3>为什么</h3><p>它适合“同一条线程调用链中的多个方法都要拿到同一份上下文，但不想层层传参数”的场景，例如请求用户信息、TraceId、租户 ID 等。</p>
+<h3>实际项目怎么用</h3><pre><code>public final class UserContext {
+    private static final ThreadLocal&lt;Long&gt; USER_ID = new ThreadLocal&lt;&gt;();
+
+    public static void set(Long id) { USER_ID.set(id); }
+    public static Long get() { return USER_ID.get(); }
+    public static void clear() { USER_ID.remove(); }
+}
+
+try {
+    UserContext.set(userId);
+    service.handle();
+} finally {
+    UserContext.clear();
+}</code></pre>
+<h3>AI补充/纠错</h3><div class="box warn"><strong>纠错 1：</strong>原资料“ThreadLocal 为每个线程提供变量副本”是便于理解的说法，但实现上不是简单复制原对象；更准确是“每个线程在自己的 ThreadLocalMap 中保存这个 ThreadLocal 对应的 value”。<br><strong>纠错 2：</strong>资料说“ThreadLocal 不能使用原子类型，只能 Object”容易误解。Java 泛型不能直接写基本类型，所以应使用包装类型，如 <code>ThreadLocal&lt;Integer&gt;</code>，不是说 ThreadLocal 不能保存数字。<br><strong>重点：</strong>线程池会复用线程，因此 Web 应用使用 ThreadLocal 后必须在 finally 中 <code>remove()</code>，否则可能发生上下文串用和内存滞留。</div>
+<h3>常见坑</h3><ul><li>把 ThreadLocal 当成跨线程传值工具；默认情况下它做不到。</li><li>线程池中 set 后不 remove。</li><li>把业务核心状态长期塞进 ThreadLocal，导致依赖隐式化、难测试。</li></ul>
+<div class="answer"><strong>面试口述版：</strong>ThreadLocal 用于线程隔离，每个线程通过自己的 ThreadLocalMap 保存对应值，因此不同线程之间互不干扰。它常用于同一请求线程中的用户上下文、TraceId、租户信息等。在线程池环境必须在 finally 中 remove，避免线程复用导致脏数据或内存滞留。</div>
+<h3>可能追问</h3><p>ThreadLocal 为什么会内存泄漏？InheritableThreadLocal 是什么？异步线程/虚拟线程下上下文应该怎么传？</p></section>
+
+<section class="card"><h2>④ 新题 3｜Thread、ThreadLocal、ThreadLocalMap 三者什么关系？</h2><div class="source"><strong>原资料：</strong>《后端高频面试题大集合》JUC 并发编程，第 6 题“说下 Thread/ThreadLocal/ThreadLocalMap 三者的关系”｜PDF 第 22～23 页。正式总进度记为后端 #19。</div>
+<h3>概念与结构</h3><pre><code>Thread
+└── ThreadLocalMap threadLocals
+      ├── Entry(ThreadLocal A → value A)
+      ├── Entry(ThreadLocal B → value B)
+      └── Entry(ThreadLocal C → value C)
+
+ThreadLocal
+├── get()
+├── set()
+└── remove()
+    ↓
+操作当前 Thread 的 ThreadLocalMap</code></pre>
+<h3>原理</h3><p><code>ThreadLocal.set()</code> 会先获取当前线程 <code>Thread.currentThread()</code>，找到该 Thread 的 <code>threadLocals</code>；不存在则创建，存在则以当前 ThreadLocal 为 Key 更新 Value。</p>
+<h3>为什么这样设计</h3><p>Map 放在线程自身，就天然把数据按 Thread 分区；ThreadLocal 则把对内部 ThreadLocalMap 的访问封装起来，让业务方不用直接操作 Thread 的内部存储结构。</p>
+<h3>AI补充/纠错｜原资料这里有一个重要错误</h3><div class="box warn"><strong>原资料错误：</strong>“所以一个线程只能存储一个值，可以理解为 JVM 内部维护 Map&lt;Thread,Object&gt;”是不准确的。<br><br><strong>正确模型：</strong>一个 Thread 通常有一个 ThreadLocalMap，但这个 Map 可以放<strong>很多个 ThreadLocal Key → Value</strong>。所以同一个线程可以同时保存 userId、traceId、tenantId 等多份线程局部数据。</div>
+<pre><code>// 同一个线程里可以同时存在多个 ThreadLocal
+ThreadLocal&lt;Long&gt; userId = new ThreadLocal&lt;&gt;();
+ThreadLocal&lt;String&gt; traceId = new ThreadLocal&lt;&gt;();
+ThreadLocal&lt;String&gt; tenantId = new ThreadLocal&lt;&gt;();
+
+// 它们都进入当前 Thread 的同一 ThreadLocalMap</code></pre>
+<h3>内存问题为什么出现</h3><p>ThreadLocalMap 的 Entry 对 ThreadLocal Key 使用弱引用思路，而 Value 仍可能被 Entry 强关联。如果 ThreadLocal Key 已失去外部引用、但线程长期存活，旧 Value 可能在清理前继续滞留。因此线程池场景最稳妥的习惯仍是显式 <code>remove()</code>。</p>
+<h3>常见坑</h3><ul><li>说“一个线程只能有一个 ThreadLocal 值”。</li><li>把结构理解成全局 <code>Map&lt;Thread,Object&gt;</code>。</li><li>只会背“Key 弱引用”，却不知道线程池长期存活才是工程风险放大的原因之一。</li></ul>
+<div class="answer"><strong>面试口述版：</strong>Thread 对象内部维护自己的 ThreadLocalMap；ThreadLocal 本身不直接保存业务值，而是作为 Key，通过 get/set/remove 操作当前线程的 ThreadLocalMap。一个线程通常只有一个 threadLocals Map，但里面可以存多个不同 ThreadLocal 对应的值，因此能同时保存多份线程上下文。</div>
+<h3>可能追问</h3><p>为什么 Entry 的 Key 要设计成弱引用？remove 做了什么？ThreadLocalMap 为什么不用普通 HashMap？</p></section>
+
+<section class="card"><h2>⑤ 新题 4｜市面上有哪些 Agent？框架层和产品层怎么回答？</h2><div class="source"><strong>原资料：</strong>《AI应用开发面试题 / Agent / RAG》1.1.7“了解过市面上有哪些智能体 Agent 吗？”｜PDF 第 6～7 页。</div>
+<h3>概念</h3><p>这题最好分成<strong>开发框架层</strong>和<strong>产品层</strong>，不要把 LangGraph、Claude Code、Dify、Devin 混成同一类。</p>
+<table><tr><th>层级</th><th>典型例子</th><th>重点</th></tr><tr><td>代码/编排框架</td><td>LangGraph、Microsoft Agent Framework、CrewAI、LlamaIndex 等</td><td>状态、工作流、工具、多 Agent、持久化</td></tr><tr><td>低代码平台</td><td>Dify、Coze 等</td><td>可视化编排、知识库、快速应用搭建</td></tr><tr><td>面向用户的 Agent 产品</td><td>Claude Code、GitHub Copilot、Cursor、Devin、Manus、Perplexity 等</td><td>代码、搜索、通用任务等具体工作场景</td></tr></table>
+<h3>原理｜选框架其实在选什么？</h3><pre><code>简单 LLM + Tool
+→ Spring AI / SDK 就能做
+
+复杂有状态工作流
+→ 图/Workflow 编排框架更合适
+
+多角色协作
+→ Multi-Agent 框架
+
+业务同学快速搭建
+→ 低代码 Agent 平台</code></pre>
+<h3>Java / Spring AI 视角</h3><p>Spring AI 更适合作为 Java/Spring 应用里的 AI 集成基础层：模型抽象、ChatClient、Tool Calling、Memory、RAG、MCP、Observability 等。对于复杂图状态编排，可以在 Spring Service/状态机/工作流方案中继续编排，也可以与外部 Agent 平台组合。</p>
+<h3>AI补充/纠错｜2026 年生态变化</h3><div class="box warn"><strong>版本纠错：</strong>资料写 Microsoft Agent Framework “1.0 GA 目标 2026 Q1”，现在已经过时。Microsoft Agent Framework 1.0 已在 2026 年 4 月 GA，并融合了 AutoGen 与 Semantic Kernel 的 Agent/Workflow 路线；AutoGen 已进入维护模式，新项目应优先看 Microsoft Agent Framework。<br><strong>Spring AI：</strong>当前稳定文档为 2.0.1，<code>ToolCallingAdvisor</code> 负责递归 Tool Calling Loop；它是 Java Agentic 应用的重要基础，但不是和 LangGraph 完全同定位的图状态编排框架。</div>
+<h3>为什么</h3><p>面试官通常不是想听 20 个名字，而是看你是否知道：框架解决“怎么开发/编排 Agent”，产品解决“Agent 最终替用户完成什么工作”。</p>
+<h3>实际项目怎么选</h3><pre><code>你的 Next.js + Spring Boot 项目：
+Next.js UI
+   ↓
+Spring Boot
+   ↓
+Spring AI
+├── ChatClient
+├── @Tool
+├── RAG
+├── Memory
+└── MCP
+   ↓
+业务 Service / DB / 外部 API
+
+如果未来任务状态和分支非常复杂，再增加显式 Workflow/状态编排层。</code></pre>
+<h3>常见坑</h3><ul><li>把 AutoGen 当成 2026 年微软新项目首选而忽略 Microsoft Agent Framework。</li><li>把 Tool Calling SDK 和完整状态编排框架说成完全一样。</li><li>只背产品名，不会解释各自解决的问题。</li></ul>
+<div class="answer"><strong>面试口述版：</strong>我会把 Agent 生态分成框架和产品两层。框架层例如 LangGraph、Microsoft Agent Framework、CrewAI、LlamaIndex，重点解决状态、工具、Workflow 和多 Agent 编排；低代码还有 Dify、Coze。产品层则有 Claude Code、GitHub Copilot、Cursor、Devin、Manus 等。Java 项目里我更熟 Spring AI，它适合做模型、RAG、Tool Calling、Memory 和 MCP 的应用基础层，复杂状态工作流再额外做编排。</div>
+<h3>可能追问</h3><p>Spring AI 和 LangGraph 的定位差异？Microsoft Agent Framework 和 AutoGen 什么关系？什么时候值得 Multi-Agent？低代码 Agent 平台适合生产吗？</p></section>
+
+<section class="card"><h2>⑥ 新题 5｜AI 项目如何写一份合格 PRD？</h2><div class="source"><strong>原资料：</strong>《AI大模型面试题-基础篇》第 7 题“在 AI 项目开发中，如何编写一份合格的产品需求文档？包含哪些关键内容？”｜PDF 第 5～6 页。</div>
+<h3>概念</h3><p>PRD 不是只写“有哪些功能”，而是把产品目标、用户、业务规则、验收标准、非功能要求、技术约束和风险统一写清，让产品、开发、测试、运营能对同一个交付目标达成一致。</p>
+<h3>原资料内容</h3><table><tr><th>模块</th><th>典型内容</th></tr><tr><td>基本信息</td><td>产品名、版本、日期、编制/审核人</td></tr><tr><td>背景与目标</td><td>项目背景、产品愿景、目标用户、市场定位</td></tr><tr><td>功能需求</td><td>功能列表、用户故事、用例、业务流程和规则</td></tr><tr><td>非功能需求</td><td>性能、安全、可用性、法律/行业要求</td></tr><tr><td>资源规划</td><td>技术栈、开发约束、里程碑、预算、风险</td></tr></table>
+<h3>AI补充/纠错｜AI PRD 必须额外写什么？</h3><div class="box ai"><strong>AI 项目额外建议：</strong><br>1. 模型能力边界：哪些问题能答、哪些必须拒答/转人工。<br>2. 数据来源与权限：RAG 数据从哪里来，ACL 怎么做。<br>3. 质量指标：任务成功率、引用准确率、检索 Recall/Precision、结构化输出通过率。<br>4. 延迟与成本：P95 响应、Token 成本、模型降级策略。<br>5. 幻觉与失败兜底：无证据时如何回答，Tool 失败怎么办。<br>6. 安全：Prompt Injection、敏感数据、越权 Tool Call。<br>7. 可观测性：Trace、Token、Tool Call、检索结果和错误日志。</div>
+<h3>实际项目怎么用｜自然语言查数据库 PRD</h3><pre><code>需求：用户用自然语言查询消费数据
+
+功能：
+- 输入问题
+- AI 识别相关表
+- 生成只读 SQL
+- 执行并格式化回答
+
+约束：
+- 仅 SELECT
+- 表/字段白名单
+- 最大行数 500
+- SQL 超时 5s
+- 敏感字段禁止返回
+- 每次 SQL 记录审计日志
+- AI 不确定时不得执行
+
+验收：
+- 标准题集 SQL 正确率 ≥ 95%
+- 越权测试 100% 阻断
+- P95 响应 &lt; 8s
+- 失败必须返回明确错误而不是编造结果</code></pre>
+<h3>为什么</h3><p>AI 的输出具有概率性，因此传统“功能做出来就算完成”不够。没有可量化验收集，你很难判断模型换版本、Prompt 修改或 RAG 调参后到底是变好还是变差。</p>
+<h3>常见坑</h3><ul><li>只有功能列表，没有验收指标。</li><li>写“准确率 99%”但没有测试集、口径和测量方式。</li><li>完全不写模型失败、无答案和人工接管。</li><li>把技术架构当成 PRD 全部内容，忽视用户和业务目标。</li></ul>
+<div class="answer"><strong>面试口述版：</strong>合格 PRD 要写清背景目标、目标用户、功能和业务流程、非功能需求、技术约束、里程碑和风险。AI 项目还要额外定义模型能力边界、数据权限、幻觉兜底、质量指标、延迟成本、人工接管以及可观测性。尤其验收指标必须有数据集和计算口径，否则 AI 功能很难做稳定迭代。</div>
+<h3>可能追问</h3><p>AI 功能怎么定义验收标准？RAG 准确率怎么量化？Prompt 修改如何回归测试？如何把安全需求写成可测试条目？</p></section>
+
+<section class="card"><h2>⑦ 今日正式进度</h2><table><tr><th>资料</th><th>昨日</th><th>今日新增</th><th>完成后</th></tr><tr><td>《后端高频面试题大集合》</td><td>正式 #1～#16</td><td>#17～#19（JUC #4～#6）</td><td>正式 #1～#19</td></tr><tr><td>《AI应用开发面试题 / Agent / RAG》</td><td>1.1.1～1.1.6</td><td>1.1.7</td><td>1.1.1～1.1.7</td></tr><tr><td>《AI大模型面试题-基础篇》</td><td>#1～#6</td><td>#7</td><td>#1～#7</td></tr></table><div class="box good"><strong>今天最该记住：</strong>① 死锁要靠线程 dump 证明锁等待环；② ThreadLocal 值真正在线程自己的 ThreadLocalMap；③ 一个线程可以有多个 ThreadLocal 值；④ Agent 生态要区分“框架”和“产品”；⑤ AI PRD 必须把概率性输出变成可测试、可验收的工程指标。</div></section>
+
+<div class="footer">Java 后端 + AI 面试知识学习记录｜2026-09-06</div>
+</main></body></html>
