@@ -121,7 +121,7 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
                 ...cash,
                 userId,
                 planetId: userInfoStore?.planetId,
-                ...(locationInfoStore?.id && { locationId: locationInfoStore?.id }),
+                ...(locationInfoStore?.id && !defaultValues?.id && { locationId: locationInfoStore?.id }),
                 ...(locationInfoStore?.id && locationInfoStore?.status === 2 && !defaultValues?.id && { newLocationName: values.newLocationName }),
             }
         }).json();
@@ -258,7 +258,7 @@ const FormGranarySpend = ({ trigger, openGranarySpendCtrl, setOpenGranarySpendCt
                         </DialogClose>
                         <Button type="submit" form="formGranarySpend" disabled={isLoadGranarySpend}>
                             {isLoadGranarySpend && <Spinner />}保存
-                            {locationInfoStore?.id && (
+                            {locationInfoStore?.id && !defaultValues?.id && (
                                 <span className="inline-flex items-center gap-0.5 whitespace-nowrap">
                                     (
                                     <MapPin className="h-4 w-4 shrink-0" />

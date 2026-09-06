@@ -98,6 +98,7 @@ const FormLocationItems = ({ trigger, openLocationCtrl, setOpenLocationCtrl, onS
                     lng: values.lng,
                     radius: values.radius,
                     spendNames: values.spendNames,
+                    status: 1
                 }
             }).json();
             onSuccess();
