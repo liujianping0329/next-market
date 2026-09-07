@@ -1,0 +1,72 @@
+name: ChatGPT Push Bridge
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  send-push:
+    if: >
+      github.event.issue.user.login == github.repository_owner &&
+      startsWith(github.event.issue.title, '[PUSH]')
+    runs-on: ubuntu-latest
+
+    env:
+      PUSH_URL: https://next-market-beta-dun.vercel.app/api/external/v1/push
+      ISSUE_TITLE: ${{ github.event.issue.title }}
+      ISSUE_BODY: ${{ github.event.issue.body }}
+      ISSUE_NUMBER: ${{ github.event.issue.number }}
+      REPOSITORY: ${{ github.repository }}
+
+    steps:
+      - name: Send push notification
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          title="${ISSUE_TITLE#\[PUSH\]}"
+          title="${title#"${title%%[![:space:]]*}"}"
+          content="${ISSUE_BODY:-no content}"
+
+          payload="$(jq -n \
+            --arg title "$title" \
+            --arg content "$content" \
+            '{planetId: 1, detail: {title: $title, content: $content, path: ""}}')"
+
+          response_file="$(mktemp)"
+          status="$(curl -sS \
+            -o "$response_file" \
+            -w '%{http_code}' \
+            -X POST "$PUSH_URL" \
+            -H 'Content-Type: application/json' \
+            --data "$payload")"
+
+          cat "$response_file"
+          echo
+          echo "HTTP status: $status"
+
+          if [[ "$status" -lt 200 || "$status" -ge 300 ]]; then
+            exit 1
+          fi
+
+      - name: Close successful command issue
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue close "$ISSUE_NUMBER" \
+            --repo "$REPOSITORY" \
+            --comment "Push bridge: sent successfully."
+
+      - name: Comment on failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue comment "$ISSUE_NUMBER" \
+            --repo "$REPOSITORY" \
+            --body "Push bridge failed. Check the GitHub Actions run for details."
