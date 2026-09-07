@@ -32,6 +32,10 @@ import ky from "ky";
  *                     type: string
  *                     description: 推送内容
  *                     example: 今日内容已经生成
+ *                   path:
+ *                     type: string
+ *                     description: 点击推送后跳转的站内路径
+ *                     example: study/market
  *             required:
  *               - detail
  *     responses:
@@ -42,9 +46,8 @@ import ky from "ky";
  *             schema:
  *               type: object
  *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
+ *                 pushInfo:
+ *                   type: object
  *       400:
  *         description: 请求参数错误
  *       500:
