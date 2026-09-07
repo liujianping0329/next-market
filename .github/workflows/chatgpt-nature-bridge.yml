@@ -1,0 +1,130 @@
+name: ChatGPT Nature Bridge
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  nature:
+    if: >
+      github.event.issue.user.login == github.repository_owner &&
+      startsWith(github.event.issue.title, '[NATURE]')
+    runs-on: ubuntu-latest
+
+    env:
+      NATURE_ACCESS_TOKEN: ${{ secrets.NATURE_ACCESS_TOKEN }}
+      ISSUE_TITLE: ${{ github.event.issue.title }}
+      ISSUE_BODY: ${{ github.event.issue.body }}
+      ISSUE_NUMBER: ${{ github.event.issue.number }}
+      REPOSITORY: ${{ github.repository }}
+
+    steps:
+      - name: Execute Nature Remo command
+        id: nature
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ -z "${NATURE_ACCESS_TOKEN:-}" ]]; then
+            echo "NATURE_ACCESS_TOKEN is not configured."
+            exit 1
+          fi
+
+          command="${ISSUE_TITLE#\[NATURE\]}"
+          command="$(echo "$command" | xargs)"
+          target="$(echo "${ISSUE_BODY:-}" | head -n 1 | xargs)"
+
+          appliances_file="$(mktemp)"
+          curl -fsS \
+            -H "Authorization: Bearer $NATURE_ACCESS_TOKEN" \
+            https://api.nature.global/1/appliances \
+            -o "$appliances_file"
+
+          lights_file="$(mktemp)"
+          jq '[.[] | select(.type == "LIGHT")]' "$appliances_file" > "$lights_file"
+          light_count="$(jq 'length' "$lights_file")"
+
+          if [[ "$command" == "list" ]]; then
+            echo "Nature Remo lights:"
+            jq -r '.[] | "- " + .nickname + " (" + .id + ")"' "$lights_file"
+            exit 0
+          fi
+
+          if [[ "$command" != "light off" ]]; then
+            echo "Unsupported command: $command"
+            echo "Supported: list, light off"
+            exit 1
+          fi
+
+          if [[ "$light_count" -eq 0 ]]; then
+            echo "No LIGHT appliance found."
+            exit 1
+          fi
+
+          selected=''
+          if [[ -n "$target" ]]; then
+            selected="$(jq -c --arg target "$target" '[.[] | select(.nickname == $target)] | .[0] // empty' "$lights_file")"
+            if [[ -z "$selected" ]]; then
+              selected="$(jq -c --arg target "$target" '[.[] | select(.nickname | contains($target))] | .[0] // empty' "$lights_file")"
+            fi
+          elif [[ "$light_count" -eq 1 ]]; then
+            selected="$(jq -c '.[0]' "$lights_file")"
+          else
+            echo "Multiple LIGHT appliances found. No action taken."
+            jq -r '.[] | "- " + .nickname + " (" + .id + ")"' "$lights_file"
+            exit 2
+          fi
+
+          if [[ -z "$selected" || "$selected" == "null" ]]; then
+            echo "Target light not found: $target"
+            jq -r '.[] | "- " + .nickname + " (" + .id + ")"' "$lights_file"
+            exit 1
+          fi
+
+          appliance_id="$(echo "$selected" | jq -r '.id')"
+          appliance_name="$(echo "$selected" | jq -r '.nickname')"
+
+          response_file="$(mktemp)"
+          status="$(curl -sS \
+            -o "$response_file" \
+            -w '%{http_code}' \
+            -X POST "https://api.nature.global/1/appliances/${appliance_id}/light" \
+            -H "Authorization: Bearer $NATURE_ACCESS_TOKEN" \
+            -H 'Content-Type: application/x-www-form-urlencoded' \
+            --data-urlencode 'button=off')"
+
+          cat "$response_file"
+          echo
+          echo "HTTP status: $status"
+
+          if [[ "$status" -lt 200 || "$status" -ge 300 ]]; then
+            exit 1
+          fi
+
+          echo "result=Turned off: $appliance_name" >> "$GITHUB_OUTPUT"
+
+      - name: Close successful command issue
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          result='${{ steps.nature.outputs.result }}'
+          if [[ -z "$result" ]]; then
+            result='Nature command completed.'
+          fi
+          gh issue close "$ISSUE_NUMBER" \
+            --repo "$REPOSITORY" \
+            --comment "$result"
+
+      - name: Comment on failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue comment "$ISSUE_NUMBER" \
+            --repo "$REPOSITORY" \
+            --body "Nature bridge could not complete the command. Check the GitHub Actions run for the appliance list/details."
