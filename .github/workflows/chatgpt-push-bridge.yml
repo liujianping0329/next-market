@@ -53,6 +53,11 @@ jobs:
             exit 1
           fi
 
+          if jq -e '.pushInfo.err != null or .pushInfo.errors != null' "$response_file" >/dev/null; then
+            echo "Push provider returned an error."
+            exit 1
+          fi
+
       - name: Close successful command issue
         if: success()
         env:
