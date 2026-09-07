@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>正式 Day 8｜JVM 引用、ThreadLocal 清理与 CompletableFuture</title><style>:root{--bg:#f5f6f8;--card:#fff;--text:#1f2937;--muted:#6b7280;--border:#e5e7eb;--soft:#f3f4f6;--code:#0f172a;--codeText:#e5e7eb;--good:#ecfdf5;--warn:#fff7ed;--ai:#eff6ff}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",Arial,sans-serif;line-height:1.7}.container{width:min(1000px,calc(100% - 32px));margin:36px auto 64px}.hero,.card{background:var(--card);border:1px solid var(--border);box-shadow:0 10px 28px rgba(15,23,42,.04)}.hero{border-radius:20px;padding:34px;margin-bottom:24px}.hero h1{margin:0;font-size:30px}.sub,.source,.footer{color:var(--muted)}.meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}.tag{font-size:12px;background:var(--soft);border-radius:999px;padding:4px 9px}.card{border-radius:16px;padding:26px 28px;margin-bottom:18px}h2{margin:0 0 14px;font-size:21px}h3{margin:24px 0 10px;font-size:18px}.source{font-size:13px;border-left:3px solid #d1d5db;padding-left:10px;margin:12px 0 18px}pre{background:var(--code);color:var(--codeText);border-radius:12px;padding:16px;overflow:auto;white-space:pre-wrap}code{font-family:Consolas,Monaco,monospace}.box{border-radius:12px;padding:14px 16px;margin:14px 0;border:1px solid var(--border)}.good{background:var(--good)}.warn{background:var(--warn)}.ai{background:var(--ai)}.answer{border-left:4px solid #111827;background:#fafafa;padding:14px 16px;border-radius:0 10px 10px 0;margin-top:12px}table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}th,td{border:1px solid var(--border);padding:10px 12px;text-align:left;vertical-align:top}th{background:var(--soft)}details{margin:12px 0;border:1px solid var(--border);border-radius:12px;padding:12px 14px;background:#fafafa}summary{cursor:pointer;font-weight:700}.footer{text-align:center;font-size:13px;margin-top:30px}@media(max-width:600px){.container{width:min(100% - 20px,1000px);margin-top:20px}.hero{padding:24px 20px}.card{padding:20px}}</style></head><body><main class="container">
+<section class="hero"><h1>正式 Day 8｜JVM 引用、ThreadLocal 清理与 CompletableFuture</h1><div class="sub">2026-09-07｜前一天复习 + 固定 5 道新题</div><div class="meta"><span class="tag">JVM Reference</span><span class="tag">ThreadLocal</span><span class="tag">CompletableFuture</span><span class="tag">Agent Loop</span><span class="tag">Spring AI 2.0</span><span class="tag">Architecture</span></div><div class="box good"><strong>正式进度推进：</strong>后端正式 #20～#22（原资料 JUC #7～#9）+ Agent/RAG 1.1.8 + AI基础 #8。</div></section>
+<section class="card"><h2>① 前一天复习｜先凭记忆回答</h2><div class="source">复习来源：2026-09-06 正式 Day 7。自动任务无法等待实时作答，因此答案放在折叠区；建议每题先口述 20～30 秒再展开。没有收到用户回答时，不虚构掌握评分。</div><h3>复习 1｜线上死锁排查</h3><p>先回答：接口卡死后如何排查 Java 死锁？为什么不能看到 BLOCKED 就直接判死锁？</p><details><summary>答完后展开</summary><p>连续抓多份 thread dump，分析谁持锁、谁等待，确认是否形成循环等待；BLOCKED 也可能只是普通竞争。</p><div class="answer"><strong>口述版：</strong>我会先用 jstack/jcmd 保留多份线程快照，分析锁持有与等待关系，确认循环等待，再回代码检查嵌套锁和顺序，通常通过统一加锁顺序、缩小临界区或 tryLock 超时解决。</div></details><h3>复习 2｜ThreadLocal</h3><p>先回答：ThreadLocal 是加锁吗？为什么适合保存 userId/traceId/tenantId？</p><details><summary>答完后展开</summary><p>不是加锁，而是利用每个 Thread 自己的 ThreadLocalMap 做线程内上下文隔离。</p></details><h3>复习 3｜Thread / ThreadLocal / ThreadLocalMap</h3><p>先回答：值存在哪里？一个线程是不是只能存一个 ThreadLocal 值？</p><details><summary>答完后展开</summary><p>值在当前 Thread 的 ThreadLocalMap 中；一个 ThreadLocalMap 可有多个 ThreadLocal→Value 条目，所以一个线程当然可以保存多个不同 ThreadLocal 值。</p></details><h3>复习 4｜Agent 框架生态</h3><p>先回答：为什么不能只堆 LangGraph、CrewAI、Dify、Claude Code 等名字？</p><details><summary>答完后展开</summary><p>应分开发/编排框架、低代码平台、最终 Agent 产品，体现技术选型逻辑。</p></details><h3>复习 5｜AI 项目 PRD</h3><p>先回答：AI PRD 除普通需求外还要增加哪些内容？</p><details><summary>答完后展开</summary><p>模型边界、数据权限、幻觉兜底、Tool 权限、延迟、成本、人工接管、评测集和量化验收指标。</p></details><h3>间隔复习｜约 3 天前：动态代理</h3><p>先回答：JDK 动态代理与类代理区别？为什么 Spring AOP 自调用可能失效？</p><details><summary>答完后展开</summary><p>JDK 动态代理基于接口，类代理通过生成子类增强；同类内部直接 self-invocation 可能绕过代理对象，因此事务等切面不生效。</p></details><h3>间隔复习｜约 7 天前：HashMap 树化</h3><p>链表达到 8 一定立即树化吗？</p><details><summary>答完后展开</summary><p>不一定；JDK 8 典型实现还要求 table capacity 足够，容量小于 64 时通常优先扩容。</p></details></section>
+<section class="card"><h2>② 新题 1｜JVM 四大引用是什么？</h2><div class="source"><strong>原资料：</strong>《后端高频面试题大集合》JUC 第 7 题“JVM里面的四大引用是哪些？使用场景有哪些”｜PDF 第 24～28 页。正式后端 #20。</div><h3>概念</h3><table><tr><th>引用</th><th>GC 语义</th><th>典型用途</th></tr><tr><td>强引用</td><td>强可达时普通 GC 不回收</td><td>普通对象</td></tr><tr><td>软引用</td><td>内存压力下可回收</td><td>内存敏感对象</td></tr><tr><td>弱引用</td><td>只剩弱引用时 GC 可回收</td><td>ThreadLocalMap Key 等</td></tr><tr><td>虚引用</td><td>不能用 get 获得对象，配合 ReferenceQueue</td><td>回收跟踪/清理机制</td></tr></table><h3>原理</h3><pre><code>强 → 最强生命周期约束
+软 → 内存压力时让步
+弱 → GC 时可让步
+虚 → 不负责保活，主要感知回收阶段</code></pre><h3>为什么</h3><p>不同引用强度让 JVM 能在普通对象、缓存、元数据关联、回收跟踪之间采用不同生命周期策略。</p><h3>项目怎么用</h3><pre><code>ThreadLocalMap.Entry
+ key = WeakReference&lt;ThreadLocal&lt;?&gt;&gt;
+ value = 普通强引用对象</code></pre><h3>AI补充/纠错</h3><div class="box warn"><strong>纠错：</strong>原资料使用 finalize() 演示 GC。现代 Java 不应把 finalization 当推荐资源清理方案。Object.finalize 已 deprecated for removal；优先 AutoCloseable + try-with-resources，特定场景用 Cleaner 或 PhantomReference + ReferenceQueue。软引用也不应替代有明确容量/过期/淘汰策略的生产缓存。</div><h3>常见坑</h3><ul><li>把弱引用理解成对象会立刻回收。</li><li>认为 PhantomReference.get() 能拿到对象。</li><li>依赖 System.gc() 保证立即回收。</li></ul><div class="answer"><strong>面试口述版：</strong>Java 有强、软、弱、虚四种引用。强引用是普通对象引用；软引用在内存压力下可回收；弱引用只剩弱关联时 GC 即可回收；虚引用主要配合 ReferenceQueue 跟踪对象回收。ThreadLocalMap 的 Key 就使用弱引用。现代 Java 不推荐 finalize 做资源清理。</div><h3>可能追问</h3><p>WeakHashMap、ReferenceQueue、Cleaner、finalize 为什么被弃用？</p></section>
+<section class="card"><h2>③ 新题 2｜ThreadLocal 为什么 Key 是弱引用？为什么还必须 remove？</h2><div class="source"><strong>原资料：</strong>《后端高频面试题大集合》JUC 第 8 题“ThreadLocal为啥需要设计成弱引用，用完需要remove呢?”｜PDF 第 28～30 页。正式后端 #21。</div><h3>概念与原理</h3><pre><code>Thread
+└── ThreadLocalMap
+    └── Entry
+        ├── key   = WeakReference&lt;ThreadLocal&gt;
+        └── value = 普通强引用</code></pre><p>Key 用弱引用是为了业务侧不再持有 ThreadLocal 后，ThreadLocal 本体不会仅因 Map 的 Key 而永久存活。但 Key 被 GC 后可能留下 key=null、value 仍强引用的 stale entry。</p><h3>为什么要 remove</h3><pre><code>Entry
+key = null
+value = UserContext / 大对象  ← 仍可能被线程长期持有</code></pre><p>线程池线程长期存活时，value 可能长期滞留；线程复用还可能造成上下文串数据。</p><h3>项目怎么用</h3><pre><code>try {
+    UserContextHolder.set(ctx);
+    service.handle();
+} finally {
+    UserContextHolder.remove();
+}</code></pre><h3>AI补充/纠错</h3><div class="box warn">ThreadLocalMap 的部分 set/get/remove 路径会顺手清理 stale entry，但不能据此省略 remove。普通 ThreadLocal 也不会自动跨新线程/线程池任务传播上下文。</div><h3>常见坑</h3><ul><li>只记“Key 是弱引用，所以不会泄漏”。</li><li>忽略线程池线程长期存活。</li><li>忘记 finally 清理导致 userId/tenantId 串请求。</li></ul><div class="answer"><strong>面试口述版：</strong>ThreadLocalMap 的 Entry 对 ThreadLocal Key 使用弱引用，让外部强引用消失后 Key 可被 GC；但 value 仍是强引用，线程池线程长期存活时可能产生 stale entry。使用完必须在 finally 中 remove，既减少内存滞留，也避免线程复用导致上下文污染。</div><h3>可能追问</h3><p>ThreadLocalMap 为什么不用 HashMap？如何处理冲突？InheritableThreadLocal 有什么问题？</p></section>
+<section class="card"><h2>④ 新题 3｜CompletableFuture 有什么用途？</h2><div class="source"><strong>原资料：</strong>《后端高频面试题大集合》JUC 第 9 题“说下CompletableFuture的用途和使用场景”｜PDF 第 30～31 页。正式后端 #22。</div><h3>概念</h3><p>CompletableFuture 同时实现 Future 和 CompletionStage，不只代表未来结果，还能组合、转换、并行聚合和异常处理。</p><h3>原理</h3><pre><code>串行：A(200ms) → B(300ms) → C(400ms) ≈ 900ms
+并行：A ─┐
+      B ─┼→ allOf/thenCombine → 汇总
+      C ─┘
+总时间更接近最慢任务 + 汇总开销</code></pre><h3>项目怎么用</h3><pre><code>var profile = CompletableFuture.supplyAsync(
+    () -> profileService.load(userId), bizExecutor);
+var orders = CompletableFuture.supplyAsync(
+    () -> orderService.queryRecent(userId), bizExecutor);
+var result = profile.thenCombine(orders, DashboardDto::new).join();</code></pre><h3>AI补充/纠错</h3><div class="box warn"><strong>纠错：</strong>默认 Async 方法通常使用 ForkJoinPool.commonPool()，但不能简单永久背成“线程数=CPU核心数”。生产慢 I/O 不应全部挤 commonPool，应按业务使用独立 Executor。无 Async 的 continuation 执行线程也不应绝对化理解。</div><h3>常见坑</h3><ul><li>并行过度压垮下游。</li><li>不处理异常。</li><li>业务共用 commonPool 导致线程饥饿。</li><li>最后无脑 join 又把请求线程阻塞。</li></ul><div class="answer"><strong>面试口述版：</strong>CompletableFuture 是 Java 8 的异步任务编排工具，适合多个独立数据源并行查询、任务依赖组合、流水线转换和异常兜底。生产中我会为慢 I/O 使用隔离线程池，并用 thenCombine、allOf、exceptionally 等 API 管理组合与失败。</div><h3>可能追问</h3><p>thenApply vs thenCompose？allOf 如何取结果？join vs get？线程池如何配置？</p></section>
+<section class="card"><h2>⑤ 新题 4｜Agent Loop 是什么？如何防止死循环？</h2><div class="source"><strong>原资料：</strong>《AI应用开发面试题 / Agent / RAG》1.1.8“Agent Loop 听说过吗？”｜PDF 第 7 页。</div><h3>概念</h3><pre><code>while not done:
+  Perceive  感知
+  Think     思考
+  Act       行动
+  Observe   观察
+  Evaluate  判断是否完成</code></pre><h3>原理与为什么</h3><p>真实任务往往需要查库、读文件、调用工具、观察结果再判断。Loop 让 Agent 获得多步执行能力。</p><h3>Spring AI / Java 化</h3><pre><code>ChatClient
+  ↓
+ToolCallingAdvisor
+  ↓
+ChatModel
+  ↓
+Tool Call?
+  ├─ Yes → ToolCallingManager → Tool Result → 再进模型
+  └─ No  → Final Response</code></pre><h3>AI补充/纠错</h3><div class="box warn"><strong>版本纠错：</strong>不要把 context.addObservation() 当 Spring AI API；那只是概念伪代码。Spring AI 2.0 的正式关键组件是 ToolCallingAdvisor 与 ToolCallingManager。标准 Tool Loop 也不等于完整 Agent Orchestration，复杂 Planning、长期状态、审批、补偿和 Workflow 仍可能由 Java Service 层控制。</div><h3>防死循环</h3><table><tr><th>策略</th><th>作用</th></tr><tr><td>max iterations</td><td>限制最大循环次数</td></tr><tr><td>timeout</td><td>限制总执行时间</td></tr><tr><td>重复 Tool 检测</td><td>识别没有进展的循环</td></tr><tr><td>Token/成本预算</td><td>限制费用</td></tr><tr><td>错误恢复</td><td>重试、换工具、降级、退出</td></tr></table><div class="answer"><strong>面试口述版：</strong>Agent Loop 是感知、思考、行动、观察、评估的循环。Spring AI 2.0 对标准 Tool Calling Loop 已有 ToolCallingAdvisor 和 ToolCallingManager 支持，但生产 Agent 还需要最大迭代、超时、重复调用检测、成本预算、状态管理和错误恢复。</div><h3>可能追问</h3><p>Tool Calling Loop 与 ReAct 区别？如何自定义 Advisor？Agent 状态放哪里？</p></section>
+<section class="card"><h2>⑥ 新题 5｜AI 项目为什么需要架构图？</h2><div class="source"><strong>原资料：</strong>《AI大模型面试题-基础篇》第 8 题“在AI项目中，为什么需要绘制架构图？不同类型架构图的作用是什么？”｜PDF 第 7～8 页。</div><h3>概念</h3><p>架构图的价值不是画得漂亮，而是降低复杂系统沟通成本，让不同角色看到自己关心的信息。</p><h3>原资料内容</h3><table><tr><th>类型</th><th>重点</th></tr><tr><td>产品/应用架构</td><td>业务能力、模块边界</td></tr><tr><td>技术架构</td><td>技术选型、组件关系</td></tr></table><h3>AI补充/纠错</h3><p>企业 AI 项目建议再补数据/RAG、部署、安全权限三个视角：</p><pre><code>文件 → 解析 → Chunk → Embedding → VectorStore → 检索 → LLM
+用户 → Spring Boot → Auth/ACL → Spring AI → DB/Redis/MQ/Object Storage
+安全 → Prompt Injection / Tool 权限 / 敏感数据 / Audit</code></pre><h3>实际项目怎么用</h3><pre><code>Web
+ ↓
+Spring Boot
+ ├─ Auth / ACL
+ ├─ File Service
+ ├─ RAG Service
+ └─ Spring AI ChatClient
+      ├─ RAG Advisor
+      └─ @Tool
+ ↓
+DB / Redis / MQ / Object Storage / VectorStore
+ ↓
+LLM Provider / 私有模型</code></pre><h3>常见坑</h3><ul><li>一张图塞所有信息。</li><li>只堆技术 Logo，没有数据流/调用方向。</li><li>AI 图只画“用户→LLM”，没有 RAG、ACL、Fallback、Observability。</li></ul><div class="answer"><strong>面试口述版：</strong>架构图用于降低复杂系统沟通成本。产品架构图强调业务能力和模块边界，技术架构图说明技术组件及关系；AI 项目我还会补数据/RAG、部署和安全权限视角，把文档如何进入向量库、检索如何做 ACL、模型如何调用 Tool、服务如何部署和监控表达清楚。</div><h3>可能追问</h3><p>C4 Model？应用架构 vs 部署架构？RAG 架构图必须画哪些数据流？</p></section>
+<section class="card"><h2>⑦ 今日正式进度</h2><table><tr><th>资料</th><th>完成后</th></tr><tr><td>《后端高频面试题大集合》</td><td>正式 #1～#22；今天原资料 JUC #7～#9</td></tr><tr><td>《AI应用开发面试题 / Agent / RAG》</td><td>1.1.1～1.1.8</td></tr><tr><td>《AI大模型面试题-基础篇》</td><td>#1～#8</td></tr></table><div class="box ai"><strong>下次优先复习：</strong>四大引用的 GC 语义；ThreadLocal Key 弱引用但 Value 仍会滞留；CompletableFuture 的线程池与 thenApply/thenCompose；Agent Loop 退出条件；AI 架构图的不同视角。</div></section>
+<div class="footer">Java 后端 + AI 面试知识学习记录｜2026-09-07</div></main></body></html>
