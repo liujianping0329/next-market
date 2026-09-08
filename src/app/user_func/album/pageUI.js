@@ -10,6 +10,7 @@ import { MessageSquarePlus, Orbit } from "lucide-react";
 import { useRef, useState, useEffect, useMemo } from "react";
 import ky from "ky";
 import { compressImage } from "@/app/utils/file";
+import Image from "next/image";
 
 const timeGroups = [
     { name: "凌晨", start: 0, end: 7 },
@@ -90,7 +91,7 @@ const AlbumUI = ({ }) => {
         await ky.post('/api/album/upsert/main', {
             body: formData
         }).json();
-        console.log("照片:", file);
+        fetchList();
     };
 
     useEffect(() => {
@@ -130,11 +131,14 @@ const AlbumUI = ({ }) => {
 
                         <div className="grid grid-cols-3 gap-2">
                             {group.items.map((item) => (
-                                <img
-                                    key={item.id}
-                                    src={item.pic}
-                                    className="aspect-[3/4] w-full rounded-lg object-cover"
-                                />
+                                <div className="relative aspect-[3/4] w-full" key={item.id}>
+                                    <Image
+                                        src={item.pic}
+                                        alt={item.name || ""}
+                                        fill
+                                        className="rounded-lg object-cover"
+                                    />
+                                </div>
                             ))}
                         </div>
                     </div>
