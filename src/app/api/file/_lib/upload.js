@@ -13,3 +13,16 @@ export async function base64Upload(base64) {
 
   return publicUrlData.publicUrl;
 }
+
+export async function upload(files, folder = "uploads") {
+  const urls = [];
+
+  for (const file of files) {
+    const fileName = crypto.randomUUID() + "-" + file.name;
+    await supabase.storage.from("garden").upload(`${folder}/${fileName}`, file);
+    const { data } = supabase.storage.from("garden").getPublicUrl(`${folder}/${fileName}`);
+
+    urls.push(data.publicUrl);
+  }
+  return urls;
+}
