@@ -19,7 +19,7 @@ import { Local, Helpcenter } from "@icon-park/react";
 import { Spinner } from "@/components/ui/spinner";
 import { useLocationStore } from "@/app/money/garden/_store/locationStore";
 
-const Header = ({ children }) => {
+const Header = ({ children, onComplete }) => {
 
     const userInfoStore = useUserStore(state => state.userInfo);
     const locationInfoStore = useLocationStore(state => state.locationInfo);
@@ -73,6 +73,11 @@ const Header = ({ children }) => {
         getLocation();
     }, [isUserReady]);
 
+    useEffect(() => {
+        if (userInfo && nearestLocation)
+            onComplete?.(userInfo, nearestLocation);
+    }, [userInfo, nearestLocation]);
+
     return (
         <>
             <div id="toolBar" className="flex p-2.5 justify-between overflow-x-auto items-center">
@@ -83,7 +88,7 @@ const Header = ({ children }) => {
                             <span>返回</span>
                         </Link>
                     </Button>}
-                    {children}
+                    {userInfo && nearestLocation && children}
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
                     <div className="flex justify-end">
