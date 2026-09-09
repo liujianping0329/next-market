@@ -15,6 +15,7 @@ export async function POST(request, context) {
 
     if (isPush) {
         const { data: tarUsersList } = await supabase.from('f_user').select("id").eq("planetId", planetId).neq("id", userId);
+        console.log("tarUsersList", tarUsersList);
 
         const origin = new URL(request.url).origin;
         let pushInfo = {};
