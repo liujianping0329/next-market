@@ -11,6 +11,7 @@ import { useRef, useState, useEffect, useMemo } from "react";
 import ky from "ky";
 import { compressImage } from "@/app/utils/file";
 import Image from "next/image";
+import { Switch } from "@/components/ui/switch";
 
 const timeGroups = [
     { name: "凌晨", start: 0, end: 7 },
@@ -26,6 +27,7 @@ const AlbumUI = ({ }) => {
     const [userInfo, setUserInfo] = useState(null)
     const [nearestLocation, setNearestLocation] = useState(null);
     const [list, setList] = useState([]);
+    const [isPush, setIsPush] = useState(true);
 
 
     const fetchList = async () => {
@@ -84,7 +86,8 @@ const AlbumUI = ({ }) => {
             file: compressedFile,
             userId: userInfo.id,
             planetId: userInfo.planetId,
-            locationId: nearestLocation.id
+            locationId: nearestLocation.id,
+            isPush,
         }).forEach(([key, value]) => {
             formData.append(key, value);
         });
@@ -118,15 +121,28 @@ const AlbumUI = ({ }) => {
                     <MessageSquarePlus className="h-4 w-4" />
                     <span>新建图片</span>
                 </Button>
+                <div className="flex items-center gap-1">
+                    <Switch
+                        checked={isPush}
+                        onCheckedChange={setIsPush}
+                    />
+                    <span className="text-sm">推送</span>
+                </div>
             </CommonHeader >
             <main className="container mx-auto px-4">
                 {groups.map((group) => (
                     <div
                         key={`${group.date}-${group.name}`}
-                        className="mb-6"
+                        className="mb-3"
                     >
-                        <div className="mb-2 text-sm font-medium">
-                            {group.date} · {group.name}
+                        <div className="mb-3 text-sm font-medium">
+                            <span>{group.date}</span>
+                            <span>·</span>
+                            <span>{group.name}</span>
+
+                            <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-normal text-muted-foreground">
+                                {group.start}点-{group.end}点
+                            </span>
                         </div>
 
                         <div className="grid grid-cols-3 gap-2">
