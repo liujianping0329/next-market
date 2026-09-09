@@ -15,7 +15,6 @@ export async function POST(request, context) {
 
     if (isPush) {
         const { data: tarUsersList } = await supabase.from('f_user').select("id").eq("planetId", planetId).neq("id", userId);
-        console.log("tarUsersList", tarUsersList);
 
         const origin = new URL(request.url).origin;
         let pushInfo = {};
@@ -28,7 +27,7 @@ export async function POST(request, context) {
             headings: {
                 en: "您有一条新的图片动态"
             },
-            contents: { en: "" },
+            contents: { en: "您有一条新的图片动态" },
             web_url: `${origin}/user_func/album`
         };
 
@@ -43,9 +42,12 @@ export async function POST(request, context) {
                 }
             ).json();
         } catch (error) {
-            console.log(error);
-            const err = await error.response.json();
-            pushInfo.err = err;
+            console.error(
+                "OneSignal error body:",
+                await error.response?.clone().text()
+            );
+
+            throw error;
         }
     }
 
