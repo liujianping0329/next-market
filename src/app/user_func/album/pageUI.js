@@ -12,6 +12,12 @@ import ky from "ky";
 import { compressImage } from "@/app/utils/file";
 import Image from "next/image";
 import { Switch } from "@/components/ui/switch";
+import useLongPress from "@/hooks/useLongPress";
+
+import {
+    Dialog,
+    DialogContent,
+} from "@/components/ui/dialog";
 
 const timeGroups = [
     { name: "凌晨", start: 0, end: 7 },
@@ -29,6 +35,8 @@ const AlbumUI = ({ }) => {
     const [list, setList] = useState([]);
     const [isPush, setIsPush] = useState(true);
 
+    const [previewItem, setPreviewItem] = useState(null);
+
 
     const fetchList = async () => {
         const response = await ky.post('/api/album/list/match', {
@@ -38,6 +46,27 @@ const AlbumUI = ({ }) => {
         }).json();
         setList(response.list);
     }
+
+    const longPressHandle = useLongPress({
+        getPayload: (e) => {
+            return list.find(
+                item => item.id === Number(e.currentTarget.dataset.no)
+            );
+        },
+        onLongPress: async (item) => {
+            if (!item) return;
+
+            if (!confirm("确定删除这张图片吗？")) return;
+
+            await ky.post("/api/album/delete", {
+                json: {
+                    id: item.id
+                }
+            });
+
+            fetchList();
+        },
+    });
 
     const groupAlbumByTime = (list = []) => {
         const groups = {};
@@ -102,6 +131,7 @@ const AlbumUI = ({ }) => {
             fetchList();
     }, [userInfo]);
 
+
     return (
         <>
             <CommonHeader onComplete={(userInfo, nearestLocation) => {
@@ -147,13 +177,25 @@ const AlbumUI = ({ }) => {
 
                         <div className="grid grid-cols-3 gap-2">
                             {group.items.map((item) => (
-                                <div className="relative aspect-[3/4] w-full" key={item.id}>
+                                <div className="relative aspect-[3/4] w-full overflow-hidden rounded-lg" key={item.id}
+                                    data-no={item.id} {...longPressHandle}>
                                     <Image
                                         src={item.pic}
                                         alt={item.name || ""}
                                         fill
                                         className="rounded-lg object-cover"
                                     />
+                                    <div className="absolute inset-x-0 bottom-0 flex items-center gap-1.5 bg-black/45 px-2 py-1.5">
+                                        <img
+                                            src={item.f_user?.raw_user_meta_data?.avatar_url || "/default-avatar.png"}
+                                            alt=""
+                                            className="h-5 w-5 shrink-0 rounded-full object-cover border border-white/50"
+                                        />
+
+                                        <span className="truncate text-[11px] text-white">
+                                            {item.f_user?.raw_user_meta_data?.name || "未知用户"}
+                                        </span>
+                                    </div>
                                 </div>
                             ))}
                         </div>
