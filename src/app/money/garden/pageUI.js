@@ -258,13 +258,13 @@ const GardenUI = ({ }) => {
                             <DropdownMenuSeparator />
                             <DropdownMenuGroup>
                                 <DropdownMenuItem>
-                                    <Link href="/study/index.html" className="flex items-center gap-2">
+                                    <Link href="https://next-study-static.edgeone.cool/study/index.html" className="flex items-center gap-2">
                                         <FileCode className="h-4 w-4" />
                                         <span>Java宝典</span>
                                     </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem>
-                                    <Link href="/study/market/index.html" className="flex items-center gap-2">
+                                    <Link href="https://next-study-static.edgeone.cool/study/market/index.html" className="flex items-center gap-2">
                                         <RankingList className="h-4 w-4" />
                                         <span>每日大观</span>
                                     </Link>
