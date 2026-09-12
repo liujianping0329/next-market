@@ -5,19 +5,14 @@ import CommonHeader from "../_component/common_header";
 
 import { Button } from "@/components/ui/button";
 
-import { cn } from "@/lib/utils";
-import { MessageSquarePlus, Orbit } from "lucide-react";
+import { MessageSquarePlus } from "lucide-react";
 import { useRef, useState, useEffect, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import ky from "ky";
 import { compressImage } from "@/app/utils/file";
 import Image from "next/image";
 import { Switch } from "@/components/ui/switch";
 import useLongPress from "@/hooks/useLongPress";
-
-import {
-    Dialog,
-    DialogContent,
-} from "@/components/ui/dialog";
 
 const timeGroups = [
     { name: "凌晨", start: 0, end: 7 },
@@ -30,13 +25,11 @@ const timeGroups = [
 const AlbumUI = ({ }) => {
 
     const inputRef = useRef(null);
+    const router = useRouter();
     const [userInfo, setUserInfo] = useState(null)
     const [nearestLocation, setNearestLocation] = useState(null);
     const [list, setList] = useState([]);
     const [isPush, setIsPush] = useState(true);
-
-    const [previewItem, setPreviewItem] = useState(null);
-
 
     const fetchList = async () => {
         const response = await ky.post('/api/album/list/match', {
@@ -67,6 +60,10 @@ const AlbumUI = ({ }) => {
             fetchList();
         },
     });
+
+    const openDetail = (id) => {
+        router.push(`/user_func/album/detail/${id}`);
+    };
 
     const groupAlbumByTime = (list = []) => {
         const groups = {};
@@ -177,8 +174,10 @@ const AlbumUI = ({ }) => {
 
                         <div className="grid grid-cols-3 gap-2">
                             {group.items.map((item) => (
-                                <div className="relative aspect-[3/4] w-full overflow-hidden rounded-lg" key={item.id}
-                                    data-no={item.id} {...longPressHandle}>
+                                <div className="relative aspect-[3/4] w-full cursor-pointer overflow-hidden rounded-lg" key={item.id}
+                                    data-no={item.id}
+                                    onClick={() => openDetail(item.id)}
+                                    {...longPressHandle}>
                                     <Image
                                         src={item.pic}
                                         alt={item.name || ""}
