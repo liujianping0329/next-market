@@ -1,0 +1,79 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>正式 Day 13｜JPMS、Class Identity、GC 泄漏与上下文管理</title><style>:root{--bg:#f5f6f8;--card:#fff;--text:#1f2937;--muted:#6b7280;--border:#e5e7eb;--soft:#f3f4f6;--code:#0f172a;--codeText:#e5e7eb;--good:#ecfdf5;--warn:#fff7ed;--ai:#eff6ff}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",Arial,sans-serif;line-height:1.7}.container{width:min(1000px,calc(100% - 32px));margin:36px auto 64px}.hero,.card{background:var(--card);border:1px solid var(--border);box-shadow:0 10px 28px rgba(15,23,42,.04)}.hero{border-radius:20px;padding:34px;margin-bottom:24px}.hero h1{margin:0;font-size:30px}.sub,.source,.footer{color:var(--muted)}.meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}.tag{font-size:12px;background:var(--soft);border-radius:999px;padding:4px 9px}.card{border-radius:16px;padding:26px 28px;margin-bottom:18px}h2{margin:0 0 14px;font-size:21px}h3{margin:24px 0 10px;font-size:18px}.source{font-size:13px;border-left:3px solid #d1d5db;padding-left:10px;margin:12px 0 18px}pre{background:var(--code);color:var(--codeText);border-radius:12px;padding:16px;overflow:auto;white-space:pre-wrap}code{font-family:Consolas,Monaco,monospace}.box{border-radius:12px;padding:14px 16px;margin:14px 0;border:1px solid var(--border)}.good{background:var(--good)}.warn{background:var(--warn)}.ai{background:var(--ai)}.answer{border-left:4px solid #111827;background:#fafafa;padding:14px 16px;border-radius:0 10px 10px 0;margin-top:12px}table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px}th,td{border:1px solid var(--border);padding:10px 12px;text-align:left;vertical-align:top}th{background:var(--soft)}details{margin:12px 0;border:1px solid var(--border);border-radius:12px;padding:12px 14px;background:#fafafa}summary{cursor:pointer;font-weight:700}.footer{text-align:center;font-size:13px;margin-top:30px}@media(max-width:600px){.container{width:min(100% - 20px,1000px);margin-top:20px}.hero{padding:24px 20px}.card{padding:20px}}</style></head><body><main class="container"><section class="hero"><h1>正式 Day 13｜JPMS、Class Identity、GC 泄漏与上下文管理</h1><div class="sub">2026-09-12｜前一天复习 + 固定 5 道新题</div><div class="meta"><span class="tag">JPMS</span><span class="tag">ClassLoader</span><span class="tag">GC</span><span class="tag">Memory Leak</span><span class="tag">Agent Context</span><span class="tag">Spring AI</span><span class="tag">Performance</span></div><div class="box good"><strong>正式进度推进：</strong>后端正式 #35～#37（JVM #9～#11）+ Agent/RAG 1.1.13 + AI基础 #14。</div></section><section class="card"><h2>① 前一天复习｜先凭记忆回答</h2><div class="source">复习来源：2026-09-11 正式 Day 12。自动学习无法等待实时作答，因此答案放入折叠区；建议每题先口述 20～30 秒，再展开核对。未收到用户回答时不虚构“已掌握”评分。</div><h3>复习 1｜方法区、PermGen、Metaspace</h3><p>先回答：为什么不能说“方法区就是 Metaspace”？JDK 8 为什么移除 PermGen？</p><details><summary>答完后展开</summary><p>方法区是 JVM 规范中的逻辑概念，PermGen 与 Metaspace 是 HotSpot 不同时代的具体实现。JDK 8 将类元数据主要迁到本地内存中的 Metaspace，降低固定永久代大小难估的问题，但并没有消除类元数据 OOM。</p><div class="answer"><strong>面试口述版：</strong>方法区是规范概念，PermGen 和 Metaspace 是 HotSpot 的实现方式。JDK 8 用 Metaspace 替代 PermGen，类元数据主要使用 native memory，但 ClassLoader 泄漏或动态类持续生成仍可能造成 Metaspace OOM。</div></details><h3>复习 2｜Metaspace OOM</h3><p>先回答：<code>MetaspaceSize</code> 与 <code>MaxMetaspaceSize</code> 分别更接近什么含义？为什么“无限增大 MaxMetaspaceSize”不是根治方案？</p><details><summary>答完后展开</summary><p><code>MetaspaceSize</code> 更偏向影响元数据 GC/类卸载触发的初始高水位，<code>MaxMetaspaceSize</code> 控制上限。若真正问题是 ClassLoader 泄漏或动态类失控，扩大上限只是延迟 OOM。</p></details><h3>复习 3｜现代类加载器</h3><p>先回答：Bootstrap、Platform、Application ClassLoader 各负责什么？Java 9 后 Extension ClassLoader 发生了什么变化？</p><details><summary>答完后展开</summary><p>Bootstrap 负责核心运行时类；Platform 负责平台类；Application/System 通常负责 classpath、module path 上的应用类。Java 9 起 Platform ClassLoader 取代旧 Extension ClassLoader。</p></details><h3>复习 4｜Agent Memory</h3><p>先回答：为什么 Agent 的“短期消息历史”和“长期用户记忆”不应该全部塞进同一个 VectorStore？</p><details><summary>答完后展开</summary><p>短期消息更适合按 conversation/session 管理窗口；用户姓名、配置、明确偏好等需要精确更新和覆盖的结构化事实更适合关系数据库；只有需要语义检索的历史摘要或片段才更适合 VectorStore。</p></details><h3>复习 5｜Chain / Workflow vs Agent</h3><p>先回答：自然语言查数据库为什么更适合先做确定性 Workflow，而不是一开始就让 Agent 自主决定所有步骤？</p><details><summary>答完后展开</summary><p>数据库查询涉及权限、SQL 安全和可审计性。固定的 Table Selection → SQL Generation → Java 校验 → Query → Summary 更容易保证边界；只有当任务需要根据中间结果动态决定是否查 Schema、文档或再次查询时，再引入 Agent 决策更合理。</p></details><h3>间隔复习｜约 3 天前：JVM 堆</h3><p>经典 Eden/S0/S1/Old 与 G1 Region 模型最重要的区别是什么？</p><details><summary>答完后展开</summary><p>经典模型把代际区域理解得较固定；G1 将堆切成 Region，Eden、Survivor、Old 是 Region 的动态角色，年轻代大小和回收集合会自适应变化。</p></details><h3>间隔复习｜约 7 天前：ReentrantLock</h3><p><code>ReentrantLock</code> 默认公平还是非公平？非公平是不是“随机抢”？</p><details><summary>答完后展开</summary><p>默认非公平。非公平不是随机，而是允许新线程先尝试插队竞争；失败后仍进入 AQS 队列。这样通常可以减少部分线程切换，提高吞吐量。</p></details></section><section class="card"><h2>② 新题 1｜JDK 9 模块化系统和新版类加载模型是什么？</h2><div class="source"><strong>原资料：</strong>《后端高频面试题大集合》JVM 第 9 题“说下JDK9的模块化系统和新版双亲委派模型”｜PDF 第 46～48 页。正式后端 #35。</div><h3>概念</h3><p>JDK 9 引入 Java Platform Module System（JPMS），把原本巨大的 Java 平台与应用依赖拆成有明确边界的模块。模块通过 <code>module-info.java</code> 声明自身名称、依赖和对外暴露的包。</p><pre><code>module com.example.order {
+    requires java.sql;
+    exports com.example.order.api;
+}</code></pre><h3>原理</h3><p>JPMS 不只是“把 jar 换个名字”。它新增了<strong>可读性（readability）</strong>和<strong>可访问性（exports/opens）</strong>约束：即使类文件物理存在，如果模块没有读取关系或包没有导出，代码也不能随意访问。</p><pre><code>Application / System ClassLoader
+          ↑ delegation
+Platform ClassLoader
+          ↑ delegation
+Bootstrap ClassLoader</code></pre><p>Java 9 后的内置加载器主要是 Bootstrap、Platform、System/Application。模块化以后，类加载还必须结合模块归属与可见性判断，不能把它理解成简单的“永远一路向父加载器查找”。</p><h3>为什么</h3><ul><li>更明确地表达依赖，降低巨大 classpath 的隐式耦合。</li><li>强化封装，不再默认暴露所有内部包。</li><li>允许 Java 运行时本身模块化，并支持 <code>jlink</code> 构建更精简运行时。</li></ul><h3>实际项目怎么用</h3><p>普通 Spring Boot 项目可以继续运行在 classpath 上，不需要为了“现代 Java”强制写 JPMS；但如果开发 SDK、桌面应用、插件平台或需要严格模块边界时，JPMS 更有价值。</p><h3>AI补充/纠错</h3><div class="box warn"><strong>纠错 1：</strong>原资料写“Platform ClassLoader 和 App ClassLoader 之间增加 PlatformLoader”不准确。现代 JDK 的官方名称就是 <strong>Platform ClassLoader</strong>，它取代了 JDK 8 时代的 Extension ClassLoader。<br><br><strong>纠错 2：</strong>“类加载器形成继承链”也不准确。父加载器是 delegation parent，是组合/委托关系，不等于 Java 类继承。JPMS 下可见性也不保证是严格树状层级。</div><h3>常见坑</h3><ul><li>把 JPMS 与 Maven module 混为一谈。</li><li>认为写了 <code>module-info.java</code> 就能自动解决依赖冲突。</li><li>把 Platform ClassLoader 说成“新插入的第四层加载器”。</li></ul><div class="answer"><strong>面试口述版：</strong>JDK 9 引入 JPMS，通过 module-info.java 明确模块依赖、exports 和 opens，强化了依赖与封装边界。类加载器也从旧的 Bootstrap/Extension/Application 调整为 Bootstrap/Platform/Application。模块化后加载不仅看父委托，还要结合模块归属和可见性，所以我不会把它简化成一条绝对的父子继承链。</div><h3>可能追问</h3><p><code>exports</code> 和 <code>opens</code> 有什么区别？Spring 反射为什么可能碰到模块开放问题？classpath 与 module path 有什么区别？</p></section><section class="card"><h2>③ 新题 2｜不同 ClassLoader 能不能加载同名 class？</h2><div class="source"><strong>原资料：</strong>《后端高频面试题大集合》JVM 第 10 题“不同类加载器是否会重复加载同个class类”｜PDF 第 48～49 页。正式后端 #36。</div><h3>概念</h3><p>可以。JVM 判断“是不是同一个类”，不仅看全限定类名，还要看<strong>定义它的 ClassLoader</strong>。</p><pre><code>Class Identity ≈ Binary Name + Defining ClassLoader
+
+Loader A → com.demo.User
+Loader B → com.demo.User
+
+看起来同名，但 JVM 认为是两个不同类型</code></pre><h3>原理</h3><p>同一个加载器通常会先检查自己是否已经加载过该类；父委托能减少重复定义核心类。但两个彼此隔离的 ClassLoader 完全可以分别 <code>defineClass</code> 同一个字节码名称，并得到不同的 <code>Class</code> 对象。</p><h3>为什么需要这样设计</h3><p>这使应用服务器、插件系统、热部署、脚本引擎能够隔离不同版本的依赖。例如插件 A 和插件 B 都依赖不同版本的同名库，只要使用不同的 ClassLoader namespace，就可以并存。</p><h3>实际项目怎么用</h3><p>典型问题是“类名明明一样，却 <code>ClassCastException</code>”。例如：</p><pre><code>com.example.Plugin loaded by LoaderA
+cannot be cast to
+com.example.Plugin loaded by LoaderB</code></pre><p>此时排查应打印：</p><pre><code>obj.getClass().getClassLoader()
+Target.class.getClassLoader()</code></pre><h3>AI补充/纠错</h3><div class="box warn">原资料前后同时出现“不同类加载器会加载同名 class”与“不同类加载器不会重复加载同一 Class”的表述，容易误导。更准确的结论是：<strong>同一个 defining ClassLoader 不会把同一个二进制名称重复定义成多个类；不同 defining ClassLoader 可以分别定义同名类，而 JVM 将它们视为不同类型。</strong></div><h3>常见坑</h3><ul><li>只比较类全限定名，不看 ClassLoader。</li><li>热部署后旧对象仍被旧 ClassLoader 持有，造成类型冲突与 Metaspace 泄漏。</li><li>自定义 ClassLoader 破坏父委托却没有清楚的隔离边界。</li></ul><div class="answer"><strong>面试口述版：</strong>不同 ClassLoader 可以定义同名类，JVM 的类身份由类的二进制名称和 defining ClassLoader 共同决定。因此两个加载器加载的 com.demo.User 即使字节码相同，也可能是两个不兼容的类型。这也是插件隔离、应用服务器和热部署的重要基础。</div><h3>可能追问</h3><p>为什么会出现“同名类不能强转”？Tomcat 的 WebAppClassLoader 为什么要做隔离？ClassLoader 泄漏和 Metaspace 有什么关系？</p></section><section class="card"><h2>④ 新题 3｜JVM 有 GC，为什么仍然会内存泄漏？</h2><div class="source"><strong>原资料：</strong>《后端高频面试题大集合》JVM 第 11 题“介绍JVM自动垃圾回收机制，是否可以完全解决内存泄露”｜PDF 第 49～50 页。正式后端 #37。</div><h3>概念</h3><p>GC 能回收的是<strong>不可达对象</strong>，而内存泄漏经常恰恰是“对象已经没有业务价值，但仍然可达”。</p><pre><code>业务上已经没用了
+        ↓
+仍然被 static Map / Listener / ThreadLocal / Cache 引用
+        ↓
+GC Roots 仍然可达
+        ↓
+GC 认为对象活着
+        ↓
+不能回收
+        ↓
+Heap 持续增长 → OOM</code></pre><h3>原理</h3><p>现代 JVM 主要基于可达性分析判断对象存活，而不是简单看“代码以后还会不会使用它”。只要从 GC Roots 仍存在引用路径，GC 就必须保留对象。</p><h3>为什么 GC 不能自动修复</h3><p>“是否仍有业务价值”是语义问题，GC 无法知道一个缓存项、监听器、Session 或 ThreadLocal value 是否应该被应用主动删除。</p><h3>实际项目怎么用</h3><p>常见 Java 泄漏来源：</p><table><tr><th>来源</th><th>问题</th></tr><tr><td>static Collection</td><td>只添加不删除，生命周期跟应用一样长</td></tr><tr><td>ThreadLocal</td><td>线程池线程长期存活，value 未 remove</td></tr><tr><td>Listener / Callback</td><td>注册后未反注册，发布者长期持有订阅者</td></tr><tr><td>Cache</td><td>没有 size/TTL/eviction</td></tr><tr><td>ClassLoader</td><td>热部署后旧加载器仍被线程、静态变量等引用</td></tr></table><p>排查通常看“谁在持有对象”，而不是先调大 <code>-Xmx</code>：</p><pre><code>jcmd &lt;pid&gt; GC.heap_dump heap.hprof
+
+→ MAT / VisualVM / JProfiler
+→ Dominator Tree
+→ Retained Size
+→ Path to GC Roots</code></pre><h3>AI补充/纠错</h3><div class="box warn"><strong>纠错：</strong>原资料说 GC 可以“避免内存泄漏”过于绝对。Java 的 GC 确实减少了 C/C++ 中“忘记 free”这一类泄漏，但不能解决<strong>逻辑引用泄漏</strong>。另外不是所有 GC 都会在每次回收中让整个应用完全停止；现代收集器有并发阶段，仍可能存在不同程度的 STW pause。</div><h3>常见坑</h3><ul><li>把“内存泄漏”和“内存溢出 OOM”当成同一个概念。</li><li>看到堆大就只增加 Xmx，不分析 retained object。</li><li>误认为 Java 有 GC 就不存在资源泄漏；数据库连接、文件句柄、Socket 仍需正确关闭。</li></ul><div class="answer"><strong>面试口述版：</strong>GC 只能回收从 GC Roots 不可达的对象，因此 Java 仍然会发生逻辑内存泄漏：对象已经没有业务价值，但因为 static 集合、ThreadLocal、Listener、Cache 或 ClassLoader 等引用仍然可达，所以 GC 无法回收。线上排查我会通过 heap dump、Dominator Tree 和 Path to GC Roots 找真正的持有链，而不是只增大堆。</div><h3>可能追问</h3><p>内存泄漏和 OOM 的区别？为什么 ThreadLocal 会泄漏？什么是 retained size？GC Roots 常见类型有哪些？</p></section><section class="card"><h2>⑤ 新题 4｜Agent 上下文管理怎么做？如何管理记忆？</h2><div class="source"><strong>原资料：</strong>《AI应用开发面试题 / Agent / RAG》1.1.13“上下文管理是怎么做的，如何进行记忆？”｜PDF 第 25～26 页。</div><h3>概念</h3><p>上下文管理不是“把历史消息全部发送给模型”，而是<strong>在有限 Token 预算下，选择当前任务最有价值的信息</strong>。</p><pre><code>Final Context
+├─ System Prompt
+├─ 用户稳定 Profile / 长期记忆
+├─ Conversation Summary
+├─ 最近 K 轮原始消息
+├─ 当前 Tool Results
+└─ Current Query</code></pre><h3>原理</h3><p>随着对话变长，需要同时解决三件事：Token 成本、上下文相关性和记忆一致性。常见策略是窗口保留 + 摘要压缩 + 按需检索长期记忆，并在上下文组装时给不同部分分配预算。</p><h3>为什么</h3><p>所有历史都塞进去会带来：</p><ul><li>Token 成本持续上升。</li><li>延迟变高。</li><li>旧信息干扰当前任务，出现 Context Rot。</li><li>用户新偏好和旧偏好冲突。</li><li>敏感信息被不必要地重复传给模型。</li></ul><h3>实际项目怎么用｜Spring AI 视角</h3><pre><code>User Request
+  ↓
+加载结构化 Profile（PostgreSQL）
+  ↓
+检索相关长期记忆（VectorStore，可选）
+  ↓
+加载 ChatMemory 最近消息
+  ↓
+追加最新 Tool Result
+  ↓
+组装 Prompt
+  ↓
+ChatClient</code></pre><p>Spring AI 2.0.1 提供 <code>ChatMemory</code> / <code>ChatMemoryRepository</code> 抽象，可以实现最近 N 条、按时间、按 Token 上限等策略；Advisor 可以把 Memory、RAG 等能力组合进 ChatClient。</p><h3>记忆写入策略</h3><table><tr><th>类型</th><th>建议</th></tr><tr><td>短期消息</td><td>每轮实时写入，按 conversationId 隔离</td></tr><tr><td>用户明确配置</td><td>结构化数据库精确 upsert</td></tr><tr><td>长期语义记忆</td><td>会话结束/事件触发后抽取，必要时写 VectorStore</td></tr><tr><td>冲突信息</td><td>保留时间/来源，按规则更新，不要盲目追加</td></tr></table><h3>AI补充/纠错</h3><div class="box ai"><strong>Spring AI 化：</strong>不要把 ChatMemory 等同于完整的“长期记忆系统”。ChatMemory 更适合对话消息窗口；稳定的用户事实、权限与配置应使用 PostgreSQL 等结构化存储；需要语义召回的摘要或历史片段才放 VectorStore。每条记忆都应带 userId/sessionId/tenantId 等隔离信息，防止跨用户记忆污染。</div><h3>常见坑</h3><ul><li>所有历史消息永久保存并全部注入 Prompt。</li><li>所有用户事实都做 embedding，导致更新和删除困难。</li><li>没有 conversation/user/tenant 隔离。</li><li>摘要不断摘要，导致事实逐渐漂移。</li><li>没有 Token Budget，Tool Result 一多就把用户问题挤出窗口。</li></ul><div class="answer"><strong>面试口述版：</strong>Agent 上下文管理的核心是在 Token 预算内组装最相关的信息。我会把固定 System Prompt、结构化用户画像、相关长期记忆、对话摘要、最近 K 轮消息、最新 Tool Result 和当前问题分层组合。Spring AI 的 ChatMemory 负责短期消息窗口，结构化事实放数据库，语义长期记忆再用 VectorStore，并通过 user/session/tenant 做严格隔离。</div><h3>可能追问</h3><p>Chat history 和 ChatMemory 有什么区别？摘要如何防止信息失真？记忆冲突怎么处理？多租户 Memory 怎么做 ACL？</p></section><section class="card"><h2>⑥ 新题 5｜LangChain / AI 应用性能怎么优化？Spring AI 怎么做？</h2><div class="source"><strong>原资料：</strong>《AI大模型面试题-基础篇》第 14 题“在使用LangChain开发AI应用时，你会如何处理和优化性能问题？”｜PDF 第 12 页。</div><h3>概念</h3><p>AI 应用的“性能”不能只看模型响应时间，至少要同时看：</p><pre><code>Latency
+Throughput
+Token Cost
+Tool / DB / VectorStore RT
+Error Rate
+Queue Time
+Cache Hit Rate
+Quality / Task Success</code></pre><h3>原理</h3><p>一次 AI 请求往往是串联链路：</p><pre><code>HTTP
+ ↓
+Prompt / Memory
+ ↓
+Embedding / Retrieval
+ ↓
+LLM
+ ↓
+Tool Call
+ ↓
+DB / External API
+ ↓
+再次 LLM
+ ↓
+Response</code></pre><p>所以优化前第一步不是“换更快模型”，而是先 Trace 出真正的瓶颈。</p><h3>为什么</h3><p>常见瓶颈可能完全不同：</p><ul><li>Prompt 太长 → 输入 Token 与首 Token 延迟高。</li><li>RAG Top-K 太大 → 向量检索和上下文都膨胀。</li><li>Tool 串行调用 → 总 RT 相加。</li><li>外部 API 慢 → 模型本身很快也没用。</li><li>重试没有上限 → 延迟和费用指数上升。</li></ul><h3>实际项目怎么用｜Spring AI 视角</h3><p>Spring AI 当前提供 ChatClient、Advisor、ChatModel、EmbeddingModel、VectorStore 等观测能力，可以配合 Spring Boot Actuator / Micrometer 看 metrics 和 traces；还可以看到输入/输出 Token usage。生产上应优先记录低敏感度的指标，Prompt/Completion 默认不要无脑记录，以免泄露隐私。</p><pre><code>优化顺序：
+1. Trace：先定位慢在哪里
+2. Prompt：减少无关上下文
+3. RAG：调整 Top-K / metadata filter / rerank
+4. 并行：互不依赖的 Tool 并发
+5. Cache：Embedding / 静态结果 / Provider prompt cache
+6. Timeout + Retry Budget
+7. Model Routing：简单任务用更小模型
+8. Streaming：改善用户感知延迟
+9. 异步任务：长任务改 Job/Queue，不占 HTTP 请求</code></pre><h3>AI补充/纠错</h3><div class="box ai">原资料以 LangSmith 为主要监控工具，这是 LangChain 生态的典型答案。Java/Spring AI 项目不需要为了监控强制引入 LangSmith：可以优先使用 Spring Boot Actuator + Micrometer + OpenTelemetry，以及 Spring AI 自带的 ChatClient/Advisor/Model/VectorStore Observability。优化目标也不能只追求低延迟，要同时控制 Token 成本和回答质量，避免“为了快而检索不足”。</div><h3>常见坑</h3><ul><li>没有 Trace 就凭感觉优化。</li><li>所有 Tool 并行执行，忽略依赖关系和下游限流。</li><li>Cache 不带 user/tenant/permission 维度，造成越权数据复用。</li><li>无限重试导致成本和延迟失控。</li><li>完整记录 Prompt/Completion，泄露敏感数据。</li></ul><div class="answer"><strong>面试口述版：</strong>AI 应用性能优化我会先做端到端可观测，分清模型、RAG、Tool、数据库还是网络慢，再针对性优化 Prompt Token、检索 Top-K、缓存、并行、模型路由和超时重试。Spring AI 可以结合 Actuator/Micrometer 做 ChatClient、Advisor、ChatModel、EmbeddingModel 和 VectorStore 的 metrics/tracing，同时监控 Token usage 与成本，避免只优化延迟却牺牲质量。</div><h3>可能追问</h3><p>Streaming 会不会真的减少总耗时？哪些结果适合缓存？Tool Call 怎么并行？怎样设计 AI 请求的 timeout/retry budget？</p></section><section class="card"><h2>⑦ 今日正式进度</h2><p>《后端高频面试题大集合》：正式 #1～#37，今天 JVM #9～#11。<br>《AI应用开发面试题 / Agent / RAG》：1.1.1～1.1.13。<br>《AI大模型面试题-基础篇》：已学习 #1～#8、#10～#14；原 PDF #9 编号缺口继续保留。</p><div class="box good"><strong>今天最值得记住的三句话：</strong><br>1. JVM 的类身份不是只有类名，而是“二进制名称 + defining ClassLoader”。<br>2. GC 能回收不可达对象，但解决不了“仍可达、业务上已经没用”的逻辑泄漏。<br>3. Agent 上下文管理的核心不是保存全部历史，而是在 Token 预算内选择最相关、可控、隔离正确的信息。</div></section><div class="footer">Java 后端 + AI 面试知识学习记录｜2026-09-12</div></main></body></html>
