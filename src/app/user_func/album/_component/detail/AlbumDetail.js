@@ -121,7 +121,10 @@ const AlbumDetail = ({ id, backHref, onBack }) => {
         setIsAnalyzing(true);
 
         try {
-            await ky.post("/api/album/analyze", { json: { id } });
+            await ky.post("/api/album/analyze", {
+                json: { id },
+                timeout: 30_000,
+            });
             setAnalysisSubmitted(true);
             toast.info("已重新提交 AI 分析，本次不会发送推送");
         } catch (analyzeError) {
