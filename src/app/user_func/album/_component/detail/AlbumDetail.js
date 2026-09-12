@@ -1,11 +1,12 @@
 "use client";
 
 import ky from "ky";
-import { DownloadOne, PreviewClose, PreviewOpen } from "@icon-park/react";
+import { DownloadOne, LoadingFour, Magic, PreviewClose, PreviewOpen } from "@icon-park/react";
 import { ArrowLeft, Sparkles } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 
 const clampPercent = (value) => Math.min(100, Math.max(0, Number(value)));
 
@@ -31,6 +32,8 @@ const AlbumDetail = ({ id, backHref, onBack }) => {
     const [imageAspectRatio, setImageAspectRatio] = useState(4 / 3);
     const [showMarkers, setShowMarkers] = useState(false);
     const [isDownloading, setIsDownloading] = useState(false);
+    const [isAnalyzing, setIsAnalyzing] = useState(false);
+    const [analysisSubmitted, setAnalysisSubmitted] = useState(false);
 
     useEffect(() => {
         let active = true;
@@ -41,6 +44,7 @@ const AlbumDetail = ({ id, backHref, onBack }) => {
                 if (active) {
                     setImageAspectRatio(4 / 3);
                     setShowMarkers(false);
+                    setAnalysisSubmitted(false);
                     setDetail(response.detail);
                 }
             })
@@ -108,6 +112,33 @@ const AlbumDetail = ({ id, backHref, onBack }) => {
             }
         } finally {
             setIsDownloading(false);
+        }
+    };
+
+    const handleAnalyze = async () => {
+        if (isAnalyzing || analysisSubmitted) return;
+
+        setIsAnalyzing(true);
+
+        try {
+            await ky.post("/api/album/analyze", { json: { id } });
+            setAnalysisSubmitted(true);
+            toast.info("已重新提交 AI 分析，本次不会发送推送");
+        } catch (analyzeError) {
+            let message = "AI 分析提交失败";
+
+            if (analyzeError.response) {
+                try {
+                    const body = await analyzeError.response.clone().json();
+                    message = body?.message || message;
+                } catch {
+                    // Keep the user-facing fallback message.
+                }
+            }
+
+            toast.error(message);
+        } finally {
+            setIsAnalyzing(false);
         }
     };
 
@@ -191,6 +222,22 @@ const AlbumDetail = ({ id, backHref, onBack }) => {
                 )}
 
                 <div className="absolute right-4 top-4 z-20 flex items-center gap-2">
+                    {albumItems.length === 0 && (
+                        <button
+                            type="button"
+                            onClick={handleAnalyze}
+                            disabled={isAnalyzing || analysisSubmitted}
+                            aria-label={analysisSubmitted ? "AI 分析已提交" : "重新提交 AI 分析"}
+                            title={analysisSubmitted ? "AI 分析已提交" : "重新提交 AI 分析"}
+                            className="grid size-10 place-items-center rounded-full bg-amber-500/90 text-white shadow-sm backdrop-blur-md transition hover:bg-amber-500 disabled:cursor-wait disabled:opacity-65"
+                        >
+                            {isAnalyzing ? (
+                                <LoadingFour className="animate-spin" size={20} />
+                            ) : (
+                                <Magic size={20} />
+                            )}
+                        </button>
+                    )}
                     <button
                         type="button"
                         onClick={() => setShowMarkers((visible) => !visible)}

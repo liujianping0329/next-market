@@ -184,6 +184,11 @@ const AlbumUI = ({ }) => {
                                         fill
                                         className="rounded-lg object-cover"
                                     />
+                                    {!item.hasAlbumItems && (
+                                        <span className="absolute right-1.5 top-1.5 z-10 rounded-full bg-amber-500/90 px-2 py-0.5 text-[10px] font-medium text-white shadow-sm backdrop-blur-sm">
+                                            待分析
+                                        </span>
+                                    )}
                                     <div className="absolute inset-x-0 bottom-0 flex items-center gap-1.5 bg-black/45 px-2 py-1.5">
                                         <img
                                             src={item.f_user?.raw_user_meta_data?.avatar_url || "/default-avatar.png"}

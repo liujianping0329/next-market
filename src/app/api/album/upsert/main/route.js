@@ -62,7 +62,7 @@ export async function POST(request, context) {
                 planetId,
                 userId,
             },
-            timeout: 120_000,
+            timeout: 300_000,
             retry: 0,
         }).then(() => {
             console.log("Spring AI task accepted:", data.id);
