@@ -2,7 +2,7 @@
 
 import ky from "ky";
 import { DownloadOne, LoadingFour, Magic, PreviewClose, PreviewOpen } from "@icon-park/react";
-import { ArrowLeft, Sparkles } from "lucide-react";
+import { ArrowLeft, Check, Pencil, Plus, Sparkles, Trash2, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -25,7 +25,7 @@ const normalizeAlternativeNames = (value) => {
     return [];
 };
 
-const AlbumDetail = ({ id, backHref, onBack }) => {
+const AlbumDetail = ({ id, backHref, onBack, enableAlbumActions = false }) => {
     const imageRef = useRef(null);
     const [detail, setDetail] = useState(null);
     const [error, setError] = useState("");
@@ -34,6 +34,14 @@ const AlbumDetail = ({ id, backHref, onBack }) => {
     const [isDownloading, setIsDownloading] = useState(false);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [analysisSubmitted, setAnalysisSubmitted] = useState(false);
+    const [editingItemId, setEditingItemId] = useState(null);
+    const [editingName, setEditingName] = useState("");
+    const [savingItemId, setSavingItemId] = useState(null);
+    const [isAddingItem, setIsAddingItem] = useState(false);
+    const [newItemName, setNewItemName] = useState("");
+    const [newItemAmount, setNewItemAmount] = useState("");
+    const [isSavingNewItem, setIsSavingNewItem] = useState(false);
+    const [deletingItemId, setDeletingItemId] = useState(null);
 
     useEffect(() => {
         let active = true;
@@ -145,6 +153,158 @@ const AlbumDetail = ({ id, backHref, onBack }) => {
         }
     };
 
+    const startEditingItem = (item) => {
+        setEditingItemId(item.id);
+        setEditingName(item.name || "");
+    };
+
+    const cancelEditingItem = () => {
+        setEditingItemId(null);
+        setEditingName("");
+    };
+
+    const saveItemName = async (item) => {
+        const name = editingName.trim();
+
+        if (!name || savingItemId != null) {
+            if (!name) toast.error("请输入成分名称");
+            return;
+        }
+
+        setSavingItemId(item.id);
+
+        try {
+            const response = await ky.patch("/api/album/item", {
+                json: {
+                    albumId: id,
+                    itemId: item.id,
+                    name,
+                },
+            }).json();
+            const updatedItem = response.item;
+
+            setDetail((currentDetail) => ({
+                ...currentDetail,
+                albumItems: (currentDetail.albumItems ?? []).map((currentItem) => (
+                    currentItem.id === updatedItem.id
+                        ? { ...currentItem, ...updatedItem }
+                        : currentItem
+                )),
+            }));
+            cancelEditingItem();
+            toast.success("成分名称已确认");
+        } catch (saveError) {
+            let message = "成分名称修改失败";
+
+            if (saveError.response) {
+                try {
+                    const body = await saveError.response.clone().json();
+                    message = body?.message || message;
+                } catch {
+                    // Keep the user-facing fallback message.
+                }
+            }
+
+            toast.error(message);
+        } finally {
+            setSavingItemId(null);
+        }
+    };
+
+    const cancelAddingItem = () => {
+        setIsAddingItem(false);
+        setNewItemName("");
+        setNewItemAmount("");
+    };
+
+    const saveNewItem = async () => {
+        const name = newItemName.trim();
+        const estimatedAmount = newItemAmount.trim();
+
+        if (!name || !estimatedAmount || isSavingNewItem) {
+            if (!name || !estimatedAmount) toast.error("请输入名称和分量");
+            return;
+        }
+
+        setIsSavingNewItem(true);
+
+        try {
+            const response = await ky.post("/api/album/item", {
+                json: {
+                    albumId: id,
+                    name,
+                    estimatedAmount,
+                },
+            }).json();
+
+            setDetail((currentDetail) => ({
+                ...currentDetail,
+                albumItems: [
+                    ...(currentDetail.albumItems ?? []),
+                    response.item,
+                ],
+            }));
+            cancelAddingItem();
+            toast.success("成分已新增");
+        } catch (saveError) {
+            let message = "新增成分失败";
+
+            if (saveError.response) {
+                try {
+                    const body = await saveError.response.clone().json();
+                    message = body?.message || message;
+                } catch {
+                    // Keep the user-facing fallback message.
+                }
+            }
+
+            toast.error(message);
+        } finally {
+            setIsSavingNewItem(false);
+        }
+    };
+
+    const deleteItem = async (item) => {
+        if (deletingItemId != null) return;
+        if (!window.confirm(`确定删除“${item.name}”吗？`)) return;
+
+        setDeletingItemId(item.id);
+
+        try {
+            await ky.delete("/api/album/item", {
+                json: {
+                    albumId: id,
+                    itemId: item.id,
+                },
+            });
+
+            setDetail((currentDetail) => ({
+                ...currentDetail,
+                albumItems: (currentDetail.albumItems ?? []).filter(
+                    (currentItem) => currentItem.id !== item.id,
+                ),
+            }));
+
+            if (editingItemId === item.id) cancelEditingItem();
+            toast.success("成分已删除");
+        } catch (deleteError) {
+            let message = "删除成分失败";
+
+            if (deleteError.response) {
+                try {
+                    const body = await deleteError.response.clone().json();
+                    message = body?.message || message;
+                } catch {
+                    // Keep the user-facing fallback message.
+                }
+            }
+
+            toast.error(message);
+        } finally {
+            setDeletingItemId(null);
+        }
+    };
+
     if (error) {
         return (
             <main className="flex min-h-[100dvh] items-center justify-center px-6 text-sm text-muted-foreground">
@@ -225,7 +385,7 @@ const AlbumDetail = ({ id, backHref, onBack }) => {
                 )}
 
                 <div className="absolute right-4 top-4 z-20 flex items-center gap-2">
-                    {albumItems.length === 0 && (
+                    {enableAlbumActions && albumItems.length === 0 && (
                         <button
                             type="button"
                             onClick={handleAnalyze}
@@ -300,11 +460,74 @@ const AlbumDetail = ({ id, backHref, onBack }) => {
                 )}
 
                 <section className="mt-7">
-                    <div className="flex items-center gap-2">
-                        <Sparkles className="size-4 text-amber-600" />
-                        <h2 className="text-base font-semibold">图片组成</h2>
-                        <span className="text-xs text-muted-foreground">{albumItems.length} 项</span>
+                    <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2">
+                            <Sparkles className="size-4 text-amber-600" />
+                            <h2 className="text-base font-semibold">图片组成</h2>
+                            <span className="text-xs text-muted-foreground">{albumItems.length} 项</span>
+                        </div>
+                        {enableAlbumActions && !isAddingItem && (
+                            <button
+                                type="button"
+                                onClick={() => setIsAddingItem(true)}
+                                aria-label="新增成分"
+                                title="新增成分"
+                                className="grid size-8 place-items-center rounded-full text-amber-700 transition hover:bg-amber-50"
+                            >
+                                <Plus className="size-5" />
+                            </button>
+                        )}
                     </div>
+
+                    {enableAlbumActions && isAddingItem && (
+                        <div className="mt-3 border-y border-amber-200 bg-amber-50/45 px-1 py-3">
+                            <div className="grid grid-cols-[minmax(0,1fr)_7rem] gap-2">
+                                <input
+                                    type="text"
+                                    value={newItemName}
+                                    onChange={(event) => setNewItemName(event.target.value)}
+                                    placeholder="成分名称"
+                                    autoFocus
+                                    maxLength={100}
+                                    className="h-9 min-w-0 rounded-lg border border-amber-300 bg-white px-3 text-sm text-foreground outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-100"
+                                />
+                                <input
+                                    type="text"
+                                    value={newItemAmount}
+                                    onChange={(event) => setNewItemAmount(event.target.value)}
+                                    onKeyDown={(event) => {
+                                        if (event.key === "Enter") saveNewItem();
+                                        if (event.key === "Escape") cancelAddingItem();
+                                    }}
+                                    placeholder="分量，如约1碗"
+                                    maxLength={100}
+                                    className="h-9 min-w-0 rounded-lg border border-amber-300 bg-white px-3 text-sm text-foreground outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-100"
+                                />
+                            </div>
+                            <div className="mt-2 flex justify-end gap-1">
+                                <button
+                                    type="button"
+                                    onClick={saveNewItem}
+                                    disabled={isSavingNewItem}
+                                    aria-label="确认新增"
+                                    title="确认"
+                                    className="grid size-8 place-items-center rounded-full text-emerald-700 transition hover:bg-emerald-50 disabled:opacity-50"
+                                >
+                                    <Check className="size-4" />
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={cancelAddingItem}
+                                    disabled={isSavingNewItem}
+                                    aria-label="放弃新增"
+                                    title="放弃"
+                                    className="grid size-8 place-items-center rounded-full text-muted-foreground transition hover:bg-black/5 disabled:opacity-50"
+                                >
+                                    <X className="size-4" />
+                                </button>
+                            </div>
+                        </div>
+                    )}
 
                     {albumItems.length ? (
                         <div className="mt-3 divide-y divide-black/8 border-y border-black/8">
@@ -314,8 +537,42 @@ const AlbumDetail = ({ id, backHref, onBack }) => {
                                 return (
                                     <div key={item.id} className="flex items-start gap-4 py-4">
                                         <div className="min-w-0 flex-1">
-                                            <p className="font-medium text-foreground">{item.name}</p>
-                                            {alternativeNames.length > 0 && (
+                                            {editingItemId === item.id ? (
+                                                <div className="space-y-2">
+                                                    <input
+                                                        type="text"
+                                                        value={editingName}
+                                                        onChange={(event) => setEditingName(event.target.value)}
+                                                        onKeyDown={(event) => {
+                                                            if (event.key === "Enter") {
+                                                                event.preventDefault();
+                                                                saveItemName(item);
+                                                            }
+                                                            if (event.key === "Escape") {
+                                                                cancelEditingItem();
+                                                            }
+                                                        }}
+                                                        autoFocus
+                                                        maxLength={100}
+                                                        className="h-9 w-full rounded-lg border border-amber-300 bg-white px-3 text-sm text-foreground outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-100"
+                                                    />
+                                                    <div className="flex flex-wrap gap-1.5">
+                                                        {alternativeNames.map((alternativeName) => (
+                                                            <button
+                                                                key={alternativeName}
+                                                                type="button"
+                                                                onClick={() => setEditingName(alternativeName)}
+                                                                className="rounded-full bg-amber-50 px-2.5 py-1 text-xs text-amber-800 transition hover:bg-amber-100"
+                                                            >
+                                                                {alternativeName}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <p className="font-medium text-foreground">{item.name}</p>
+                                            )}
+                                            {editingItemId !== item.id && alternativeNames.length > 0 && (
                                                 <p className="mt-1 text-xs leading-5 text-muted-foreground">
                                                     也可能是：{alternativeNames.join("、")}
                                                 </p>
@@ -324,6 +581,52 @@ const AlbumDetail = ({ id, backHref, onBack }) => {
                                         <span className="shrink-0 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-800">
                                             {item.estimated_amount || "份量不明"}
                                         </span>
+                                        {enableAlbumActions && editingItemId === item.id ? (
+                                            <div className="flex shrink-0 items-center gap-1">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => saveItemName(item)}
+                                                    disabled={savingItemId === item.id}
+                                                    aria-label="确认成分名称"
+                                                    title="确认"
+                                                    className="grid size-8 place-items-center rounded-full text-emerald-700 transition hover:bg-emerald-50 disabled:opacity-50"
+                                                >
+                                                    <Check className="size-4" />
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={cancelEditingItem}
+                                                    disabled={savingItemId === item.id}
+                                                    aria-label="放弃修改"
+                                                    title="放弃"
+                                                    className="grid size-8 place-items-center rounded-full text-muted-foreground transition hover:bg-black/5 disabled:opacity-50"
+                                                >
+                                                    <X className="size-4" />
+                                                </button>
+                                            </div>
+                                        ) : enableAlbumActions && alternativeNames.length > 0 ? (
+                                            <button
+                                                type="button"
+                                                onClick={() => startEditingItem(item)}
+                                                aria-label={`修改${item.name}`}
+                                                title="修改"
+                                                className="grid size-8 shrink-0 place-items-center rounded-full text-amber-700 transition hover:bg-amber-50"
+                                            >
+                                                <Pencil className="size-4" />
+                                            </button>
+                                        ) : null}
+                                        {enableAlbumActions && editingItemId !== item.id && (
+                                            <button
+                                                type="button"
+                                                onClick={() => deleteItem(item)}
+                                                disabled={deletingItemId === item.id}
+                                                aria-label={`删除${item.name}`}
+                                                title="删除"
+                                                className="grid size-8 shrink-0 place-items-center rounded-full text-rose-600 transition hover:bg-rose-50 disabled:opacity-50"
+                                            >
+                                                <Trash2 className="size-4" />
+                                            </button>
+                                        )}
                                     </div>
                                 );
                             })}
