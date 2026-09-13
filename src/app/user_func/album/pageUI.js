@@ -13,6 +13,7 @@ import { compressImage } from "@/app/utils/file";
 import Image from "next/image";
 import { Switch } from "@/components/ui/switch";
 import useLongPress from "@/hooks/useLongPress";
+import { useAlbumListRefresh } from "./_component/AlbumListRefreshContext";
 
 const timeGroups = [
     { name: "凌晨", start: 0, end: 7 },
@@ -47,6 +48,7 @@ const AlbumUI = ({ }) => {
     const hasFetchedYesterdayCountRef = useRef(false);
     const router = useRouter();
     const searchParams = useSearchParams();
+    const { refreshKey } = useAlbumListRefresh();
     const [userInfo, setUserInfo] = useState(null)
     const [nearestLocation, setNearestLocation] = useState(null);
     const [list, setList] = useState([]);
@@ -71,7 +73,7 @@ const AlbumUI = ({ }) => {
         }).json();
         setList(response.list);
         setIsListLoaded(true);
-    }
+    };
 
     const fetchYesterdayCount = async () => {
         const response = await ky.post('/api/album/list/match', {
@@ -187,7 +189,8 @@ const AlbumUI = ({ }) => {
             hasFetchedYesterdayCountRef.current = true;
             fetchYesterdayCount();
         });
-    }, [userInfo, activeTab]);
+
+    }, [userInfo, activeTab, refreshKey]);
 
 
     return (
@@ -269,6 +272,13 @@ const AlbumUI = ({ }) => {
                                     {!item.hasAlbumItems && (
                                         <span className="absolute right-1.5 top-1.5 z-10 rounded-full bg-amber-500/90 px-2 py-0.5 text-[10px] font-medium text-white shadow-sm backdrop-blur-sm">
                                             待分析
+                                        </span>
+                                    )}
+                                    {item.hasAlbumItems && (
+                                        <span className={`absolute right-1.5 top-1.5 z-10 rounded-full px-2 py-0.5 text-[10px] font-medium text-white shadow-sm backdrop-blur-sm ${
+                                            item.status === 2 ? "bg-emerald-500/90" : "bg-sky-500/90"
+                                        }`}>
+                                            {item.status === 2 ? "已校对" : "待校对"}
                                         </span>
                                     )}
                                     <div className="absolute inset-x-0 bottom-0 flex items-center gap-1.5 bg-black/45 px-2 py-1.5">

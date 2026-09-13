@@ -26,7 +26,7 @@ const normalizeAlternativeNames = (value) => {
     return [];
 };
 
-const AlbumDetail = ({ id, backHref, onBack, enableAlbumActions = false, enableSwipe = false, albumIds = [] }) => {
+const AlbumDetail = ({ id, backHref, onBack, onStatusChange, enableAlbumActions = false, enableSwipe = false, albumIds = [] }) => {
     const router = useRouter();
     const imageRef = useRef(null);
     const touchStartRef = useRef(null);
@@ -124,6 +124,7 @@ const AlbumDetail = ({ id, backHref, onBack, enableAlbumActions = false, enableS
                 ...currentDetail,
                 status,
             }));
+            onStatusChange?.();
             setEditingItemId(null);
             setIsAddingItem(false);
         } catch {
@@ -427,6 +428,7 @@ const AlbumDetail = ({ id, backHref, onBack, enableAlbumActions = false, enableS
 
     const albumItems = detail.albumItems ?? [];
     const isVerified = detail.status === 2;
+    const albumUsers = detail.albumUsers ?? [detail.f_user].filter(Boolean);
     const markedItems = albumItems
         .filter((item) => item.center_x_percent != null && item.center_y_percent != null)
         .slice(0, 4);
@@ -591,11 +593,26 @@ const AlbumDetail = ({ id, backHref, onBack, enableAlbumActions = false, enableS
             </div>
 
             <main className="px-5 pb-14 pt-5">
-                {createdAt && (
-                    <p className="text-xs text-muted-foreground">{createdAt}</p>
-                )}
+                <div className="flex items-center justify-between gap-3">
+                    {createdAt && (
+                        <p className="text-xs text-muted-foreground">{createdAt}</p>
+                    )}
+                    {albumUsers.length > 0 && (
+                        <div className="flex -space-x-2" aria-label="图片创建者">
+                            {albumUsers.map((user) => (
+                                <img
+                                    key={user.id}
+                                    src={user.raw_user_meta_data?.avatar_url || "/default-avatar.png"}
+                                    alt={user.raw_user_meta_data?.name || "用户头像"}
+                                    title={user.raw_user_meta_data?.name || "用户"}
+                                    className="size-7 rounded-full border-2 border-[#fffefa] object-cover"
+                                />
+                            ))}
+                        </div>
+                    )}
+                </div>
 
-                <section className="mt-7">
+                <section className="mt-1">
                     <div className="sticky top-0 z-20 -mx-5 flex items-center justify-between gap-3 border-b border-black/8 bg-[#fffefa]/95 px-5 py-3 backdrop-blur">
                         <div className="flex items-center gap-2">
                             <Sparkles className="size-4 text-amber-600" />
@@ -608,11 +625,10 @@ const AlbumDetail = ({ id, backHref, onBack, enableAlbumActions = false, enableS
                                     type="button"
                                     onClick={handleStatusChange}
                                     disabled={isUpdatingStatus}
-                                    className={`inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-semibold transition disabled:cursor-wait disabled:opacity-60 ${
-                                        isVerified
-                                            ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
-                                            : "bg-amber-500 text-white shadow-sm hover:bg-amber-600"
-                                    }`}
+                                    className={`inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-semibold transition disabled:cursor-wait disabled:opacity-60 ${isVerified
+                                        ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                                        : "bg-amber-500 text-white shadow-sm hover:bg-amber-600"
+                                        }`}
                                 >
                                     {isVerified ? "取消校对" : "校对全部成分"}
                                     {isVerified && <Check className="size-4 text-emerald-600" />}
