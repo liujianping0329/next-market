@@ -51,6 +51,7 @@ const AlbumDetail = ({ id, backHref, onBack, enableAlbumActions = false, enableS
     const [newItemAmount, setNewItemAmount] = useState("");
     const [isSavingNewItem, setIsSavingNewItem] = useState(false);
     const [deletingItemId, setDeletingItemId] = useState(null);
+    const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 
     useEffect(() => {
         let active = true;
@@ -106,6 +107,30 @@ const AlbumDetail = ({ id, backHref, onBack, enableAlbumActions = false, enableS
             setShowMarkers(false);
             setIsMarkerPreviewing(false);
         }, 1500);
+    };
+
+    const handleStatusChange = async () => {
+        if (isUpdatingStatus) return;
+
+        const status = detail.status === 2 ? 1 : 2;
+        setIsUpdatingStatus(true);
+
+        try {
+            await ky.post("/api/album/upsert", {
+                json: { id, status },
+            }).json();
+
+            setDetail((currentDetail) => ({
+                ...currentDetail,
+                status,
+            }));
+            setEditingItemId(null);
+            setIsAddingItem(false);
+        } catch {
+            toast.error("校对状态更新失败");
+        } finally {
+            setIsUpdatingStatus(false);
+        }
     };
 
     const handleMarkerClick = (itemId) => {
@@ -401,6 +426,7 @@ const AlbumDetail = ({ id, backHref, onBack, enableAlbumActions = false, enableS
     }
 
     const albumItems = detail.albumItems ?? [];
+    const isVerified = detail.status === 2;
     const markedItems = albumItems
         .filter((item) => item.center_x_percent != null && item.center_y_percent != null)
         .slice(0, 4);
@@ -570,26 +596,43 @@ const AlbumDetail = ({ id, backHref, onBack, enableAlbumActions = false, enableS
                 )}
 
                 <section className="mt-7">
-                    <div className="flex items-center justify-between gap-3">
+                    <div className="sticky top-0 z-20 -mx-5 flex items-center justify-between gap-3 border-b border-black/8 bg-[#fffefa]/95 px-5 py-3 backdrop-blur">
                         <div className="flex items-center gap-2">
                             <Sparkles className="size-4 text-amber-600" />
                             <h2 className="text-base font-semibold">图片组成</h2>
                             <span className="text-xs text-muted-foreground">{albumItems.length} 项</span>
                         </div>
-                        {enableAlbumActions && !isAddingItem && (
-                            <button
-                                type="button"
-                                onClick={() => setIsAddingItem(true)}
-                                aria-label="新增成分"
-                                title="新增成分"
-                                className="grid size-8 place-items-center rounded-full text-amber-700 transition hover:bg-amber-50"
-                            >
-                                <Plus className="size-5" />
-                            </button>
+                        {enableAlbumActions && (
+                            <div className="flex items-center gap-2">
+                                <button
+                                    type="button"
+                                    onClick={handleStatusChange}
+                                    disabled={isUpdatingStatus}
+                                    className={`inline-flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-semibold transition disabled:cursor-wait disabled:opacity-60 ${
+                                        isVerified
+                                            ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
+                                            : "bg-amber-500 text-white shadow-sm hover:bg-amber-600"
+                                    }`}
+                                >
+                                    {isVerified ? "取消校对" : "校对全部成分"}
+                                    {isVerified && <Check className="size-4 text-emerald-600" />}
+                                </button>
+                                {!isVerified && !isAddingItem && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsAddingItem(true)}
+                                        aria-label="新增成分"
+                                        title="新增成分"
+                                        className="grid size-8 place-items-center rounded-full text-amber-700 transition hover:bg-amber-50"
+                                    >
+                                        <Plus className="size-5" />
+                                    </button>
+                                )}
+                            </div>
                         )}
                     </div>
 
-                    {enableAlbumActions && isAddingItem && (
+                    {enableAlbumActions && !isVerified && isAddingItem && (
                         <div className="mt-3 border-y border-amber-200 bg-amber-50/45 px-1 py-3">
                             <div className="grid grid-cols-[minmax(0,1fr)_7rem] gap-2">
                                 <input
@@ -699,7 +742,7 @@ const AlbumDetail = ({ id, backHref, onBack, enableAlbumActions = false, enableS
                                         <span className="shrink-0 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-800">
                                             {item.estimated_amount || "份量不明"}
                                         </span>
-                                        {enableAlbumActions && editingItemId === item.id ? (
+                                        {enableAlbumActions && !isVerified && editingItemId === item.id ? (
                                             <div className="flex shrink-0 items-center gap-1">
                                                 <button
                                                     type="button"
@@ -722,7 +765,7 @@ const AlbumDetail = ({ id, backHref, onBack, enableAlbumActions = false, enableS
                                                     <X className="size-4" />
                                                 </button>
                                             </div>
-                                        ) : enableAlbumActions && alternativeNames.length > 0 ? (
+                                        ) : enableAlbumActions && !isVerified && alternativeNames.length > 0 ? (
                                             <button
                                                 type="button"
                                                 onClick={() => startEditingItem(item)}
@@ -733,7 +776,7 @@ const AlbumDetail = ({ id, backHref, onBack, enableAlbumActions = false, enableS
                                                 <Pencil className="size-4" />
                                             </button>
                                         ) : null}
-                                        {enableAlbumActions && editingItemId !== item.id && (
+                                        {enableAlbumActions && !isVerified && editingItemId !== item.id && (
                                             <button
                                                 type="button"
                                                 onClick={() => deleteItem(item)}
