@@ -30,10 +30,13 @@ const AlbumDetail = ({ id, backHref, onBack, enableAlbumActions = false, enableS
     const router = useRouter();
     const imageRef = useRef(null);
     const touchStartRef = useRef(null);
+    const markerPreviewTimerRef = useRef(null);
     const [detail, setDetail] = useState(null);
     const [error, setError] = useState("");
     const [imageAspectRatio, setImageAspectRatio] = useState(4 / 3);
     const [showMarkers, setShowMarkers] = useState(false);
+    const [isMarkerPreviewing, setIsMarkerPreviewing] = useState(false);
+    const [isImageUiVisible, setIsImageUiVisible] = useState(true);
     const [isDownloading, setIsDownloading] = useState(false);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [analysisSubmitted, setAnalysisSubmitted] = useState(false);
@@ -48,14 +51,17 @@ const AlbumDetail = ({ id, backHref, onBack, enableAlbumActions = false, enableS
 
     useEffect(() => {
         let active = true;
+        clearTimeout(markerPreviewTimerRef.current);
         setError("");
+        setShowMarkers(false);
+        setIsMarkerPreviewing(false);
+        setIsImageUiVisible(true);
 
         ky.post("/api/album/detail", { json: { id } })
             .json()
             .then((response) => {
                 if (active) {
                     setImageAspectRatio(4 / 3);
-                    setShowMarkers(false);
                     setAnalysisSubmitted(false);
                     setDetail(response.detail);
                 }
@@ -77,8 +83,24 @@ const AlbumDetail = ({ id, backHref, onBack, enableAlbumActions = false, enableS
 
         return () => {
             active = false;
+            clearTimeout(markerPreviewTimerRef.current);
         };
     }, [id]);
+
+    const handleImageLoad = (event) => {
+        const { naturalWidth, naturalHeight } = event.currentTarget;
+        if (naturalWidth && naturalHeight) {
+            setImageAspectRatio(naturalWidth / naturalHeight);
+        }
+
+        clearTimeout(markerPreviewTimerRef.current);
+        setShowMarkers(true);
+        setIsMarkerPreviewing(true);
+        markerPreviewTimerRef.current = setTimeout(() => {
+            setShowMarkers(false);
+            setIsMarkerPreviewing(false);
+        }, 1000);
+    };
 
     const handleTouchStart = (event) => {
         const touch = event.touches[0];
@@ -393,15 +415,17 @@ const AlbumDetail = ({ id, backHref, onBack, enableAlbumActions = false, enableS
                     priority
                     sizes="100vw"
                     className="object-contain"
-                    onLoad={(event) => {
-                        const { naturalWidth, naturalHeight } = event.currentTarget;
-                        if (naturalWidth && naturalHeight) {
-                            setImageAspectRatio(naturalWidth / naturalHeight);
-                        }
-                    }}
+                    onLoad={handleImageLoad}
                 />
 
-                {enableSwipe && getAdjacentAlbumId(-1) && (
+                <button
+                    type="button"
+                    onClick={() => setIsImageUiVisible((visible) => !visible)}
+                    aria-label={isImageUiVisible ? "隐藏图片信息" : "显示图片信息"}
+                    className="absolute inset-0 z-[15] cursor-default"
+                />
+
+                {isImageUiVisible && enableSwipe && getAdjacentAlbumId(-1) && (
                     <button
                         type="button"
                         onClick={() => handleAlbumChange(-1)}
@@ -413,7 +437,7 @@ const AlbumDetail = ({ id, backHref, onBack, enableAlbumActions = false, enableS
                     </button>
                 )}
 
-                {enableSwipe && getAdjacentAlbumId(1) && (
+                {isImageUiVisible && enableSwipe && getAdjacentAlbumId(1) && (
                     <button
                         type="button"
                         onClick={() => handleAlbumChange(1)}
@@ -425,7 +449,7 @@ const AlbumDetail = ({ id, backHref, onBack, enableAlbumActions = false, enableS
                     </button>
                 )}
 
-                {showMarkers && (
+                {isImageUiVisible && showMarkers && (
                     <>
                         <div className="pointer-events-none absolute inset-0 bg-black/25" />
                         {markedItems.map((item) => (
@@ -448,7 +472,7 @@ const AlbumDetail = ({ id, backHref, onBack, enableAlbumActions = false, enableS
                     </>
                 )}
 
-                <div className="absolute right-4 top-4 z-20 flex items-center gap-2">
+                {isImageUiVisible && <div className="absolute right-4 top-4 z-20 flex items-center gap-2">
                     {enableAlbumActions && albumItems.length === 0 && (
                         <button
                             type="button"
@@ -468,10 +492,11 @@ const AlbumDetail = ({ id, backHref, onBack, enableAlbumActions = false, enableS
                     <button
                         type="button"
                         onClick={() => setShowMarkers((visible) => !visible)}
+                        disabled={isMarkerPreviewing}
                         aria-label={showMarkers ? "隐藏图片标记" : "显示图片标记"}
                         aria-pressed={showMarkers}
                         title={showMarkers ? "隐藏图片标记" : "显示图片标记"}
-                        className="grid size-10 place-items-center rounded-full bg-black/45 text-white backdrop-blur-md transition hover:bg-black/60"
+                        className="grid size-10 place-items-center rounded-full bg-black/45 text-white backdrop-blur-md transition hover:bg-black/60 disabled:cursor-wait disabled:opacity-60"
                     >
                         {showMarkers ? <PreviewClose size={20} /> : <PreviewOpen size={20} />}
                     </button>
@@ -485,9 +510,9 @@ const AlbumDetail = ({ id, backHref, onBack, enableAlbumActions = false, enableS
                     >
                         <DownloadOne size={20} />
                     </button>
-                </div>
+                </div>}
 
-                {onBack ? (
+                {isImageUiVisible && (onBack ? (
                     <button
                         type="button"
                         onClick={onBack}
@@ -504,9 +529,9 @@ const AlbumDetail = ({ id, backHref, onBack, enableAlbumActions = false, enableS
                     >
                         <ArrowLeft className="size-5" />
                     </Link>
-                )}
+                ))}
 
-                <div className="absolute inset-x-0 bottom-0 z-10 px-5 pb-5 text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)]">
+                {isImageUiVisible && <div className="absolute inset-x-0 bottom-0 z-10 px-5 pb-5 text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)]">
                     <h1 className="text-3xl font-semibold tracking-tight">
                         {detail.title || "相册记录"}
                     </h1>
@@ -515,7 +540,7 @@ const AlbumDetail = ({ id, backHref, onBack, enableAlbumActions = false, enableS
                             {detail.detail}
                         </p>
                     )}
-                </div>
+                </div>}
             </div>
 
             <main className="px-5 pb-14 pt-5">
