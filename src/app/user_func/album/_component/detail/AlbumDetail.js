@@ -105,7 +105,7 @@ const AlbumDetail = ({ id, backHref, onBack, enableAlbumActions = false, enableS
         markerPreviewTimerRef.current = setTimeout(() => {
             setShowMarkers(false);
             setIsMarkerPreviewing(false);
-        }, 1000);
+        }, 1500);
     };
 
     const handleMarkerClick = (itemId) => {
@@ -651,9 +651,8 @@ const AlbumDetail = ({ id, backHref, onBack, enableAlbumActions = false, enableS
                                             if (node) itemRefs.current.set(item.id, node);
                                             else itemRefs.current.delete(item.id);
                                         }}
-                                        className={`flex items-start gap-4 py-4 transition-colors ${
-                                            highlightedItemId === item.id ? "bg-amber-100/80" : ""
-                                        }`}
+                                        className={`flex items-start gap-4 py-4 transition-colors ${highlightedItemId === item.id ? "bg-amber-100/80" : ""
+                                            }`}
                                     >
                                         <div className="min-w-0 flex-1">
                                             {editingItemId === item.id ? (

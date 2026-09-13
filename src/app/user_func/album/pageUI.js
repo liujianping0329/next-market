@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 
 import { MessageSquarePlus } from "lucide-react";
 import { useRef, useState, useEffect, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import ky from "ky";
 import { compressImage } from "@/app/utils/file";
 import Image from "next/image";
@@ -22,23 +22,77 @@ const timeGroups = [
     { name: "晚餐", start: 17, end: 20 },
     { name: "夜宵", start: 20, end: 24 },
 ];
+const tabs = [
+    { value: "all", label: "全部" },
+    { value: "mine", label: "只看我" },
+    { value: "yesterday", label: "我昨天..." },
+];
+
+const getYesterdayRange = () => {
+    const jstNow = new Date(Date.now() + 9 * 60 * 60 * 1000);
+    const today = jstNow.toISOString().slice(0, 10);
+    const yesterdayDate = new Date(`${today}T00:00:00Z`);
+    yesterdayDate.setUTCDate(yesterdayDate.getUTCDate() - 1);
+    const yesterday = yesterdayDate.toISOString().slice(0, 10);
+
+    return {
+        createdAtFrom: new Date(`${yesterday}T00:00:00+09:00`).toISOString(),
+        createdAtTo: new Date(`${today}T00:00:00+09:00`).toISOString(),
+    };
+};
+
 const AlbumUI = ({ }) => {
 
     const inputRef = useRef(null);
+    const hasFetchedYesterdayCountRef = useRef(false);
     const router = useRouter();
+    const searchParams = useSearchParams();
     const [userInfo, setUserInfo] = useState(null)
     const [nearestLocation, setNearestLocation] = useState(null);
     const [list, setList] = useState([]);
+    const [isListLoaded, setIsListLoaded] = useState(false);
     const [isPush, setIsPush] = useState(true);
+    const [yesterdayCount, setYesterdayCount] = useState(null);
+    const tabParam = searchParams.get("tab");
+    const activeTab = tabs.some((tab) => tab.value === tabParam) ? tabParam : "all";
 
     const fetchList = async () => {
+        const requestBody = { planetId: userInfo.planetId };
+
+        if (activeTab === "mine" || activeTab === "yesterday") {
+            requestBody.userId = userInfo.id;
+        }
+        if (activeTab === "yesterday") {
+            Object.assign(requestBody, getYesterdayRange());
+        }
+
         const response = await ky.post('/api/album/list/match', {
-            json: {
-                planetId: userInfo.planetId
-            }
+            json: requestBody,
         }).json();
         setList(response.list);
+        setIsListLoaded(true);
     }
+
+    const fetchYesterdayCount = async () => {
+        const response = await ky.post('/api/album/list/match', {
+            json: {
+                planetId: userInfo.planetId,
+                userId: userInfo.id,
+                ...getYesterdayRange(),
+            },
+        }).json();
+        setYesterdayCount(response.list.length);
+    };
+
+    const handleTabChange = (tab) => {
+        const params = new URLSearchParams(searchParams.toString());
+
+        if (tab === "all") params.delete("tab");
+        else params.set("tab", tab);
+
+        const query = params.toString();
+        router.replace(query ? `/user_func/album?${query}` : "/user_func/album");
+    };
 
     const longPressHandle = useLongPress({
         getPayload: (e) => {
@@ -125,9 +179,15 @@ const AlbumUI = ({ }) => {
     };
 
     useEffect(() => {
-        if (userInfo)
-            fetchList();
-    }, [userInfo]);
+        if (!userInfo) return;
+
+        fetchList().then(() => {
+            if (hasFetchedYesterdayCountRef.current) return;
+
+            hasFetchedYesterdayCountRef.current = true;
+            fetchYesterdayCount();
+        });
+    }, [userInfo, activeTab]);
 
 
     return (
@@ -158,6 +218,27 @@ const AlbumUI = ({ }) => {
                 </div>
             </CommonHeader >
             <main className="container mx-auto px-4">
+                {isListLoaded && <div className="mb-3 flex gap-2 overflow-x-auto pb-1 pt-2">
+                    {tabs.map((tab) => (
+                        <button
+                            key={tab.value}
+                            type="button"
+                            onClick={() => handleTabChange(tab.value)}
+                            aria-pressed={activeTab === tab.value}
+                            className={`relative shrink-0 rounded-sm border px-2.5 py-1 text-xs font-medium transition ${activeTab === tab.value
+                                ? "border-sky-600 bg-sky-600 text-white"
+                                : "border-sky-100 bg-white text-sky-700 hover:bg-sky-50"
+                                }`}
+                        >
+                            {tab.label}
+                            {tab.value === "yesterday" && yesterdayCount != null && (
+                                <span className="absolute right--1 top-0 size-4 -translate-y-1/2 rounded-full bg-rose-500 text-center text-[10px] font-semibold leading-4 text-white">
+                                    {yesterdayCount}
+                                </span>
+                            )}
+                        </button>
+                    ))}
+                </div>}
                 {groups.map((group) => (
                     <div
                         key={`${group.date}-${group.name}`}
