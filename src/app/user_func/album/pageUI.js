@@ -62,7 +62,8 @@ const AlbumUI = ({ }) => {
     });
 
     const openDetail = (id) => {
-        router.push(`/user_func/album/detail/${id}`);
+        const albumIds = list.map((item) => item.id).join(",");
+        router.push(`/user_func/album/detail/${id}?albumIds=${albumIds}`);
     };
 
     const groupAlbumByTime = (list = []) => {

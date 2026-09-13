@@ -2,9 +2,10 @@
 
 import ky from "ky";
 import { DownloadOne, LoadingFour, Magic, PreviewClose, PreviewOpen } from "@icon-park/react";
-import { ArrowLeft, Check, Pencil, Plus, Sparkles, Trash2, X } from "lucide-react";
+import { ArrowLeft, Check, ChevronLeft, ChevronRight, Pencil, Plus, Sparkles, Trash2, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -25,8 +26,10 @@ const normalizeAlternativeNames = (value) => {
     return [];
 };
 
-const AlbumDetail = ({ id, backHref, onBack, enableAlbumActions = false }) => {
+const AlbumDetail = ({ id, backHref, onBack, enableAlbumActions = false, enableSwipe = false, albumIds = [] }) => {
+    const router = useRouter();
     const imageRef = useRef(null);
+    const touchStartRef = useRef(null);
     const [detail, setDetail] = useState(null);
     const [error, setError] = useState("");
     const [imageAspectRatio, setImageAspectRatio] = useState(4 / 3);
@@ -45,6 +48,7 @@ const AlbumDetail = ({ id, backHref, onBack, enableAlbumActions = false }) => {
 
     useEffect(() => {
         let active = true;
+        setError("");
 
         ky.post("/api/album/detail", { json: { id } })
             .json()
@@ -75,6 +79,40 @@ const AlbumDetail = ({ id, backHref, onBack, enableAlbumActions = false }) => {
             active = false;
         };
     }, [id]);
+
+    const handleTouchStart = (event) => {
+        const touch = event.touches[0];
+        touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+    };
+
+    const getAdjacentAlbumId = (direction) => {
+        const currentIndex = albumIds.indexOf(Number(id));
+        if (currentIndex < 0) return null;
+
+        return albumIds[currentIndex + direction] ?? null;
+    };
+
+    const handleAlbumChange = (direction) => {
+        const targetId = getAdjacentAlbumId(direction);
+        if (targetId) {
+            router.replace(`/user_func/album/detail/${targetId}?albumIds=${albumIds.join(",")}`);
+        }
+    };
+
+    const handleTouchEnd = (event) => {
+        const touchStart = touchStartRef.current;
+        const touch = event.changedTouches[0];
+        touchStartRef.current = null;
+
+        if (!touchStart || !touch) return;
+
+        const distanceX = touch.clientX - touchStart.x;
+        const distanceY = touch.clientY - touchStart.y;
+
+        if (Math.abs(distanceX) < 56 || Math.abs(distanceX) <= Math.abs(distanceY)) return;
+
+        handleAlbumChange(distanceX > 0 ? 1 : -1);
+    };
 
     const handleDownload = async () => {
         if (!detail?.pic || isDownloading) return;
@@ -342,8 +380,10 @@ const AlbumDetail = ({ id, backHref, onBack, enableAlbumActions = false }) => {
     return (
         <article className="min-h-[100dvh] w-full bg-[#fffefa] text-[#40352c]">
             <div
-                className="relative w-full overflow-hidden bg-stone-200"
+                className="relative w-full touch-pan-y overflow-hidden bg-stone-200"
                 style={{ aspectRatio: imageAspectRatio }}
+                onTouchStart={enableSwipe ? handleTouchStart : undefined}
+                onTouchEnd={enableSwipe ? handleTouchEnd : undefined}
             >
                 <Image
                     ref={imageRef}
@@ -360,6 +400,30 @@ const AlbumDetail = ({ id, backHref, onBack, enableAlbumActions = false }) => {
                         }
                     }}
                 />
+
+                {enableSwipe && getAdjacentAlbumId(-1) && (
+                    <button
+                        type="button"
+                        onClick={() => handleAlbumChange(-1)}
+                        aria-label="上一张"
+                        title="上一张"
+                        className="absolute left-4 top-1/2 z-20 grid size-10 -translate-y-1/2 place-items-center rounded-full bg-black/45 text-white shadow-sm backdrop-blur-md transition hover:bg-black/60"
+                    >
+                        <ChevronLeft className="size-6" />
+                    </button>
+                )}
+
+                {enableSwipe && getAdjacentAlbumId(1) && (
+                    <button
+                        type="button"
+                        onClick={() => handleAlbumChange(1)}
+                        aria-label="下一张"
+                        title="下一张"
+                        className="absolute right-4 top-1/2 z-20 grid size-10 -translate-y-1/2 place-items-center rounded-full bg-black/45 text-white shadow-sm backdrop-blur-md transition hover:bg-black/60"
+                    >
+                        <ChevronRight className="size-6" />
+                    </button>
+                )}
 
                 {showMarkers && (
                     <>
