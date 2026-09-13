@@ -31,12 +31,15 @@ const AlbumDetail = ({ id, backHref, onBack, enableAlbumActions = false, enableS
     const imageRef = useRef(null);
     const touchStartRef = useRef(null);
     const markerPreviewTimerRef = useRef(null);
+    const highlightTimerRef = useRef(null);
+    const itemRefs = useRef(new Map());
     const [detail, setDetail] = useState(null);
     const [error, setError] = useState("");
     const [imageAspectRatio, setImageAspectRatio] = useState(4 / 3);
     const [showMarkers, setShowMarkers] = useState(false);
     const [isMarkerPreviewing, setIsMarkerPreviewing] = useState(false);
     const [isImageUiVisible, setIsImageUiVisible] = useState(true);
+    const [highlightedItemId, setHighlightedItemId] = useState(null);
     const [isDownloading, setIsDownloading] = useState(false);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [analysisSubmitted, setAnalysisSubmitted] = useState(false);
@@ -52,10 +55,12 @@ const AlbumDetail = ({ id, backHref, onBack, enableAlbumActions = false, enableS
     useEffect(() => {
         let active = true;
         clearTimeout(markerPreviewTimerRef.current);
+        clearTimeout(highlightTimerRef.current);
         setError("");
         setShowMarkers(false);
         setIsMarkerPreviewing(false);
         setIsImageUiVisible(true);
+        setHighlightedItemId(null);
 
         ky.post("/api/album/detail", { json: { id } })
             .json()
@@ -84,6 +89,7 @@ const AlbumDetail = ({ id, backHref, onBack, enableAlbumActions = false, enableS
         return () => {
             active = false;
             clearTimeout(markerPreviewTimerRef.current);
+            clearTimeout(highlightTimerRef.current);
         };
     }, [id]);
 
@@ -99,6 +105,15 @@ const AlbumDetail = ({ id, backHref, onBack, enableAlbumActions = false, enableS
         markerPreviewTimerRef.current = setTimeout(() => {
             setShowMarkers(false);
             setIsMarkerPreviewing(false);
+        }, 1000);
+    };
+
+    const handleMarkerClick = (itemId) => {
+        itemRefs.current.get(itemId)?.scrollIntoView({ behavior: "smooth", block: "center" });
+        clearTimeout(highlightTimerRef.current);
+        setHighlightedItemId(itemId);
+        highlightTimerRef.current = setTimeout(() => {
+            setHighlightedItemId(null);
         }, 1000);
     };
 
@@ -455,18 +470,24 @@ const AlbumDetail = ({ id, backHref, onBack, enableAlbumActions = false, enableS
                         {markedItems.map((item) => (
                             <div
                                 key={item.id}
-                                className="absolute z-10 -translate-x-1/2 -translate-y-1/2"
+                                className="absolute z-20 -translate-x-1/2 -translate-y-1/2"
                                 style={{
                                     left: `${clampPercent(item.center_x_percent)}%`,
                                     top: `${clampPercent(item.center_y_percent)}%`,
                                 }}
                             >
-                                <div className="flex flex-col items-center drop-shadow-lg">
+                                <button
+                                    type="button"
+                                    onClick={() => handleMarkerClick(item.id)}
+                                    aria-label={`查看${item.name}`}
+                                    title={`查看${item.name}`}
+                                    className="flex flex-col items-center drop-shadow-lg"
+                                >
                                     <span className="whitespace-nowrap rounded-full bg-black/70 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm">
                                         {item.name}
                                     </span>
                                     <span className="mt-1 size-3 rounded-full border-2 border-white bg-amber-400 shadow" />
-                                </div>
+                                </button>
                             </div>
                         ))}
                     </>
@@ -624,7 +645,16 @@ const AlbumDetail = ({ id, backHref, onBack, enableAlbumActions = false, enableS
                                 const alternativeNames = normalizeAlternativeNames(item.alternative_names);
 
                                 return (
-                                    <div key={item.id} className="flex items-start gap-4 py-4">
+                                    <div
+                                        key={item.id}
+                                        ref={(node) => {
+                                            if (node) itemRefs.current.set(item.id, node);
+                                            else itemRefs.current.delete(item.id);
+                                        }}
+                                        className={`flex items-start gap-4 py-4 transition-colors ${
+                                            highlightedItemId === item.id ? "bg-amber-100/80" : ""
+                                        }`}
+                                    >
                                         <div className="min-w-0 flex-1">
                                             {editingItemId === item.id ? (
                                                 <div className="space-y-2">
