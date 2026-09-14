@@ -42,10 +42,13 @@ export async function POST(request) {
 }
 
 export async function PATCH(request) {
-    const { albumId, itemId, name } = await request.json();
+    const { albumId, itemId, name, estimatedAmount } = await request.json();
     const normalizedAlbumId = Number(albumId);
     const normalizedItemId = Number(itemId);
     const normalizedName = typeof name === "string" ? name.trim() : "";
+    const normalizedAmount = typeof estimatedAmount === "string"
+        ? estimatedAmount.trim()
+        : "";
 
     if (
         !Number.isSafeInteger(normalizedAlbumId)
@@ -54,6 +57,8 @@ export async function PATCH(request) {
         || normalizedItemId <= 0
         || !normalizedName
         || normalizedName.length > 100
+        || !normalizedAmount
+        || normalizedAmount.length > 100
     ) {
         return NextResponse.json({ message: "成分信息不正确" }, { status: 400 });
     }
@@ -63,10 +68,11 @@ export async function PATCH(request) {
         .update({
             name: normalizedName,
             alternative_names: [],
+            estimated_amount: normalizedAmount,
         })
         .eq("id", normalizedItemId)
         .eq("album_id", normalizedAlbumId)
-        .select("id,name,alternative_names")
+        .select("id,name,alternative_names,estimated_amount")
         .single();
 
     if (error) {

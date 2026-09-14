@@ -45,6 +45,7 @@ const AlbumDetail = ({ id, backHref, onBack, onStatusChange, enableAlbumActions 
     const [analysisSubmitted, setAnalysisSubmitted] = useState(false);
     const [editingItemId, setEditingItemId] = useState(null);
     const [editingName, setEditingName] = useState("");
+    const [editingAmount, setEditingAmount] = useState("");
     const [savingItemId, setSavingItemId] = useState(null);
     const [isAddingItem, setIsAddingItem] = useState(false);
     const [newItemName, setNewItemName] = useState("");
@@ -257,18 +258,21 @@ const AlbumDetail = ({ id, backHref, onBack, onStatusChange, enableAlbumActions 
     const startEditingItem = (item) => {
         setEditingItemId(item.id);
         setEditingName(item.name || "");
+        setEditingAmount(item.estimated_amount || "");
     };
 
     const cancelEditingItem = () => {
         setEditingItemId(null);
         setEditingName("");
+        setEditingAmount("");
     };
 
     const saveItemName = async (item) => {
         const name = editingName.trim();
+        const estimatedAmount = editingAmount.trim();
 
-        if (!name || savingItemId != null) {
-            if (!name) toast.error("请输入成分名称");
+        if (!name || !estimatedAmount || savingItemId != null) {
+            if (!name || !estimatedAmount) toast.error("请输入名称和分量");
             return;
         }
 
@@ -280,6 +284,7 @@ const AlbumDetail = ({ id, backHref, onBack, onStatusChange, enableAlbumActions 
                     albumId: id,
                     itemId: item.id,
                     name,
+                    estimatedAmount,
                 },
             }).json();
             const updatedItem = response.item;
@@ -733,6 +738,23 @@ const AlbumDetail = ({ id, backHref, onBack, onStatusChange, enableAlbumActions 
                                                         }}
                                                         autoFocus
                                                         maxLength={100}
+                                                        className="h-9 w-full rounded-lg border border-amber-300 bg-white px-3 text-sm text-foreground outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-100"
+                                                    />
+                                                    <input
+                                                        type="text"
+                                                        value={editingAmount}
+                                                        onChange={(event) => setEditingAmount(event.target.value)}
+                                                        onKeyDown={(event) => {
+                                                            if (event.key === "Enter") {
+                                                                event.preventDefault();
+                                                                saveItemName(item);
+                                                            }
+                                                            if (event.key === "Escape") {
+                                                                cancelEditingItem();
+                                                            }
+                                                        }}
+                                                        maxLength={100}
+                                                        placeholder="份量"
                                                         className="h-9 w-full rounded-lg border border-amber-300 bg-white px-3 text-sm text-foreground outline-none transition focus:border-amber-500 focus:ring-2 focus:ring-amber-100"
                                                     />
                                                     <div className="flex flex-wrap gap-1.5">
