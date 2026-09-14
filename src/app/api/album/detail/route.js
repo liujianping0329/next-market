@@ -12,7 +12,7 @@ export async function POST(request) {
     const [albumResult, itemsResult] = await Promise.all([
         supabase
             .from("album")
-            .select("id,pic,title,detail,created_at,status,f_user(*)")
+            .select("id,pic,title,detail,created_at,status,album_user(*,f_user(*))")
             .eq("id", id)
             .single(),
         supabase

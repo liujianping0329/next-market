@@ -428,7 +428,9 @@ const AlbumDetail = ({ id, backHref, onBack, onStatusChange, enableAlbumActions 
 
     const albumItems = detail.albumItems ?? [];
     const isVerified = detail.status === 2;
-    const albumUsers = detail.albumUsers ?? [detail.f_user].filter(Boolean);
+    const albumUsers = (detail.album_user ?? [])
+        .map((albumUser) => albumUser.f_user)
+        .filter(Boolean);
     const markedItems = albumItems
         .filter((item) => item.center_x_percent != null && item.center_y_percent != null)
         .slice(0, 4);

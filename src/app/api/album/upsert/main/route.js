@@ -52,6 +52,14 @@ export async function POST(request, context) {
     //     }
     // }
     const { data, error } = await supabase.from('album').upsert({ pic: fileUrl, userId, planetId, locationId }).select().single();
+    const { error: albumUserError } = await supabase
+        .from("album_user")
+        .insert({ album_id: data.id, user_id: userId, role: "creator" });
+
+    if (albumUserError) {
+        return NextResponse.json({ message: albumUserError.message }, { status: 500 });
+    }
+
     waitUntil(
         ky.post(`${process.env.SPRING_AI_URL}/api/ai/album/analyze`, {
             json: {

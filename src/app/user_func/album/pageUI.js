@@ -14,6 +14,7 @@ import Image from "next/image";
 import { Switch } from "@/components/ui/switch";
 import useLongPress from "@/hooks/useLongPress";
 import { useAlbumListRefresh } from "./_component/AlbumListRefreshContext";
+import AlbumMoreOpMenu from "./_component/AlbumMoreOpMenu";
 
 const timeGroups = [
     { name: "凌晨", start: 0, end: 7 },
@@ -46,6 +47,7 @@ const AlbumUI = ({ }) => {
 
     const inputRef = useRef(null);
     const hasFetchedYesterdayCountRef = useRef(false);
+    const suppressDetailOpenRef = useRef(false);
     const router = useRouter();
     const searchParams = useSearchParams();
     const { refreshKey } = useAlbumListRefresh();
@@ -55,6 +57,8 @@ const AlbumUI = ({ }) => {
     const [isListLoaded, setIsListLoaded] = useState(false);
     const [isPush, setIsPush] = useState(true);
     const [yesterdayCount, setYesterdayCount] = useState(null);
+    const [moreOpMenuOpen, setMoreOpMenuOpen] = useState(false);
+    const [moreOpMenuTarget, setMoreOpMenuTarget] = useState(null);
     const tabParam = searchParams.get("tab");
     const activeTab = tabs.some((tab) => tab.value === tabParam) ? tabParam : "all";
 
@@ -86,6 +90,11 @@ const AlbumUI = ({ }) => {
         setYesterdayCount(response.list.length);
     };
 
+    const handleMoreOpSuccess = () => {
+        fetchList();
+        fetchYesterdayCount();
+    };
+
     const handleTabChange = (tab) => {
         const params = new URLSearchParams(searchParams.toString());
 
@@ -102,18 +111,12 @@ const AlbumUI = ({ }) => {
                 item => item.id === Number(e.currentTarget.dataset.no)
             );
         },
-        onLongPress: async (item) => {
+        onLongPress: (item) => {
             if (!item) return;
 
-            if (!confirm("确定删除这张图片吗？")) return;
-
-            await ky.post("/api/album/delete", {
-                json: {
-                    id: item.id
-                }
-            });
-
-            fetchList();
+            suppressDetailOpenRef.current = true;
+            setMoreOpMenuTarget(item);
+            setMoreOpMenuOpen(true);
         },
     });
 
@@ -258,10 +261,19 @@ const AlbumUI = ({ }) => {
                         </div>
 
                         <div className="grid grid-cols-3 gap-2">
-                            {group.items.map((item) => (
+                            {group.items.map((item) => {
+                                const albumUsers = item.album_user ?? [];
+
+                                return (
                                 <div className="relative aspect-[3/4] w-full cursor-pointer overflow-hidden rounded-lg" key={item.id}
                                     data-no={item.id}
-                                    onClick={() => openDetail(item.id)}
+                                    onClick={() => {
+                                        if (suppressDetailOpenRef.current) {
+                                            suppressDetailOpenRef.current = false;
+                                            return;
+                                        }
+                                        openDetail(item.id);
+                                    }}
                                     {...longPressHandle}>
                                     <Image
                                         src={item.pic}
@@ -282,22 +294,39 @@ const AlbumUI = ({ }) => {
                                         </span>
                                     )}
                                     <div className="absolute inset-x-0 bottom-0 flex items-center gap-1.5 bg-black/45 px-2 py-1.5">
-                                        <img
-                                            src={item.f_user?.raw_user_meta_data?.avatar_url || "/default-avatar.png"}
-                                            alt=""
-                                            className="h-5 w-5 shrink-0 rounded-full object-cover border border-white/50"
-                                        />
+                                        <div className="flex -space-x-1.5">
+                                            {albumUsers.map((albumUser) => (
+                                                <img
+                                                    key={albumUser.user_id}
+                                                    src={albumUser.f_user?.raw_user_meta_data?.avatar_url || "/default-avatar.png"}
+                                                    alt=""
+                                                    className="h-5 w-5 shrink-0 rounded-full border border-white/50 object-cover"
+                                                />
+                                            ))}
+                                        </div>
 
                                         <span className="truncate text-[11px] text-white">
-                                            {item.f_user?.raw_user_meta_data?.name || "未知用户"}
+                                            {albumUsers.length === 1
+                                                ? albumUsers[0].f_user?.raw_user_meta_data?.name || "未知用户"
+                                                : albumUsers.length > 1
+                                                    ? `等 ${albumUsers.length} 人`
+                                                    : "未知用户"}
                                         </span>
                                     </div>
                                 </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     </div>
                 ))}
             </main>
+            <AlbumMoreOpMenu
+                open={moreOpMenuOpen}
+                onOpenChange={setMoreOpMenuOpen}
+                target={moreOpMenuTarget}
+                userInfo={userInfo}
+                onSuccess={handleMoreOpSuccess}
+            />
         </>
     );
 }
