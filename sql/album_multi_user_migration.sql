@@ -49,3 +49,7 @@ do update set role = excluded.role;
 -- 后续新增照片时，同步写入创建者关联记录：
 -- insert into public.album_user (album_id, user_id, role)
 -- values (:album_id, :user_id, 'creator');
+
+-- 应用代码完成多用户改造并执行上方数据迁移后，再删除旧创建者字段
+alter table public.album
+drop column "userId";

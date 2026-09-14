@@ -47,7 +47,7 @@ export async function POST(request) {
     const albumQueryStartedAt = Date.now();
     const { data: album, error: albumError } = await supabase
         .from("album")
-        .select("id,pic,userId,planetId")
+        .select("id,pic,planetId")
         .eq("id", albumId)
         .single();
 
@@ -100,7 +100,6 @@ export async function POST(request) {
                 mimeType,
                 isPush: false,
                 planetId: album.planetId,
-                userId: album.userId,
             },
             timeout: 300_000,
             retry: 0,

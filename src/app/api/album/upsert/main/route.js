@@ -51,7 +51,7 @@ export async function POST(request, context) {
     //         throw error;
     //     }
     // }
-    const { data, error } = await supabase.from('album').upsert({ pic: fileUrl, userId, planetId, locationId }).select().single();
+    const { data, error } = await supabase.from('album').upsert({ pic: fileUrl, planetId, locationId }).select().single();
     const { error: albumUserError } = await supabase
         .from("album_user")
         .insert({ album_id: data.id, user_id: userId, role: "creator" });
@@ -68,7 +68,6 @@ export async function POST(request, context) {
                 mimeType: file.type,
                 isPush,
                 planetId,
-                userId,
             },
             timeout: 300_000,
             retry: 0,
