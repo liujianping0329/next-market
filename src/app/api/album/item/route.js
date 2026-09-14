@@ -67,7 +67,6 @@ export async function PATCH(request) {
         .from("album_item")
         .update({
             name: normalizedName,
-            alternative_names: [],
             estimated_amount: normalizedAmount,
         })
         .eq("id", normalizedItemId)
