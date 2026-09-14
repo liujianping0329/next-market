@@ -51,6 +51,25 @@ export async function POST(request) {
         });
     }
 
+    const submittedAt = new Date().toISOString();
+    const reportData = {
+        status: "analyzing_nutrition",
+        album_ids: payload.albumIds,
+        submitted_at: submittedAt,
+        error_message: null,
+    };
+    const { error: reportError } = await supabase
+        .from("diet_daily_report")
+        .upsert({
+            user_id: userId,
+            target_date: targetDate,
+            ...reportData,
+        }, { onConflict: "user_id,target_date" });
+
+    if (reportError) {
+        return NextResponse.json({ message: reportError.message }, { status: 500 });
+    }
+
     waitUntil(
         ky.post(`${process.env.SPRING_AI_URL}/api/ai/diet/daily-report`, {
             json: payload,
