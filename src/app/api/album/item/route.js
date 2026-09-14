@@ -31,7 +31,7 @@ export async function POST(request) {
             center_x_percent: null,
             center_y_percent: null,
         })
-        .select("id,name,alternative_names,estimated_amount,center_x_percent,center_y_percent")
+        .select("id,name,alternative_names,estimated_amount,status,center_x_percent,center_y_percent")
         .single();
 
     if (error) {
@@ -68,10 +68,11 @@ export async function PATCH(request) {
         .update({
             name: normalizedName,
             estimated_amount: normalizedAmount,
+            status: 2,
         })
         .eq("id", normalizedItemId)
         .eq("album_id", normalizedAlbumId)
-        .select("id,name,alternative_names,estimated_amount")
+        .select("id,name,alternative_names,estimated_amount,status")
         .single();
 
     if (error) {

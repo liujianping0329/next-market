@@ -771,7 +771,10 @@ const AlbumDetail = ({ id, backHref, onBack, onStatusChange, enableAlbumActions 
                                                     </div>
                                                 </div>
                                             ) : (
-                                                <p className="font-medium text-foreground">{item.name}</p>
+                                                <div className="flex items-center gap-1.5">
+                                                    {item.status === 2 && <Check className="size-4 shrink-0 text-emerald-600" />}
+                                                    <p className="font-medium text-foreground">{item.name}</p>
+                                                </div>
                                             )}
                                             {editingItemId !== item.id && alternativeNames.length > 0 && (
                                                 <p className="mt-1 text-xs leading-5 text-muted-foreground">

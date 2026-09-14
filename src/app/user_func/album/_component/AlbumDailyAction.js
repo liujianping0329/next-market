@@ -1,11 +1,28 @@
 "use client";
 
+import ky from "ky";
 import Datepicker from "@/components/datepicker";
 import { Button } from "@/components/ui/button";
 
-const AlbumDailyAction = ({ date, enable = true, list = [], onDateChange }) => {
+const AlbumDailyAction = ({ date, userId, enable = true, list = [], onDateChange }) => {
     const pendingCount = list.filter((item) => item.status !== 2).length;
     const isAllVerified = pendingCount === 0;
+
+    const generateDailyReport = async () => {
+        const targetDate = [
+            date.getFullYear(),
+            String(date.getMonth() + 1).padStart(2, "0"),
+            String(date.getDate()).padStart(2, "0"),
+        ].join("-");
+
+        await ky.post("/api/album/daily-report", {
+            json: {
+                userId,
+                targetDate,
+                albumIds: list.map((item) => item.id),
+            },
+        });
+    };
 
     return (
         <section className="mb-3 flex items-center justify-between gap-2 rounded-lg bg-muted px-3 py-1.5">
@@ -26,6 +43,7 @@ const AlbumDailyAction = ({ date, enable = true, list = [], onDateChange }) => {
                     type="button"
                     size="sm"
                     disabled={!isAllVerified}
+                    onClick={generateDailyReport}
                     className="h-8 bg-sky-600 px-2 text-xs text-white hover:bg-sky-700"
                 >
                     生成日报

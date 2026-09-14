@@ -256,7 +256,12 @@ const AlbumUI = ({ }) => {
                     ))}
                 </div>}
                 {isListLoaded && loadedTab === activeTab && activeTab === "yesterday" && (
-                    <AlbumDailyAction date={getYesterdayLabel()} enable={false} list={list} />
+                    <AlbumDailyAction
+                        date={getYesterdayLabel()}
+                        userId={userInfo.id}
+                        enable={false}
+                        list={list}
+                    />
                 )}
                 {groups.map((group) => (
                     <div

@@ -17,7 +17,7 @@ export async function POST(request) {
             .single(),
         supabase
             .from("album_item")
-            .select("id,name,alternative_names,estimated_amount,center_x_percent,center_y_percent")
+            .select("id,name,alternative_names,estimated_amount,status,center_x_percent,center_y_percent")
             .eq("album_id", id)
             .order("id", { ascending: true }),
     ]);
