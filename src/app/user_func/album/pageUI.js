@@ -15,6 +15,7 @@ import { Switch } from "@/components/ui/switch";
 import useLongPress from "@/hooks/useLongPress";
 import { useAlbumListRefresh } from "./_component/AlbumListRefreshContext";
 import AlbumMoreOpMenu from "./_component/AlbumMoreOpMenu";
+import AlbumDailyAction from "./_component/AlbumDailyAction";
 
 const timeGroups = [
     { name: "凌晨", start: 0, end: 7 },
@@ -43,6 +44,13 @@ const getYesterdayRange = () => {
     };
 };
 
+const getYesterdayLabel = () => {
+    const date = new Date();
+    date.setDate(date.getDate() - 1);
+    date.setHours(0, 0, 0, 0);
+    return date;
+};
+
 const AlbumUI = ({ }) => {
 
     const inputRef = useRef(null);
@@ -55,6 +63,7 @@ const AlbumUI = ({ }) => {
     const [nearestLocation, setNearestLocation] = useState(null);
     const [list, setList] = useState([]);
     const [isListLoaded, setIsListLoaded] = useState(false);
+    const [loadedTab, setLoadedTab] = useState(null);
     const [isPush, setIsPush] = useState(true);
     const [yesterdayCount, setYesterdayCount] = useState(null);
     const [moreOpMenuOpen, setMoreOpMenuOpen] = useState(false);
@@ -77,6 +86,7 @@ const AlbumUI = ({ }) => {
         }).json();
         setList(response.list);
         setIsListLoaded(true);
+        setLoadedTab(activeTab);
     };
 
     const fetchYesterdayCount = async () => {
@@ -224,7 +234,7 @@ const AlbumUI = ({ }) => {
                 </div>
             </CommonHeader >
             <main className="container mx-auto px-4">
-                {isListLoaded && <div className="mb-3 flex gap-2 overflow-x-auto pb-1 pt-2">
+                {isListLoaded && <div className="mb-1 flex gap-2 overflow-x-auto pb-1 pt-2">
                     {tabs.map((tab) => (
                         <button
                             key={tab.value}
@@ -245,6 +255,9 @@ const AlbumUI = ({ }) => {
                         </button>
                     ))}
                 </div>}
+                {isListLoaded && loadedTab === activeTab && activeTab === "yesterday" && (
+                    <AlbumDailyAction date={getYesterdayLabel()} enable={false} list={list} />
+                )}
                 {groups.map((group) => (
                     <div
                         key={`${group.date}-${group.name}`}
@@ -265,55 +278,54 @@ const AlbumUI = ({ }) => {
                                 const albumUsers = item.album_user ?? [];
 
                                 return (
-                                <div className="relative aspect-[3/4] w-full cursor-pointer overflow-hidden rounded-lg" key={item.id}
-                                    data-no={item.id}
-                                    onClick={() => {
-                                        if (suppressDetailOpenRef.current) {
-                                            suppressDetailOpenRef.current = false;
-                                            return;
-                                        }
-                                        openDetail(item.id);
-                                    }}
-                                    {...longPressHandle}>
-                                    <Image
-                                        src={item.pic}
-                                        alt={item.name || ""}
-                                        fill
-                                        className="rounded-lg object-cover"
-                                    />
-                                    {!item.hasAlbumItems && (
-                                        <span className="absolute right-1.5 top-1.5 z-10 rounded-full bg-amber-500/90 px-2 py-0.5 text-[10px] font-medium text-white shadow-sm backdrop-blur-sm">
-                                            待分析
-                                        </span>
-                                    )}
-                                    {item.hasAlbumItems && (
-                                        <span className={`absolute right-1.5 top-1.5 z-10 rounded-full px-2 py-0.5 text-[10px] font-medium text-white shadow-sm backdrop-blur-sm ${
-                                            item.status === 2 ? "bg-emerald-500/90" : "bg-sky-500/90"
-                                        }`}>
-                                            {item.status === 2 ? "已校对" : "待校对"}
-                                        </span>
-                                    )}
-                                    <div className="absolute inset-x-0 bottom-0 flex items-center gap-1.5 bg-black/45 px-2 py-1.5">
-                                        <div className="flex -space-x-1.5">
-                                            {albumUsers.map((albumUser) => (
-                                                <img
-                                                    key={albumUser.user_id}
-                                                    src={albumUser.f_user?.raw_user_meta_data?.avatar_url || "/default-avatar.png"}
-                                                    alt=""
-                                                    className="h-5 w-5 shrink-0 rounded-full border border-white/50 object-cover"
-                                                />
-                                            ))}
-                                        </div>
+                                    <div className="relative aspect-[3/4] w-full cursor-pointer overflow-hidden rounded-lg" key={item.id}
+                                        data-no={item.id}
+                                        onClick={() => {
+                                            if (suppressDetailOpenRef.current) {
+                                                suppressDetailOpenRef.current = false;
+                                                return;
+                                            }
+                                            openDetail(item.id);
+                                        }}
+                                        {...longPressHandle}>
+                                        <Image
+                                            src={item.pic}
+                                            alt={item.name || ""}
+                                            fill
+                                            className="rounded-lg object-cover"
+                                        />
+                                        {!item.hasAlbumItems && (
+                                            <span className="absolute right-1.5 top-1.5 z-10 rounded-full bg-amber-500/90 px-2 py-0.5 text-[10px] font-medium text-white shadow-sm backdrop-blur-sm">
+                                                待分析
+                                            </span>
+                                        )}
+                                        {item.hasAlbumItems && (
+                                            <span className={`absolute right-1.5 top-1.5 z-10 rounded-full px-2 py-0.5 text-[10px] font-medium text-white shadow-sm backdrop-blur-sm ${item.status === 2 ? "bg-emerald-500/90" : "bg-sky-500/90"
+                                                }`}>
+                                                {item.status === 2 ? "已校对" : "待校对"}
+                                            </span>
+                                        )}
+                                        <div className="absolute inset-x-0 bottom-0 flex items-center gap-1.5 bg-black/45 px-2 py-1.5">
+                                            <div className="flex -space-x-1.5">
+                                                {albumUsers.map((albumUser) => (
+                                                    <img
+                                                        key={albumUser.user_id}
+                                                        src={albumUser.f_user?.raw_user_meta_data?.avatar_url || "/default-avatar.png"}
+                                                        alt=""
+                                                        className="h-5 w-5 shrink-0 rounded-full border border-white/50 object-cover"
+                                                    />
+                                                ))}
+                                            </div>
 
-                                        <span className="truncate text-[11px] text-white">
-                                            {albumUsers.length === 1
-                                                ? albumUsers[0].f_user?.raw_user_meta_data?.name || "未知用户"
-                                                : albumUsers.length > 1
-                                                    ? `等 ${albumUsers.length} 人`
-                                                    : "未知用户"}
-                                        </span>
+                                            <span className="truncate text-[11px] text-white">
+                                                {albumUsers.length === 1
+                                                    ? albumUsers[0].f_user?.raw_user_meta_data?.name || "未知用户"
+                                                    : albumUsers.length > 1
+                                                        ? `等 ${albumUsers.length} 人`
+                                                        : "未知用户"}
+                                            </span>
+                                        </div>
                                     </div>
-                                </div>
                                 );
                             })}
                         </div>
