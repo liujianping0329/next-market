@@ -11,8 +11,6 @@ create table public.diet_daily_report (
     dinner_advice text,
     future_attention text,
     health_context text,
-    report_json jsonb,
-    report_model text,
     error_message text,
     submitted_at timestamp with time zone,
     completed_at timestamp with time zone,
@@ -41,8 +39,6 @@ comment on column public.diet_daily_report.lunch_advice is '午餐建议';
 comment on column public.diet_daily_report.dinner_advice is '晚餐建议';
 comment on column public.diet_daily_report.future_attention is '后续注意事项';
 comment on column public.diet_daily_report.health_context is '健康背景信息';
-comment on column public.diet_daily_report.report_json is 'AI原始日报结果';
-comment on column public.diet_daily_report.report_model is '生成日报使用的模型';
 comment on column public.diet_daily_report.error_message is '处理失败信息';
 comment on column public.diet_daily_report.submitted_at is '日报提交时间';
 comment on column public.diet_daily_report.completed_at is '日报完成时间';

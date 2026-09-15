@@ -4,4 +4,6 @@ drop column if exists daily_nutrition,
 drop column if exists meal_nutrition,
 drop column if exists questionnaire_created_at,
 drop column if exists questionnaire_push_at,
+drop column if exists report_model,
+drop column if exists report_json,
 drop column if exists updated_at;

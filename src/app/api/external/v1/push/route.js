@@ -54,8 +54,11 @@ import ky from "ky";
  *         description: 服务器内部错误
  */
 export async function POST(request, context) {
-    const { planetId = 1, detail } = await request.json();
-    const { data: tarUsersList } = await supabase.from('f_user').select("id").eq("planetId", planetId);
+    const { planetId = 1, userId, detail } = await request.json();
+    let userQuery = supabase.from('f_user').select("id");
+    if (userId) userQuery = userQuery.eq("id", userId);
+    else userQuery = userQuery.eq("planetId", planetId);
+    const { data: tarUsersList } = await userQuery;
 
     const origin = new URL(request.url).origin;
     let pushInfo = {};
