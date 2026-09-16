@@ -3,6 +3,8 @@
 import ky from "ky";
 import { useEffect, useState } from "react";
 
+import DailyNutritionDashboard from "./DailyNutritionDashboard";
+
 const AlbumDailyReportContent = ({ reportId, userId, targetDate }) => {
     const [report, setReport] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -60,6 +62,7 @@ const AlbumDailyReportContent = ({ reportId, userId, targetDate }) => {
     return (
         <div className="space-y-4 text-sm leading-6">
             {report.summary && <p className="rounded-lg bg-sky-50 p-3 text-slate-700">{report.summary}</p>}
+            <DailyNutritionDashboard report={report} />
             {[
                 ["早餐建议", report.breakfast_advice],
                 ["午餐建议", report.lunch_advice],
