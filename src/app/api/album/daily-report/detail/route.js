@@ -13,7 +13,7 @@ export async function POST(request) {
 
     let query = supabase
         .from("diet_daily_report")
-        .select("id,status,summary,breakfast_advice,lunch_advice,dinner_advice,future_attention,health_context,completed_at");
+        .select("id,target_date,status,summary,breakfast_advice,lunch_advice,dinner_advice,future_attention,health_context,completed_at");
 
     if (hasReportId) {
         query = query.eq("id", normalizedReportId);
