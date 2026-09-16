@@ -13,7 +13,7 @@ export async function POST(request) {
 
     let query = supabase
         .from("diet_daily_report")
-        .select("id,target_date,status,summary,breakfast_advice,lunch_advice,dinner_advice,future_attention,health_context,completed_at");
+        .select("id,target_date,status,summary,breakfast_advice,lunch_advice,dinner_advice,future_attention,health_context,completed_at,nut_calories_kcal,nut_protein_g,nut_fat_g,nut_saturated_fat_g,nut_carbohydrate_g,nut_dietary_fiber_g,nut_vitamin_a_ug,nut_vitamin_b1_mg,nut_vitamin_b2_mg,nut_vitamin_b6_mg,nut_vitamin_b12_ug,nut_vitamin_c_mg,nut_vitamin_d_ug,nut_calcium_mg,nut_iron_mg,nut_sodium_mg,nut_potassium_mg");
 
     if (hasReportId) {
         query = query.eq("id", normalizedReportId);
