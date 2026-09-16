@@ -31,8 +31,6 @@ export async function POST(request) {
     }
 
     const payload = {
-        userId,
-        targetDate,
         albumIds: albums.map((album) => album.id),
         breakfastAlbums: [],
         lunchAlbums: [],
@@ -58,17 +56,21 @@ export async function POST(request) {
         submitted_at: submittedAt,
         error_message: null,
     };
-    const { error: reportError } = await supabase
+    const { data: report, error: reportError } = await supabase
         .from("diet_daily_report")
         .upsert({
             user_id: userId,
             target_date: targetDate,
             ...reportData,
-        }, { onConflict: "user_id,target_date" });
+        }, { onConflict: "user_id,target_date" })
+        .select("id")
+        .single();
 
     if (reportError) {
         return NextResponse.json({ message: reportError.message }, { status: 500 });
     }
+
+    payload.reportId = report.id;
 
     waitUntil(
         ky.post(`${process.env.SPRING_AI_URL}/api/ai/diet/daily-report`, {
@@ -85,5 +87,9 @@ export async function POST(request) {
         }),
     );
 
-    return NextResponse.json({ accepted: true }, { status: 202 });
+    return NextResponse.json({
+        accepted: true,
+        reportId: report.id,
+        report: { id: report.id, status: reportData.status },
+    }, { status: 202 });
 }
