@@ -2,7 +2,7 @@
 
 import ky from "ky";
 import { DownloadOne, LoadingFour, Magic, PreviewClose, PreviewOpen } from "@icon-park/react";
-import { ArrowLeft, Check, ChevronLeft, ChevronRight, Pencil, Plus, Sparkles, Trash2, X } from "lucide-react";
+import { ArrowLeft, Check, ChevronLeft, ChevronRight, MapPin, Pencil, Plus, Sparkles, Trash2, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -601,9 +601,15 @@ const AlbumDetail = ({ id, backHref, onBack, onStatusChange, enableAlbumActions 
 
             <main className="px-5 pb-14 pt-5">
                 <div className="flex items-center justify-between gap-3">
-                    {createdAt && (
-                        <p className="text-xs text-muted-foreground">{createdAt}</p>
-                    )}
+                    <div className="flex min-w-0 items-center gap-3 text-xs text-muted-foreground">
+                        {createdAt && <p>{createdAt}</p>}
+                        {detail.location?.name && (
+                            <span className="flex min-w-0 items-center gap-1">
+                                <MapPin className="size-3.5 shrink-0" />
+                                <span className="truncate">{detail.location.name}</span>
+                            </span>
+                        )}
+                    </div>
                     {albumUsers.length > 0 && (
                         <div className="flex -space-x-2" aria-label="图片创建者">
                             {albumUsers.map((user) => (
