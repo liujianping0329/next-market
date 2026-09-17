@@ -1,0 +1,97 @@
+{
+  "schemaVersion": "nutrition-target.v1",
+  "ruleVersion": "JP_DRI_2025_V1",
+  "generatedAt": "2026-09-17T12:28:04.994Z",
+  "profile": {
+    "sex": "male",
+    "birthDate": "1992-03-29",
+    "age": 34,
+    "ageBand": "30-49",
+    "heightCm": 173,
+    "currentWeightKg": 103.8,
+    "targetWeightKg": 95,
+    "referenceWeightKg": 95,
+    "bodyFatPct": null,
+    "activity": "low",
+    "bmi": 34.7,
+    "menstruation": null,
+    "ckdStage": null
+  },
+  "goals": [
+    "loss",
+    "glucose"
+  ],
+  "healthTags": [
+    "tg"
+  ],
+  "nutritionTargets": {
+    "energyKcal": {
+      "min": 2375,
+      "max": 2613
+    },
+    "proteinG": {
+      "min": 77.2,
+      "max": 130.7
+    },
+    "fatG": {
+      "min": 52.8,
+      "max": 72.6
+    },
+    "saturatedFatG": {
+      "max": 20.3
+    },
+    "carbohydrateG": {
+      "min": 296.9,
+      "max": 391.9
+    },
+    "dietaryFiberG": {
+      "min": 25
+    },
+    "vitaminA_ugRAE": {
+      "min": 900
+    },
+    "vitaminB1_mg": {
+      "min": 1.2
+    },
+    "vitaminB2_mg": {
+      "min": 1.7
+    },
+    "vitaminB6_mg": {
+      "min": 1.5
+    },
+    "vitaminB12_ug": {
+      "min": 4
+    },
+    "vitaminC_mg": {
+      "min": 100
+    },
+    "vitaminD_ug": {
+      "target": 9
+    },
+    "calcium_mg": {
+      "min": 750
+    },
+    "iron_mg": {
+      "min": 7.5
+    },
+    "sodium_mg": {
+      "max": 2953
+    },
+    "saltEquivalent_g": {
+      "max": 7.5
+    },
+    "potassium_mg": {
+      "min": 3000
+    }
+  },
+  "appliedRules": {
+    "weightLoss": true,
+    "glucoseControl": true,
+    "bloodPressureControl": false,
+    "lipidControl": true,
+    "higherFiber": true,
+    "ckdSafetyOverride": false,
+    "anemiaWarning": false,
+    "uricAcidMonitoring": false
+  }
+}
