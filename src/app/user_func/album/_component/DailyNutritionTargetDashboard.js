@@ -8,9 +8,44 @@ const format = (value, unit) => {
 };
 
 const getStatus = (value, min, max) => {
+    if (min != null && value < Number(min) * 0.8) return ["不足", "bg-orange-50 text-orange-700", "bg-orange-500"];
     if (min != null && value < Number(min)) return ["稍低", "bg-amber-50 text-amber-700", "bg-amber-400"];
-    if (max != null && value > Number(max)) return ["偏高", "bg-rose-50 text-rose-600", "bg-rose-400"];
+    if (max != null && value > Number(max) * 1.2) return ["超标", "bg-rose-50 text-rose-600", "bg-rose-500"];
+    if (max != null && value > Number(max)) return ["稍高", "bg-pink-50 text-pink-600", "bg-pink-400"];
     return ["适中", "bg-emerald-50 text-emerald-700", "bg-emerald-500"];
+};
+
+const getNutritionScore = (report, target) => {
+    const items = [
+        [report.nut_calories_kcal, target.energy_kcal_min, target.energy_kcal_max],
+        [report.nut_protein_g, target.protein_g_min, target.protein_g_max],
+        [report.nut_fat_g, target.fat_g_min, target.fat_g_max],
+        [report.nut_saturated_fat_g, null, target.saturated_fat_g_max],
+        [report.nut_carbohydrate_g, target.carbohydrate_g_min, target.carbohydrate_g_max],
+        [report.nut_dietary_fiber_g, target.dietary_fiber_g_min, null],
+        [report.nut_vitamin_a_ug, target.vitamin_a_ug_rae_min, null],
+        [report.nut_vitamin_b1_mg, target.vitamin_b1_mg_min, null],
+        [report.nut_vitamin_b2_mg, target.vitamin_b2_mg_min, null],
+        [report.nut_vitamin_b6_mg, target.vitamin_b6_mg_min, null],
+        [report.nut_vitamin_b12_ug, target.vitamin_b12_ug_min, null],
+        [report.nut_vitamin_c_mg, target.vitamin_c_mg_min, null],
+        [report.nut_vitamin_d_ug, target.vitamin_d_ug_target, null],
+        [report.nut_calcium_mg, target.calcium_mg_min, null],
+        [report.nut_iron_mg, target.iron_mg_min, null],
+        [report.nut_sodium_mg, null, target.sodium_mg_max],
+        [report.nut_potassium_mg, target.potassium_mg_min, null],
+    ].filter(([value, min, max]) => Number.isFinite(Number(value)) && ((min != null && Number.isFinite(Number(min))) || (max != null && Number.isFinite(Number(max)))));
+
+    if (!items.length) return null;
+
+    const total = items.reduce((sum, [value, min, max]) => {
+        const numericValue = Number(value);
+        if ((min != null && numericValue < Number(min) * 0.8) || (max != null && numericValue > Number(max) * 1.2)) return sum;
+        if ((min != null && numericValue < Number(min)) || (max != null && numericValue > Number(max))) return sum + 0.5;
+        return sum + 1;
+    }, 0);
+
+    return Math.round(total / items.length * 100);
 };
 
 const NutritionRow = ({ code, label, value, unit, min, max }) => {
@@ -28,7 +63,7 @@ const NutritionRow = ({ code, label, value, unit, min, max }) => {
                 <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-slate-100 text-xs font-bold text-slate-600">{code}</span>
                 <div className="min-w-0"><p className="font-semibold text-slate-800">{label}</p><p className="mt-0.5 text-xs text-slate-400">目标 {target}</p></div>
             </div>
-            <div className="flex items-center gap-3 pl-12"><strong className="shrink-0 text-sm tabular-nums text-slate-950">{text}</strong><span className="h-2 flex-1 overflow-hidden rounded-full bg-slate-100"><i className={`block h-full rounded-full ${barClass}`} style={{ width: `${percentage}%` }} /></span><span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${statusClass}`}>{status}</span></div>
+            <div className="grid grid-cols-[5.5rem_minmax(0,1fr)_auto] items-center gap-3 pl-12"><strong className="text-sm tabular-nums text-slate-950">{text}</strong><span className="h-2 overflow-hidden rounded-full bg-slate-100"><i className={`block h-full rounded-full ${barClass}`} style={{ width: `${percentage}%` }} /></span><span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${statusClass}`}>{status}</span></div>
         </div>
     );
 };
