@@ -14,9 +14,10 @@ const getMealKey = (createdAt) => {
 };
 
 export async function POST(request) {
-    const { userId, targetDate, albumIds } = await request.json();
+    const { userId, targetDate, albumIds, stepCount } = await request.json();
+    const normalizedStepCount = stepCount === null || stepCount === undefined || stepCount === "" ? null : Number(stepCount);
 
-    if (!userId || !targetDate || !Array.isArray(albumIds) || !albumIds.length) {
+    if (!userId || !targetDate || !Array.isArray(albumIds) || !albumIds.length || (normalizedStepCount !== null && (!Number.isSafeInteger(normalizedStepCount) || normalizedStepCount < 0))) {
         return NextResponse.json({ message: "日报参数不正确" }, { status: 400 });
     }
 
@@ -53,6 +54,7 @@ export async function POST(request) {
     const reportData = {
         status: "analyzing_nutrition",
         album_ids: payload.albumIds,
+        step_count: normalizedStepCount,
         submitted_at: submittedAt,
         error_message: null,
     };

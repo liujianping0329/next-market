@@ -5,6 +5,7 @@ create table public.diet_daily_report (
     target_date date not null,
     status text not null default 'pending_confirmation',
     album_ids bigint[] not null default '{}',
+    step_count integer,
     summary text,
     breakfast_advice text,
     lunch_advice text,
@@ -33,6 +34,7 @@ create table public.diet_daily_report (
     completed_at timestamp with time zone,
     report_push_at timestamp with time zone,
     constraint diet_daily_report_user_id_target_date_key unique (user_id, target_date),
+    constraint diet_daily_report_step_count_check check (step_count is null or step_count >= 0),
     constraint diet_daily_report_status_check check (status in (
         'pending_confirmation',
         'analyzing_nutrition',
@@ -50,6 +52,7 @@ comment on column public.diet_daily_report.user_id is '日报所属用户';
 comment on column public.diet_daily_report.target_date is '日报目标日期';
 comment on column public.diet_daily_report.status is '日报处理状态：pending_confirmation待用户确认，analyzing_nutrition已提交并分析营养，generating_report生成日报中，completed已完成，nutrition_failed营养分析失败，report_failed日报生成失败';
 comment on column public.diet_daily_report.album_ids is '生成日报使用的相册ID列表';
+comment on column public.diet_daily_report.step_count is '当日步数（选填）';
 comment on column public.diet_daily_report.summary is '日报摘要';
 comment on column public.diet_daily_report.breakfast_advice is '早餐建议';
 comment on column public.diet_daily_report.lunch_advice is '午餐建议';

@@ -3,6 +3,7 @@
 import ky from "ky";
 import Datepicker from "@/components/datepicker";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
     Dialog,
     DialogClose,
@@ -20,6 +21,7 @@ const AlbumDailyAction = ({ date, userId, enable = true, list = [], onDateChange
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [reportId, setReportId] = useState(null);
     const [isReportOpen, setIsReportOpen] = useState(false);
+    const [steps, setSteps] = useState("");
 
     const getTargetDate = () => [
         date.getFullYear(),
@@ -31,6 +33,7 @@ const AlbumDailyAction = ({ date, userId, enable = true, list = [], onDateChange
         if (isSubmitting) return;
 
         const targetDate = getTargetDate();
+        const stepCount = steps === "" ? null : Number(steps);
 
         setIsSubmitting(true);
 
@@ -40,6 +43,7 @@ const AlbumDailyAction = ({ date, userId, enable = true, list = [], onDateChange
                     userId,
                     targetDate,
                     albumIds: list.map((item) => item.id),
+                    stepCount,
                 },
             }).json();
             setReportId(response.reportId);
@@ -52,18 +56,42 @@ const AlbumDailyAction = ({ date, userId, enable = true, list = [], onDateChange
     };
 
     return (
-        <section className="mb-3 flex items-center justify-between gap-2 rounded-lg bg-muted px-3 py-1.5">
-            <div className="relative w-20 [&_input]:h-8 [&_input]:px-2 [&_input]:text-xs">
-                <Datepicker
-                    dateDf={date}
-                    dtFormat="MM/dd"
-                    onChange={onDateChange || (() => { })}
+        <section className="mb-3 space-y-1.5 rounded-lg bg-muted px-3 py-2">
+            <div className="flex items-center justify-between gap-2">
+                <div className="relative w-20 [&_input]:h-8 [&_input]:px-2 [&_input]:text-xs">
+                    <Datepicker
+                        dateDf={date}
+                        dtFormat="MM/dd"
+                        onChange={onDateChange || (() => { })}
+                    />
+                    {!enable && <div className="absolute inset-0 z-10 cursor-not-allowed" />}
+                </div>
+                <Input
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={steps}
+                    onChange={(event) => setSteps(event.target.value)}
+                    placeholder="步数（选填）"
+                    className="hidden"
                 />
-                {!enable && <div className="absolute inset-0 z-10 cursor-not-allowed" />}
-            </div>
-            <div className="flex items-center gap-2">
-                <span className={`text-xs font-semibold ${isAllVerified ? "text-emerald-600" : "text-amber-600"
+                <span className={`inline-flex items-center gap-1 text-xs font-semibold ${isAllVerified ? "text-emerald-600" : "text-amber-600"
                     }`}>
+                    {isAllVerified ? <><span aria-hidden>✓</span>全部校对</> : `${pendingCount} 项待校对`}
+                </span>
+            </div>
+            <div className="flex items-center justify-between gap-2">
+                <Input
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={steps}
+                    onChange={(event) => setSteps(event.target.value)}
+                    placeholder="步数（选填）"
+                    className="h-8 w-20 text-xs"
+                />
+                <span className={`text-xs font-semibold ${isAllVerified ? "text-emerald-600" : "text-amber-600"
+                    } hidden`}>
                     {isAllVerified ? "已全部校对" : `${pendingCount} 件待校对`}
                 </span>
                 <Button
@@ -71,7 +99,7 @@ const AlbumDailyAction = ({ date, userId, enable = true, list = [], onDateChange
                     size="sm"
                     disabled={!isAllVerified || isSubmitting}
                     onClick={generateDailyReport}
-                    className="h-8 bg-sky-600 px-2 text-xs text-white hover:bg-sky-700"
+                    className="ml-auto h-8 bg-sky-600 px-2 text-xs text-white hover:bg-sky-700"
                 >
                     生成日报
                 </Button>
