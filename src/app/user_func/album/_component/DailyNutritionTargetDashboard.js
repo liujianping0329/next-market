@@ -1,0 +1,71 @@
+"use client";
+
+import { useState } from "react";
+
+const format = (value, unit) => {
+    if (value == null || !Number.isFinite(Number(value))) return null;
+    return `${Number(value).toLocaleString("zh-CN", { maximumFractionDigits: 1 })} ${unit}`;
+};
+
+const getStatus = (value, min, max) => {
+    if (min != null && value < Number(min)) return ["稍低", "bg-amber-50 text-amber-700", "bg-amber-400"];
+    if (max != null && value > Number(max)) return ["偏高", "bg-rose-50 text-rose-600", "bg-rose-400"];
+    return ["适中", "bg-emerald-50 text-emerald-700", "bg-emerald-500"];
+};
+
+const NutritionRow = ({ code, label, value, unit, min, max }) => {
+    const text = format(value, unit);
+    if (!text) return null;
+
+    const [status, statusClass, barClass] = getStatus(Number(value), min, max);
+    const benchmark = Number(max ?? min ?? value);
+    const percentage = Math.min(100, Math.max(8, Number(value) / benchmark * 100));
+    const target = min != null && max != null ? `${format(min, unit)}–${format(max, unit)}` : min != null ? `${format(min, unit)} 以上` : `${format(max, unit)} 以下`;
+
+    return (
+        <div className="space-y-2 px-4 py-3 sm:px-5">
+            <div className="flex min-w-0 items-center gap-3">
+                <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-slate-100 text-xs font-bold text-slate-600">{code}</span>
+                <div className="min-w-0"><p className="font-semibold text-slate-800">{label}</p><p className="mt-0.5 text-xs text-slate-400">目标 {target}</p></div>
+            </div>
+            <div className="flex items-center gap-3 pl-12"><strong className="shrink-0 text-sm tabular-nums text-slate-950">{text}</strong><span className="h-2 flex-1 overflow-hidden rounded-full bg-slate-100"><i className={`block h-full rounded-full ${barClass}`} style={{ width: `${percentage}%` }} /></span><span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold ${statusClass}`}>{status}</span></div>
+        </div>
+    );
+};
+
+const DailyNutritionTargetDashboard = ({ report, target }) => {
+    const [isOpen, setIsOpen] = useState(true);
+    if (!target) return null;
+
+    return (
+        <section className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_12px_30px_rgba(35,49,80,0.06)]">
+            <button type="button" onClick={() => setIsOpen((open) => !open)} aria-expanded={isOpen} className="flex w-full items-center justify-between bg-slate-50/80 px-4 py-3 text-left sm:px-5">
+                <div><h2 className="text-sm font-semibold text-slate-800">宏量营养</h2><p className="mt-0.5 text-xs text-slate-400">依据每日目标估算</p></div>
+                <span className="text-sm text-slate-400">{isOpen ? "收起" : "展开"}</span>
+            </button>
+            {isOpen && <div className="divide-y divide-slate-100">
+                <NutritionRow code="E" label="热量" value={report.nut_calories_kcal} unit="kcal" min={target.energy_kcal_min} max={target.energy_kcal_max} />
+                <NutritionRow code="P" label="蛋白质" value={report.nut_protein_g} unit="g" min={target.protein_g_min} max={target.protein_g_max} />
+                <NutritionRow code="F" label="脂肪" value={report.nut_fat_g} unit="g" min={target.fat_g_min} max={target.fat_g_max} />
+                <NutritionRow code="SF" label="饱和脂肪" value={report.nut_saturated_fat_g} unit="g" max={target.saturated_fat_g_max} />
+                <NutritionRow code="C" label="碳水化合物" value={report.nut_carbohydrate_g} unit="g" min={target.carbohydrate_g_min} max={target.carbohydrate_g_max} />
+                <NutritionRow code="Fi" label="膳食纤维" value={report.nut_dietary_fiber_g} unit="g" min={target.dietary_fiber_g_min} />
+                <h3 className="bg-slate-50/70 px-4 py-3 text-sm font-semibold text-slate-800 sm:px-5">维生素</h3>
+                <NutritionRow code="VA" label="维生素 A" value={report.nut_vitamin_a_ug} unit="μg" min={target.vitamin_a_ug_rae_min} />
+                <NutritionRow code="B1" label="维生素 B1" value={report.nut_vitamin_b1_mg} unit="mg" min={target.vitamin_b1_mg_min} />
+                <NutritionRow code="B2" label="维生素 B2" value={report.nut_vitamin_b2_mg} unit="mg" min={target.vitamin_b2_mg_min} />
+                <NutritionRow code="B6" label="维生素 B6" value={report.nut_vitamin_b6_mg} unit="mg" min={target.vitamin_b6_mg_min} />
+                <NutritionRow code="B12" label="维生素 B12" value={report.nut_vitamin_b12_ug} unit="μg" min={target.vitamin_b12_ug_min} />
+                <NutritionRow code="VC" label="维生素 C" value={report.nut_vitamin_c_mg} unit="mg" min={target.vitamin_c_mg_min} />
+                <NutritionRow code="VD" label="维生素 D" value={report.nut_vitamin_d_ug} unit="μg" min={target.vitamin_d_ug_target} />
+                <h3 className="bg-slate-50/70 px-4 py-3 text-sm font-semibold text-slate-800 sm:px-5">矿物质</h3>
+                <NutritionRow code="Ca" label="钙" value={report.nut_calcium_mg} unit="mg" min={target.calcium_mg_min} />
+                <NutritionRow code="Fe" label="铁" value={report.nut_iron_mg} unit="mg" min={target.iron_mg_min} />
+                <NutritionRow code="Na" label="钠" value={report.nut_sodium_mg} unit="mg" max={target.sodium_mg_max} />
+                <NutritionRow code="K" label="钾" value={report.nut_potassium_mg} unit="mg" min={target.potassium_mg_min} />
+            </div>}
+        </section>
+    );
+};
+
+export default DailyNutritionTargetDashboard;
