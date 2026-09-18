@@ -11,7 +11,7 @@ import {
     DialogFooter,
     DialogTitle,
 } from "@/components/ui/dialog";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import AlbumDailyReportContent from "./AlbumDailyReportContent";
 
@@ -28,6 +28,29 @@ const AlbumDailyAction = ({ date, userId, enable = true, list = [], onDateChange
         String(date.getMonth() + 1).padStart(2, "0"),
         String(date.getDate()).padStart(2, "0"),
     ].join("-");
+
+    useEffect(() => {
+        let active = true;
+
+        if (!userId) {
+            setSteps("");
+            return () => {
+                active = false;
+            };
+        }
+
+        ky.post("/api/album/daily-report/detail", {
+            json: { userId, targetDate: getTargetDate() },
+        }).json().then(({ report }) => {
+            if (active) setSteps(report?.step_count == null ? "" : String(report.step_count));
+        }).catch(() => {
+            if (active) setSteps("");
+        });
+
+        return () => {
+            active = false;
+        };
+    }, [date, userId]);
 
     const generateDailyReport = async () => {
         if (isSubmitting) return;
@@ -58,13 +81,16 @@ const AlbumDailyAction = ({ date, userId, enable = true, list = [], onDateChange
     return (
         <section className="mb-3 space-y-1.5 rounded-lg bg-muted px-3 py-2">
             <div className="flex items-center justify-between gap-2">
-                <div className="relative w-20 [&_input]:h-8 [&_input]:px-2 [&_input]:text-xs">
-                    <Datepicker
-                        dateDf={date}
-                        dtFormat="MM/dd"
-                        onChange={onDateChange || (() => { })}
-                    />
-                    {!enable && <div className="absolute inset-0 z-10 cursor-not-allowed" />}
+                <div className="flex w-28 items-center gap-1.5">
+                    <span className="text-xs text-muted-foreground">日期</span>
+                    <div className="relative w-20 [&_input]:h-8 [&_input]:px-2 [&_input]:text-xs">
+                        <Datepicker
+                            dateDf={date}
+                            dtFormat="MM/dd"
+                            onChange={onDateChange || (() => { })}
+                        />
+                        {!enable && <div className="absolute inset-0 z-10 cursor-not-allowed" />}
+                    </div>
                 </div>
                 <Input
                     type="number"
@@ -81,15 +107,18 @@ const AlbumDailyAction = ({ date, userId, enable = true, list = [], onDateChange
                 </span>
             </div>
             <div className="flex items-center justify-between gap-2">
-                <Input
-                    type="number"
-                    min="0"
-                    step="1"
-                    value={steps}
-                    onChange={(event) => setSteps(event.target.value)}
-                    placeholder="步数（选填）"
-                    className="h-8 w-20 text-xs"
-                />
+                <div className="flex w-28 items-center gap-1.5">
+                    <span className="text-xs text-muted-foreground">步数</span>
+                    <Input
+                        type="number"
+                        min="0"
+                        step="1"
+                        value={steps}
+                        onChange={(event) => setSteps(event.target.value)}
+                        placeholder="选填"
+                        className="h-8 w-20 text-xs"
+                    />
+                </div>
                 <span className={`text-xs font-semibold ${isAllVerified ? "text-emerald-600" : "text-amber-600"
                     } hidden`}>
                     {isAllVerified ? "已全部校对" : `${pendingCount} 件待校对`}
