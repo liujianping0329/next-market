@@ -28,6 +28,8 @@ const AlbumDailyAction = ({ date, userId, enable = true, list = [], onDateChange
         String(date.getMonth() + 1).padStart(2, "0"),
         String(date.getDate()).padStart(2, "0"),
     ].join("-");
+    const latestSelectableDate = new Date();
+    latestSelectableDate.setHours(0, 0, 0, 0);
 
     useEffect(() => {
         let active = true;
@@ -88,6 +90,7 @@ const AlbumDailyAction = ({ date, userId, enable = true, list = [], onDateChange
                             dateDf={date}
                             dtFormat="MM/dd"
                             onChange={onDateChange || (() => { })}
+                            disabledDays={{ after: latestSelectableDate }}
                         />
                         {!enable && <div className="absolute inset-0 z-10 cursor-not-allowed" />}
                     </div>

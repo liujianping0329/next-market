@@ -15,7 +15,7 @@ import * as holiday_jp from "@holiday-jp/holiday_jp";
 
 import { formatDateLocal } from "@/app/utils/date";
 
-const Datepicker = ({ dateDf, onChange, dtFormat = "yyyy-MM-dd", onMonthChange, redPointDates }) => {
+const Datepicker = ({ dateDf, onChange, dtFormat = "yyyy-MM-dd", onMonthChange, redPointDates, disabledDays }) => {
   const [open, setOpen] = useState(false);
   const [month, setMonth] = useState(new Date());
 
@@ -66,6 +66,7 @@ const Datepicker = ({ dateDf, onChange, dtFormat = "yyyy-MM-dd", onMonthChange, 
             endMonth={new Date(2036, 11)}
             month={month}
             onMonthChange={setMonth}
+            disabled={disabledDays}
             modifiers={{
               holiday: holidays.map(h => h.date),
               weekend: (date) => date.getDay() === 0 || date.getDay() === 6,

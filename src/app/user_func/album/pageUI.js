@@ -28,19 +28,21 @@ const timeGroups = [
 const tabs = [
     { value: "all", label: "全部" },
     { value: "mine", label: "只看我" },
-    { value: "yesterday", label: "我昨天..." },
+    { value: "yesterday", label: "我某一天..." },
 ];
 
-const getYesterdayRange = () => {
-    const jstNow = new Date(Date.now() + 9 * 60 * 60 * 1000);
-    const today = jstNow.toISOString().slice(0, 10);
-    const yesterdayDate = new Date(`${today}T00:00:00Z`);
-    yesterdayDate.setUTCDate(yesterdayDate.getUTCDate() - 1);
-    const yesterday = yesterdayDate.toISOString().slice(0, 10);
+const getDateRange = (date) => {
+    const targetDate = [
+        date.getFullYear(),
+        String(date.getMonth() + 1).padStart(2, "0"),
+        String(date.getDate()).padStart(2, "0"),
+    ].join("-");
+    const nextDate = new Date(`${targetDate}T00:00:00+09:00`);
+    nextDate.setUTCDate(nextDate.getUTCDate() + 1);
 
     return {
-        createdAtFrom: new Date(`${yesterday}T00:00:00+09:00`).toISOString(),
-        createdAtTo: new Date(`${today}T00:00:00+09:00`).toISOString(),
+        createdAtFrom: new Date(`${targetDate}T00:00:00+09:00`).toISOString(),
+        createdAtTo: nextDate.toISOString(),
     };
 };
 
@@ -54,7 +56,6 @@ const getYesterdayLabel = () => {
 const AlbumUI = ({ }) => {
 
     const inputRef = useRef(null);
-    const hasFetchedYesterdayCountRef = useRef(false);
     const suppressDetailOpenRef = useRef(false);
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -66,6 +67,7 @@ const AlbumUI = ({ }) => {
     const [loadedTab, setLoadedTab] = useState(null);
     const [isPush, setIsPush] = useState(true);
     const [yesterdayCount, setYesterdayCount] = useState(null);
+    const [selectedDate, setSelectedDate] = useState(() => getYesterdayLabel());
     const [moreOpMenuOpen, setMoreOpMenuOpen] = useState(false);
     const [moreOpMenuTarget, setMoreOpMenuTarget] = useState(null);
     const tabParam = searchParams.get("tab");
@@ -78,7 +80,7 @@ const AlbumUI = ({ }) => {
             requestBody.userId = userInfo.id;
         }
         if (activeTab === "yesterday") {
-            Object.assign(requestBody, getYesterdayRange());
+            Object.assign(requestBody, getDateRange(selectedDate));
         }
 
         const response = await ky.post('/api/album/list/match', {
@@ -94,7 +96,7 @@ const AlbumUI = ({ }) => {
             json: {
                 planetId: userInfo.planetId,
                 userId: userInfo.id,
-                ...getYesterdayRange(),
+                ...getDateRange(selectedDate),
             },
         }).json();
         setYesterdayCount(response.list.length);
@@ -196,14 +198,9 @@ const AlbumUI = ({ }) => {
     useEffect(() => {
         if (!userInfo) return;
 
-        fetchList().then(() => {
-            if (hasFetchedYesterdayCountRef.current) return;
+        fetchList().then(fetchYesterdayCount);
 
-            hasFetchedYesterdayCountRef.current = true;
-            fetchYesterdayCount();
-        });
-
-    }, [userInfo, activeTab, refreshKey]);
+    }, [userInfo, activeTab, selectedDate, refreshKey]);
 
 
     return (
@@ -257,9 +254,9 @@ const AlbumUI = ({ }) => {
                 </div>}
                 {isListLoaded && loadedTab === activeTab && activeTab === "yesterday" && (
                     <AlbumDailyAction
-                        date={getYesterdayLabel()}
+                        date={selectedDate}
                         userId={userInfo.id}
-                        enable={false}
+                        onDateChange={setSelectedDate}
                         list={list}
                     />
                 )}
