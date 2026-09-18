@@ -2,6 +2,14 @@ import { NextResponse } from "next/server";
 
 import supabase from "@/app/utils/database";
 
+const corsHeaders = {
+    "Access-Control-Allow-Origin": "https://next-study-static.edgeone.cool",
+    "Access-Control-Allow-Methods": "GET, OPTIONS",
+    "Access-Control-Allow-Headers": "Accept, Content-Type",
+    "Cache-Control": "no-store",
+    "Vary": "Origin",
+};
+
 /**
  * @swagger
  * /api/external/v1/user-nutrition-targets:
@@ -20,8 +28,12 @@ export async function GET() {
         .select("*,user:f_user!user_nutrition_target_user_id_fkey(id,email)");
 
     if (targetError) {
-        return NextResponse.json({ message: targetError.message }, { status: 500 });
+        return NextResponse.json({ message: targetError.message }, { status: 500, headers: corsHeaders });
     }
 
-    return NextResponse.json({ data: targets });
+    return NextResponse.json({ data: targets }, { headers: corsHeaders });
+}
+
+export async function OPTIONS() {
+    return new NextResponse(null, { status: 204, headers: corsHeaders });
 }
