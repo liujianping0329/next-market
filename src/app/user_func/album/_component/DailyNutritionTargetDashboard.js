@@ -89,7 +89,7 @@ const DailyNutritionTargetDashboard = ({ report, target }) => {
     const walkingCalories = walking?.calories ?? 0;
     const energyMin = addWalkingCalories(target.energy_kcal_min, walkingCalories);
     const energyMax = addWalkingCalories(target.energy_kcal_max, walkingCalories);
-    const walkingSuffix = walking && `今日${walking.steps.toLocaleString("zh-CN")}步 ${format(walking.calories, "kcal")}`;
+    const walkingSuffix = walking && `${walking.steps.toLocaleString("zh-CN")}步 ${format(walking.calories, "kcal")}`;
 
     return (
         <section className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_12px_30px_rgba(35,49,80,0.06)]">
