@@ -90,6 +90,14 @@ const AlbumDailyReportContent = ({ reportId, userId, targetDate }) => {
             <header className="mb-6">
                 <h2 className="text-lg font-semibold">{displayDate ? `${displayDate} 饮食日报` : "饮食日报"}</h2>
                 {generatedAt && <p className="mt-1 text-xs text-muted-foreground">生成时间：{generatedAt}</p>}
+                <a
+                    href="https://next-study-static.edgeone.cool/personal/nutrition.html"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-2 inline-block text-sm text-sky-700 hover:underline"
+                >
+                    设置个人营养标准
+                </a>
             </header>
             {content}
         </div>

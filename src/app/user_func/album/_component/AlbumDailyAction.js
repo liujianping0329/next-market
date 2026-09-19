@@ -20,6 +20,7 @@ const AlbumDailyAction = ({ date, userId, enable = true, list = [], onDateChange
     const isAllVerified = pendingCount === 0;
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [reportId, setReportId] = useState(null);
+    const [hasReport, setHasReport] = useState(false);
     const [isReportOpen, setIsReportOpen] = useState(false);
     const [steps, setSteps] = useState("");
 
@@ -33,6 +34,8 @@ const AlbumDailyAction = ({ date, userId, enable = true, list = [], onDateChange
 
     useEffect(() => {
         let active = true;
+        setHasReport(false);
+        setReportId(null);
 
         if (!userId) {
             setSteps("");
@@ -44,9 +47,15 @@ const AlbumDailyAction = ({ date, userId, enable = true, list = [], onDateChange
         ky.post("/api/album/daily-report/detail", {
             json: { userId, targetDate: getTargetDate() },
         }).json().then(({ report }) => {
-            if (active) setSteps(report?.step_count == null ? "" : String(report.step_count));
+            if (!active) return;
+            setSteps(report?.step_count == null ? "" : String(report.step_count));
+            setReportId(report?.id ?? null);
+            setHasReport(Boolean(report));
         }).catch(() => {
-            if (active) setSteps("");
+            if (!active) return;
+            setSteps("");
+            setReportId(null);
+            setHasReport(false);
         });
 
         return () => {
@@ -72,6 +81,7 @@ const AlbumDailyAction = ({ date, userId, enable = true, list = [], onDateChange
                 },
             }).json();
             setReportId(response.reportId);
+            setHasReport(true);
             toast.success("日报已提交，请耐心等待");
         } catch {
             toast.error("日报提交失败，请稍后重试");
@@ -139,7 +149,7 @@ const AlbumDailyAction = ({ date, userId, enable = true, list = [], onDateChange
                     type="button"
                     size="sm"
                     variant="outline"
-                    disabled={!userId}
+                        disabled={!hasReport}
                     onClick={() => setIsReportOpen(true)}
                     className="h-8 border-sky-200 px-2 text-xs text-sky-700 hover:bg-sky-50"
                 >
