@@ -26,8 +26,7 @@ const timeGroups = [
     { name: "夜宵", start: 20, end: 24 },
 ];
 const tabs = [
-    { value: "all", label: "全部" },
-    { value: "mine", label: "只看我" },
+    { value: "all", label: "动态" },
     { value: "yesterday", label: "我某一天..." },
 ];
 
@@ -43,6 +42,19 @@ const getDateRange = (date) => {
     return {
         createdAtFrom: new Date(`${targetDate}T00:00:00+09:00`).toISOString(),
         createdAtTo: nextDate.toISOString(),
+    };
+};
+
+const getRecentDateRange = () => {
+    const tokyoToday = new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString().slice(0, 10);
+    const startDate = new Date(`${tokyoToday}T00:00:00+09:00`);
+    startDate.setUTCDate(startDate.getUTCDate() - 2);
+    const endDate = new Date(`${tokyoToday}T00:00:00+09:00`);
+    endDate.setUTCDate(endDate.getUTCDate() + 1);
+
+    return {
+        createdAtFrom: startDate.toISOString(),
+        createdAtTo: endDate.toISOString(),
     };
 };
 
@@ -76,10 +88,12 @@ const AlbumUI = ({ }) => {
     const fetchList = async () => {
         const requestBody = { planetId: userInfo.planetId };
 
-        if (activeTab === "mine" || activeTab === "yesterday") {
+        if (activeTab !== "all") {
             requestBody.userId = userInfo.id;
         }
-        if (activeTab === "yesterday") {
+        if (activeTab === "all") {
+            Object.assign(requestBody, getRecentDateRange());
+        } else if (activeTab === "yesterday") {
             Object.assign(requestBody, getDateRange(selectedDate));
         }
 
