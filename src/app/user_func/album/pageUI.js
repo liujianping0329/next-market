@@ -30,6 +30,30 @@ const tabs = [
     { value: "yesterday", label: "我某一天..." },
 ];
 
+const AlbumListImage = ({ src, alt }) => {
+    const [hasLoadError, setHasLoadError] = useState(false);
+
+    if (hasLoadError) {
+        return (
+            <img
+                src={src}
+                alt={alt}
+                className="absolute inset-0 h-full w-full rounded-lg object-cover"
+            />
+        );
+    }
+
+    return (
+        <Image
+            src={src}
+            alt={alt}
+            fill
+            className="rounded-lg object-cover"
+            onError={() => setHasLoadError(true)}
+        />
+    );
+};
+
 const getDateRange = (date) => {
     const targetDate = [
         date.getFullYear(),
@@ -304,11 +328,10 @@ const AlbumUI = ({ }) => {
                                             openDetail(item.id);
                                         }}
                                         {...longPressHandle}>
-                                        <Image
+                                        <AlbumListImage
+                                            key={`${item.id}-${item.pic}`}
                                             src={item.pic}
                                             alt={item.name || ""}
-                                            fill
-                                            className="rounded-lg object-cover"
                                         />
                                         {!item.hasAlbumItems && (
                                             <span className="absolute right-1.5 top-1.5 z-10 rounded-full bg-amber-500/90 px-2 py-0.5 text-[10px] font-medium text-white shadow-sm backdrop-blur-sm">
