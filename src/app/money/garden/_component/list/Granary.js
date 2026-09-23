@@ -118,7 +118,7 @@ const Granary = ({ userInfo, isUserReady, onNewLocationUpdate }) => {
                                 </Button>
                             } onSuccess={(newLocation) => {
                                 fetchData();
-                                onNewLocationUpdate?.(newLocation);
+                                if (newLocation) onNewLocationUpdate?.(newLocation);
                             }} cash={cash} spendCate={spendCate} />}
 
                             {/* <FormSoy trigger={ */}
