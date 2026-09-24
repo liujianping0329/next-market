@@ -300,7 +300,7 @@ const Harvest = ({ userInfo, isUserReady }) => {
                                     <Route className="h-4 w-4" />
                                     新增旅程
                                 </Button>
-                            } onSuccess={() => fetchList(startTime)} />
+                            } onSuccess={() => fetchList(startTime)} userInfo={userInfo} />
                             <FormHarvest trigger={
                                 <Button size="sm" variant="outline">
                                     <PlusCircle className="h-4 w-4" />

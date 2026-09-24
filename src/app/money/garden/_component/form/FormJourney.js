@@ -35,7 +35,7 @@ import DateRangePicker from "@/components/dateRangePicker";
 
 import { Textarea } from "@/components/ui/textarea";
 import { formatDateLocal } from "@/app/utils/date";
-const FormComponent = ({ trigger, openCtrl, setOpenCtrl, onSuccess, defaultValues = null }) => {
+const FormComponent = ({ trigger, openCtrl, setOpenCtrl, onSuccess, defaultValues = null, userInfo }) => {
 
     const [open, setOpen] = useState(false);
     const [isLoad, setIsLoad] = useState(false);
@@ -62,6 +62,9 @@ const FormComponent = ({ trigger, openCtrl, setOpenCtrl, onSuccess, defaultValue
             const response = await ky.post('/api/journey/upsert', {
                 json: {
                     ...(defaultValues?.id && { id: defaultValues.id }),
+                    ...(!defaultValues?.id && (userInfo?.planetId
+                        ? { planetId: userInfo.planetId }
+                        : { userId: userInfo?.id })),
                     startDate: formatDateLocal(values.dateRange.from),
                     endDate: formatDateLocal(values.dateRange.to),
                     title: values.title
