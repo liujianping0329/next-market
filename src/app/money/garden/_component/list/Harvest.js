@@ -593,12 +593,12 @@ const Harvest = ({ userInfo, isUserReady }) => {
                                     setEmptyBlockAddOpen(false);
                                 }
                             } defaultValues={emptyBlockAddTarget} key={emptyBlockAddTarget?.startTime ?? "emptyBlockAddTarget"} />
-                            <FormHarvestJourney openHarvestCtrl={emptyBlockJourneyAddOpen} setOpenHarvestCtrl={setEmptyBlockJourneyAddOpen} needPassCode={true} onSuccess={
+                            <FormHarvestJourney openHarvestCtrl={emptyBlockJourneyAddOpen} setOpenHarvestCtrl={setEmptyBlockJourneyAddOpen} onSuccess={
                                 () => {
                                     fetchList(startTime)
                                     setEmptyBlockJourneyAddOpen(false);
                                 }
-                            } defaultValues={emptyBlockJourneyAddTarget} key={`JourneyAddTarget-${emptyBlockJourneyAddTarget?.journeyId ?? "emptyBlockJourneyAddTarget"}`} />
+                            } defaultValues={emptyBlockJourneyAddTarget} key={`JourneyAddTarget-${emptyBlockJourneyAddTarget?.journeyId ?? "emptyBlockJourneyAddTarget"}-${emptyBlockJourneyAddTarget?.journeyType ?? ""}-${emptyBlockJourneyAddTarget?.startTime ?? ""}`} />
                             <JourneyDetail open={detailJourneyOpen} onOpenChange={setDetailJourneyOpen} target={detailJourneyTarget} onSuccess={
                                 () => {
 

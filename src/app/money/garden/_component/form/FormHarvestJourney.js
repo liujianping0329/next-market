@@ -1,6 +1,5 @@
 "use client";
 
-import DateTimePicker from "@/components/datetimepicker";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -21,79 +20,54 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Spinner } from "@/components/ui/spinner";
 import ky from "ky";
 import {
-    useEffect,
     useState,
 } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import {
     formatDateLocal,
-    parseLocalDateTime,
 } from "@/app/utils/date";
-import supabase from "@/app/utils/database";
-import {
-    Alert,
-    AlertDescription,
-    AlertTitle,
-} from "@/components/ui/alert";
-import { AlertTriangle } from "lucide-react";
-import { Label } from "@/components/ui/label";
-import {
-    RadioGroup,
-    RadioGroupItem,
-} from "@/components/ui/radio-group";
-import { decode } from "@/app/utils/base64";
-import { Switch } from "@/components/ui/switch";
 import { useUserStore } from "@/app/money/garden/_store/userStore";
-const FormHarvestJourney = ({ trigger, openHarvestCtrl, setOpenHarvestCtrl, onSuccess, defaultValues = null, needPassCode = false }) => {
+
+const journeyTypeNames = { memo: "备忘", flight: "飞机", hotel: "酒店" };
+
+const FormHarvestJourney = ({ trigger, openHarvestCtrl, setOpenHarvestCtrl, onSuccess, defaultValues = null }) => {
     const [openHarvest, setOpenHarvest] = useState(false);
     const [isLoadHarvest, setIsLoadHarvest] = useState(false);
-    const [passCodeGarden, setPassCodeGarden] = useState(null);
     const form = useForm({
         defaultValues: {
             title: defaultValues?.title || "",
+            body: "",
         }
     });
 
     const userInfoStore = useUserStore(state => state.userInfo);
 
-    useEffect(() => {
-        if (needPassCode && (openHarvest || openHarvestCtrl)) {
-            const loadPassCode = async () => {
-                try {
-                    const text = await navigator.clipboard.readText();
-                    if (text) {
-                        let passCodeObj = decode(text);
-                        console.log(passCodeObj)
-                        setPassCodeGarden(passCodeObj);
-
-                        form.setValue("title", passCodeObj.title ?? "");
-                    }
-                } catch (e) {
-
-                }
-            }
-            loadPassCode();
-        }
-    }, [needPassCode, openHarvest, openHarvestCtrl]);
-
     const onSubmit = async (values) => {
         setIsLoadHarvest(true);
 
         try {
-            const response = await ky.post('/api/money/harvest/upsert', {
+            const items = values.body.split(/\r?\n/).map(line => line.trim()).filter(Boolean).map((line) => {
+                const match = line.match(/https?:\/\/[^\s，。！？、]+/i);
+                const link = match?.[0].replace(/[.,;!?)\]）】]+$/, "") || null;
+                return {
+                    text: link ? line.replace(link, "").trim() : line,
+                    link,
+                };
+            });
+
+            await ky.post('/api/money/harvest/createWithItems', {
                 json: {
-                    ...(defaultValues?.id && { id: defaultValues.id }),
                     startTime: formatDateLocal(defaultValues.startTime, "yyyy-MM-dd HH:mm"),
-                    ...values,
-                    ...(passCodeGarden && { gardenId: passCodeGarden.id }),
-                    ...(defaultValues?.gardenId && { gardenId: defaultValues.gardenId }),
+                    title: values.title,
                     userId: userInfoStore?.id,
                     journeyId: defaultValues?.journeyId,
                     journeyType: defaultValues?.journeyType,
+                    items,
                 }
             }).json();
             onSuccess();
@@ -114,24 +88,8 @@ const FormHarvestJourney = ({ trigger, openHarvestCtrl, setOpenHarvestCtrl, onSu
                 {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>{defaultValues?.id ? "修改" : "新增"}</DialogTitle>
+                        <DialogTitle>新增{journeyTypeNames[defaultValues?.journeyType] || "旅程记录"}</DialogTitle>
                     </DialogHeader>
-
-                    {passCodeGarden && <Alert className="">
-                        <AlertTriangle className="h-4 w-4" />
-                        <AlertTitle>发现口令</AlertTitle>
-                        <AlertDescription>
-                            将绑定【{passCodeGarden.title}】
-                        </AlertDescription>
-                    </Alert>}
-
-                    {needPassCode && !passCodeGarden && <Alert className="border-yellow-300 bg-yellow-50 text-yellow-900">
-                        <AlertTriangle className="h-4 w-4" />
-                        <AlertTitle>未发现口令</AlertTitle>
-                        <AlertDescription>
-                            可在种草详情页发行口令以用于绑定
-                        </AlertDescription>
-                    </Alert>}
 
                     <div className="w-full max-h-dvh overflow-y-auto overscroll-contain">
                         <Form {...form}>
@@ -140,9 +98,19 @@ const FormHarvestJourney = ({ trigger, openHarvestCtrl, setOpenHarvestCtrl, onSu
                                     <FormField name="title" control={form.control}
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel>日程说明</FormLabel>
+                                                <FormLabel>标题</FormLabel>
                                                 <FormControl>
                                                     <Input {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )} />
+                                    <FormField name="body" control={form.control}
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>正文</FormLabel>
+                                                <FormControl>
+                                                    <Textarea {...field} rows={8} placeholder="每行一条，可包含一个链接" />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
