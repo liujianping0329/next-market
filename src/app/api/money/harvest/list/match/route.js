@@ -10,7 +10,7 @@ export async function POST(request, context) {
     let query = supabase.from("harvest").select();
 
     query = applyPlanetFilter(query, { planetId, userId }, `
-            *,garden(pics),
+            *,garden(pics),harvest_item(status),
     `);
 
     if (harvestFilter.startTime__gte) {

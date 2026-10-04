@@ -32,6 +32,7 @@ import FormHarvestJourney from "../form/FormHarvestJourney";
 import FormJourney from "../form/FormJourney";
 
 import MoreOpMenu from "@/app/money/garden/_component/list/harvest/MoreOpMenu";
+import JourneyMoreOpMenu from "@/app/money/garden/_component/list/harvest/JourneyMoreOpMenu";
 import useLongPress from "@/hooks/useLongPress";
 import HarvestDetail from "@/app/money/garden/_component/detail/HarvestDetail";
 import JourneyDetail from "@/app/money/garden/_component/detail/JourneyDetail";
@@ -59,6 +60,9 @@ const Harvest = ({ userInfo, isUserReady }) => {
     const [detailOpen, setDetailOpen] = useState(false);
     const [detailJourneyOpen, setDetailJourneyOpen] = useState(false);
     const [detailJourneyTarget, setDetailJourneyTarget] = useState(null);
+    const [journeyMoreOpMenuOpen, setJourneyMoreOpMenuOpen] = useState(false);
+    const [journeyMoreOpMenuTarget, setJourneyMoreOpMenuTarget] = useState(null);
+    const journeyLongPressTriggeredRef = useRef(false);
     const [holidays, setHolidays] = useState([]);
     const [redPointDates, setRedPointDates] = useState([]);
     const [journeys, setJourneys] = useState([]);
@@ -229,6 +233,20 @@ const Harvest = ({ userInfo, isUserReady }) => {
             setMoreOpMenuTarget(item);
         },
     });
+    const journeyLongPressHandle = useLongPress({
+        getPayload: (e) => {
+            const journeyType = e.currentTarget.dataset.journeyType;
+            const blockIndex = Number(e.currentTarget.dataset.blockIndex);
+            const item = journeyItems.find((journeyItem) => journeyItem.id === journeyType);
+            return item?.blocks[blockIndex]?.harvest ? item.blocks[blockIndex] : null;
+        },
+        onLongPress: (target) => {
+            if (!target?.harvest) return;
+            journeyLongPressTriggeredRef.current = true;
+            setJourneyMoreOpMenuTarget(target);
+            setJourneyMoreOpMenuOpen(true);
+        },
+    });
     const detailHandle = (e) => {
         const no = e.currentTarget.dataset.no;
         const item = timelist[no];
@@ -256,6 +274,13 @@ const Harvest = ({ userInfo, isUserReady }) => {
             setEmptyBlockJourneyAddOpen(true);
         }
     }
+    const journeyCellClickHandle = (block, item) => {
+        if (journeyLongPressTriggeredRef.current) {
+            journeyLongPressTriggeredRef.current = false;
+            return;
+        }
+        detailJourneyHandle(block, item);
+    };
 
     const handleMonthChange = useCallback(async (start, end) => {
         const sumInfo = await ky.post("/api/money/harvest/summary", {
@@ -469,13 +494,16 @@ const Harvest = ({ userInfo, isUserReady }) => {
                                     {item.blocks.map((block, index) => (
                                         <div
                                             key={index}
+                                            data-journey-type={item.id}
+                                            data-block-index={index}
                                             className={cn(
                                                 "flex h-full w-[166px] shrink-0 rounded border",
                                                 block
                                                     ? "border-sky-200 bg-sky-50"
                                                     : "border-transparent"
                                             )}
-                                            onClick={() => detailJourneyHandle(block, item)}
+                                            onClick={() => journeyCellClickHandle(block, item)}
+                                            {...journeyLongPressHandle}
                                         >
                                             {/* 左侧正方形 */}
                                             {block?.harvest?.garden && (<div className="h-full aspect-square flex-shrink-0">
@@ -486,7 +514,7 @@ const Harvest = ({ userInfo, isUserReady }) => {
                                                 />
                                             </div>)}
                                             <div className="flex-1 flex items-center justify-center px-1 line-clamp-2 leading-tight">
-                                                {block?.harvest?.title ?? ""}
+                                                {block?.harvest ? `${(block.harvest.harvest_item || []).filter(row => row.status === 1).length}/${(block.harvest.harvest_item || []).length} ${block.harvest.title ?? ""}` : ""}
                                             </div>
                                         </div>
                                     ))}
@@ -582,6 +610,7 @@ const Harvest = ({ userInfo, isUserReady }) => {
                                     fetchList();
                                 }
                             } />
+                            <JourneyMoreOpMenu open={journeyMoreOpMenuOpen} onOpenChange={setJourneyMoreOpMenuOpen} target={journeyMoreOpMenuTarget} onSuccess={() => fetchList(startTime)} />
                             <HarvestDetail open={detailOpen} onOpenChange={setDetailOpen} target={moreOpMenuTarget} onSuccess={
                                 () => {
 
@@ -601,7 +630,7 @@ const Harvest = ({ userInfo, isUserReady }) => {
                             } defaultValues={emptyBlockJourneyAddTarget} key={`JourneyAddTarget-${emptyBlockJourneyAddTarget?.journeyId ?? "emptyBlockJourneyAddTarget"}-${emptyBlockJourneyAddTarget?.journeyType ?? ""}-${emptyBlockJourneyAddTarget?.startTime ?? ""}`} />
                             <JourneyDetail open={detailJourneyOpen} onOpenChange={setDetailJourneyOpen} target={detailJourneyTarget} onSuccess={
                                 () => {
-
+                                    fetchList(startTime);
                                 }
                             } />
                             <FormJourney openCtrl={updateJourneyOpen} setOpenCtrl={setUpdateJourneyOpen} defaultValues={selectedJourney} onSuccess={

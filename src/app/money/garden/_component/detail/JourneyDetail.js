@@ -62,6 +62,7 @@ const JourneyDetail = ({ open, onOpenChange, target, onSuccess }) => {
       setItems((current) => current.map((item) =>
         item.id === itemId ? { ...item, ...changes } : item
       ));
+      onSuccess();
       return true;
     } catch {
       toast.error("待办事项更新失败");
@@ -76,6 +77,7 @@ const JourneyDetail = ({ open, onOpenChange, target, onSuccess }) => {
         json: { id: itemId },
       }).json();
       setItems((current) => current.filter((item) => item.id !== itemId));
+      onSuccess();
     } catch {
       toast.error("待办事项删除失败");
     }
@@ -118,7 +120,7 @@ const JourneyDetail = ({ open, onOpenChange, target, onSuccess }) => {
 
             <TabsContent key={curDate} value={curDate}
               className="flex flex-1 min-h-0 flex-col">
-              <div className="mt-4 rounded-3xl border border-sky-100 bg-sky-50 px-4 py-4 shadow-sm">
+              <div className="mt-4 shrink-0 rounded-3xl border border-sky-100 bg-sky-50 px-4 py-4 shadow-sm">
                 <div className="flex items-start gap-3">
                   <div className="min-w-0 flex-1">
                     <p className="text-base font-medium leading-7 text-slate-800">
@@ -150,7 +152,7 @@ const JourneyDetail = ({ open, onOpenChange, target, onSuccess }) => {
                 </div>
               </div>
 
-              <div className="mt-4 max-h-[35dvh] shrink-0 space-y-0.5 overflow-y-auto rounded-xl bg-rose-50 px-3 py-2">
+              <div className="mt-4 min-h-0 space-y-0.5 overflow-y-auto rounded-xl bg-rose-50 px-3 py-2">
                 {items.length === 0 ? (
                   <p className="py-3 text-center text-sm text-muted-foreground">暂无待办事项</p>
                 ) : items.map((item) => (
