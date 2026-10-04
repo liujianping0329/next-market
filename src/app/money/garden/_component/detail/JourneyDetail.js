@@ -165,16 +165,17 @@ const JourneyDetail = ({ open, onOpenChange, target, onSuccess }) => {
                     ) : <button
                       type="button"
                       aria-label={item.status === 1 ? "标记为未完成" : "标记为完成"}
+                      aria-pressed={item.status === 1}
                       onClick={() => updateItem(item.id, { status: item.status === 1 ? 0 : 1 })}
-                      className="shrink-0 text-muted-foreground"
+                      className="flex min-h-9 min-w-0 flex-1 items-center gap-2 text-left"
                     >
                       {item.status === 1
-                        ? <Check className="size-5 rounded-full border border-current p-0.5" />
-                        : <Circle className="size-5" />}
+                        ? <Check className="size-5 shrink-0 rounded-full border border-current p-0.5 text-muted-foreground" />
+                        : <Circle className="size-5 shrink-0 text-muted-foreground" />}
+                      <span className={`min-w-0 flex-1 break-words whitespace-pre-wrap text-sm ${item.status === 1 ? "text-muted-foreground line-through" : ""}`}>
+                        {item.text || item.link || "链接"}
+                      </span>
                     </button>}
-                    {editingItemId !== item.id && <span className={`min-w-0 flex-1 break-words whitespace-pre-wrap text-sm ${item.status === 1 ? "text-muted-foreground line-through" : ""}`}>
-                      {item.text || item.link || "链接"}
-                    </span>}
                     <div className="-mr-1 flex shrink-0 items-center">
                       {editingItemId === item.id ? <>
                         <Button type="button" variant="ghost" size="icon" aria-label="Save" onClick={saveEdit}>

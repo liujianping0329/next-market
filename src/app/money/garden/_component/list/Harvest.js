@@ -23,6 +23,7 @@ import {
     changeHour,
 } from "@/app/utils/date";
 import {
+    Check,
     Pencil,
     Trash2,
 } from "lucide-react";
@@ -505,6 +506,18 @@ const Harvest = ({ userInfo, isUserReady }) => {
                                             onClick={() => journeyCellClickHandle(block, item)}
                                             {...journeyLongPressHandle}
                                         >
+                                            {block?.harvest?.harvest_item?.length > 0 && (
+                                                <div className={cn(
+                                                    "flex h-full aspect-square shrink-0 items-center justify-center rounded-l text-xs",
+                                                    block.harvest.harvest_item.every(row => row.status === 1)
+                                                        ? "bg-white text-green-600"
+                                                        : "bg-rose-100 text-rose-700"
+                                                )}>
+                                                    {block.harvest.harvest_item.every(row => row.status === 1)
+                                                        ? <Check className="size-5" aria-label="全部完成" />
+                                                        : `${block.harvest.harvest_item.filter(row => row.status === 1).length}/${block.harvest.harvest_item.length}`}
+                                                </div>
+                                            )}
                                             {/* 左侧正方形 */}
                                             {block?.harvest?.garden && (<div className="h-full aspect-square flex-shrink-0">
                                                 <img
@@ -514,7 +527,7 @@ const Harvest = ({ userInfo, isUserReady }) => {
                                                 />
                                             </div>)}
                                             <div className="flex-1 flex items-center justify-center px-1 line-clamp-2 leading-tight">
-                                                {block?.harvest ? `${(block.harvest.harvest_item || []).filter(row => row.status === 1).length}/${(block.harvest.harvest_item || []).length} ${block.harvest.title ?? ""}` : ""}
+                                                {block?.harvest?.title ?? ""}
                                             </div>
                                         </div>
                                     ))}
