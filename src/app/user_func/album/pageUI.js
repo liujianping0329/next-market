@@ -5,7 +5,8 @@ import CommonHeader from "../_component/common_header";
 
 import { Button } from "@/components/ui/button";
 
-import { MessageSquarePlus } from "lucide-react";
+import { MessageSquarePlus, ImagePlus } from "lucide-react";
+import { toast } from "sonner";
 import { useRef, useState, useEffect, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import ky from "ky";
@@ -256,9 +257,13 @@ const AlbumUI = ({ }) => {
                     className="hidden"
                     onChange={handleChange}
                 />
-                <Button variant="outline" className="p-3" onClick={() => inputRef.current?.click()}>
-                    <MessageSquarePlus className="h-4 w-4" />
-                    <span>新建图片</span>
+                <Button variant="outline" size="sm" onClick={() => inputRef.current?.click()}>
+                    <MessageSquarePlus className="size-3.5" />
+                    <span>相机</span>
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => toast.info("敬请期待")}>
+                    <ImagePlus className="size-3.5" />
+                    <span>补发</span>
                 </Button>
                 <div className="flex items-center gap-1">
                     <Switch

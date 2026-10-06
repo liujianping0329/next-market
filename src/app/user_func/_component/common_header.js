@@ -82,10 +82,9 @@ const Header = ({ children, onComplete }) => {
         <>
             <div id="toolBar" className="flex p-2.5 justify-between overflow-x-auto items-center">
                 <div className="flex space-x-2 items-center">
-                    {!userInfo?.fromSession && <Button variant="outline" className="p-3">
-                        <Link href={`/money/garden`} className="flex items-center gap-1">
+                    {!userInfo?.fromSession && <Button variant="ghost" size="icon-sm" className="h-7 w-5 p-0" asChild>
+                        <Link href={`/money/garden`} className="flex items-center gap-1" aria-label="返回" title="返回">
                             <ArrowLeft className="h-4 w-4" />
-                            <span>返回</span>
                         </Link>
                     </Button>}
                     {userInfo && nearestLocation && children}
