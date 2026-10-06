@@ -33,6 +33,7 @@ const canUseNextImage = (src) => {
 export default function ImageCarousel({ images = [], ratio = 3 / 4 }) {
   const [api, setApi] = useState(null);
   const [selected, setSelected] = useState(0);
+  const [failedImageSources, setFailedImageSources] = useState([]);
 
   useEffect(() => {
     if (!api) return;
@@ -56,7 +57,7 @@ export default function ImageCarousel({ images = [], ratio = 3 / 4 }) {
       <Carousel className="w-full" setApi={setApi}>
         <CarouselContent>
           {images.map((img, idx) => {
-            const useNextImage = canUseNextImage(img);
+            const useNextImage = canUseNextImage(img) && !failedImageSources.includes(img);
             return (
               <CarouselItem key={img + idx}>
                 <div className="relative w-full overflow-hidden bg-muted"
@@ -68,6 +69,7 @@ export default function ImageCarousel({ images = [], ratio = 3 / 4 }) {
                       fill
                       className="object-contain"
                       priority={idx === 0}
+                      onError={() => setFailedImageSources((sources) => [...sources, img])}
                     />
                   ) : (
                     <img

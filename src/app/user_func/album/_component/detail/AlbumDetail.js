@@ -36,6 +36,7 @@ const AlbumDetail = ({ id, backHref, onBack, onStatusChange, enableAlbumActions 
     const [detail, setDetail] = useState(null);
     const [error, setError] = useState("");
     const [imageAspectRatio, setImageAspectRatio] = useState(4 / 3);
+    const [failedImageSource, setFailedImageSource] = useState(null);
     const [showMarkers, setShowMarkers] = useState(false);
     const [isMarkerPreviewing, setIsMarkerPreviewing] = useState(false);
     const [isImageUiVisible, setIsImageUiVisible] = useState(true);
@@ -59,6 +60,7 @@ const AlbumDetail = ({ id, backHref, onBack, onStatusChange, enableAlbumActions 
         clearTimeout(markerPreviewTimerRef.current);
         clearTimeout(highlightTimerRef.current);
         setError("");
+        setFailedImageSource(null);
         setShowMarkers(false);
         setIsMarkerPreviewing(false);
         setIsImageUiVisible(true);
@@ -457,16 +459,27 @@ const AlbumDetail = ({ id, backHref, onBack, onStatusChange, enableAlbumActions 
                 onTouchStart={enableSwipe ? handleTouchStart : undefined}
                 onTouchEnd={enableSwipe ? handleTouchEnd : undefined}
             >
-                <Image
-                    ref={imageRef}
-                    src={detail.pic}
-                    alt={detail.title || "相册图片"}
-                    fill
-                    priority
-                    sizes="100vw"
-                    className="object-contain"
-                    onLoad={handleImageLoad}
-                />
+                {failedImageSource === detail.pic ? (
+                    <img
+                        ref={imageRef}
+                        src={detail.pic}
+                        alt={detail.title || "相册图片"}
+                        className="absolute inset-0 h-full w-full object-contain"
+                        onLoad={handleImageLoad}
+                    />
+                ) : (
+                    <Image
+                        ref={imageRef}
+                        src={detail.pic}
+                        alt={detail.title || "相册图片"}
+                        fill
+                        priority
+                        sizes="100vw"
+                        className="object-contain"
+                        onLoad={handleImageLoad}
+                        onError={() => setFailedImageSource(detail.pic)}
+                    />
+                )}
 
                 <button
                     type="button"
